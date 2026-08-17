@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>IntuneAccess.AdminAccess</Name>
+      <ViewSelectedBy><TypeName>IntuneAccess.AdminAccess</TypeName></ViewSelectedBy>
+      <CustomControl>
+        <CustomEntries>
+          <CustomEntry>
+            <CustomItem>
+              <NewLine />
+              <Text>INTUNE EFFECTIVE ACCESS</Text><NewLine />
+              <Text>Administrator: </Text><ExpressionBinding><ScriptBlock>$_.User.UserPrincipalName</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Tenant:        </Text><ExpressionBinding><ScriptBlock>$_.Tenant.DisplayName</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Assignments:   </Text><ExpressionBinding><ScriptBlock>$_.RoleAssignments.Count</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Permissions:   </Text><ExpressionBinding><ScriptBlock>$_.EffectivePermissions.Count</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Warnings:      </Text><ExpressionBinding><ScriptBlock>$_.Warnings.Count</ScriptBlock></ExpressionBinding><NewLine />
+            </CustomItem>
+          </CustomEntry>
+        </CustomEntries>
+      </CustomControl>
+    </View>
+    <View>
+      <Name>IntuneAccess.AdminAccessComparison</Name>
+      <ViewSelectedBy><TypeName>IntuneAccess.AdminAccessComparison</TypeName></ViewSelectedBy>
+      <CustomControl>
+        <CustomEntries>
+          <CustomEntry>
+            <CustomItem>
+              <NewLine />
+              <Text>INTUNE ACCESS COMPARISON</Text><NewLine />
+              <Text>Reference:          </Text><ExpressionBinding><ScriptBlock>$_.ReferenceUser.UserPrincipalName</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Difference:         </Text><ExpressionBinding><ScriptBlock>$_.DifferenceUser.UserPrincipalName</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Total changes:      </Text><ExpressionBinding><ScriptBlock>$_.Summary.TotalChanges</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Different evidence:</Text><ExpressionBinding><ScriptBlock>$_.Summary.DifferentEvidence</ScriptBlock></ExpressionBinding><NewLine />
+            </CustomItem>
+          </CustomEntry>
+        </CustomEntries>
+      </CustomControl>
+    </View>
+    <View>
+      <Name>IntuneAccess.ScopedPermissionImpact</Name>
+      <ViewSelectedBy><TypeName>IntuneAccess.ScopedPermissionImpact</TypeName></ViewSelectedBy>
+      <CustomControl>
+        <CustomEntries>
+          <CustomEntry>
+            <CustomItem>
+              <NewLine />
+              <Text>INTUNE SCOPED PERMISSIONS IMPACT</Text><NewLine />
+              <Text>Administrator: </Text><ExpressionBinding><ScriptBlock>$_.User.UserPrincipalName</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Tenant mode:   </Text><ExpressionBinding><ScriptBlock>$_.TenantMode</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Contexts:      </Text><ExpressionBinding><ScriptBlock>$_.Summary.PermissionContexts</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Reductions:    </Text><ExpressionBinding><ScriptBlock>$_.Summary.Reductions</ScriptBlock></ExpressionBinding><NewLine />
+              <Text>Not evaluated: </Text><ExpressionBinding><ScriptBlock>$_.Summary.NotEvaluated</ScriptBlock></ExpressionBinding><NewLine />
+            </CustomItem>
+          </CustomEntry>
+        </CustomEntries>
+      </CustomControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

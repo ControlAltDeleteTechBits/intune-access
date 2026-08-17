@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="85" height="85" viewBox="0 0 85 85" role="img" aria-labelledby="title description">
+  <title id="title">IntuneAccess</title>
+  <desc id="description">A technical access path symbol in charcoal and yellow.</desc>
+  <rect width="85" height="85" rx="12" fill="#171717"/>
+  <path d="M18 23h24v10H28v14h24v15H42V57H18V23Z" fill="#f2c94c"/>
+  <circle cx="62" cy="28" r="7" fill="none" stroke="#f4f1e8" stroke-width="4"/>
+  <circle cx="62" cy="57" r="7" fill="none" stroke="#f4f1e8" stroke-width="4"/>
+  <path d="M52 28h3M52 57h3" stroke="#f4f1e8" stroke-width="4" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,14 @@
+# Local reports can contain tenant information.
+reports/
+*.local.html
+
+# PowerShell and test artefacts.
+TestResults/
+*.clixml
+coverage.xml
+
+# Editor and operating system files.
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

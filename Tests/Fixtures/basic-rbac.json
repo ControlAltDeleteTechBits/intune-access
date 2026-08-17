@@ -1,0 +1,45 @@
+{
+  "user": {
+    "id": "10000000-0000-0000-0000-000000000001",
+    "displayName": "Alex Wilber",
+    "userPrincipalName": "alex.wilber@example.test"
+  },
+  "adminGroup": {
+    "id": "20000000-0000-0000-0000-000000000001",
+    "displayName": "UK Intune Helpdesk"
+  },
+  "scopeGroup": {
+    "id": "30000000-0000-0000-0000-000000000001",
+    "displayName": "UK Managed Devices"
+  },
+  "scopeTag": {
+    "id": "40000000-0000-0000-0000-000000000001",
+    "displayName": "UK"
+  },
+  "roleDefinition": {
+    "id": "50000000-0000-0000-0000-000000000001",
+    "displayName": "Help Desk Operator",
+    "isBuiltIn": true,
+    "rolePermissions": [
+      {
+        "resourceActions": [
+          {
+            "allowedResourceActions": [
+              "Microsoft.Intune_ManagedDevices_Read",
+              "Microsoft.Intune_ManagedDevices_RemoteLock"
+            ],
+            "notAllowedResourceActions": []
+          }
+        ]
+      }
+    ]
+  },
+  "roleAssignment": {
+    "id": "60000000-0000-0000-0000-000000000001",
+    "displayName": "UK Helpdesk",
+    "members": ["20000000-0000-0000-0000-000000000001"],
+    "resourceScopes": ["30000000-0000-0000-0000-000000000001"],
+    "roleScopeTagIds": ["40000000-0000-0000-0000-000000000001"],
+    "scopeType": "resourceScope"
+  }
+}
