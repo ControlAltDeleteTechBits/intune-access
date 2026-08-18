@@ -2,6 +2,13 @@
 
 All notable project changes are recorded here.
 
+## 2.0.1
+
+1. Added a prominent two-command Quick start to the GitHub README.
+2. Added `Install-Module -Name IntuneAccess -Scope CurrentUser; Start-IntuneAccess` to the PowerShell Gallery description and release notes.
+3. Clarified that installation and starting the guided explorer are separate PowerShell commands.
+4. No collection, permission or report behaviour changed from 2.0.0.
+
 ## 2.0.0
 
 1. Added conservative policy setting overlap and potential conflict analysis.

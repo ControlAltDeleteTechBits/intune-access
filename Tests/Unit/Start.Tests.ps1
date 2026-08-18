@@ -55,7 +55,7 @@ Describe 'Guided IntuneAccess workflow' {
             $result.ReportPath | Should -Be $path
             $result.Opened | Should -BeTrue
             $result.ReadOnly | Should -BeTrue
-            $result.ToolVersion | Should -Be '2.0.0'
+            $result.ToolVersion | Should -Be '2.0.1'
         }
 
         It 'saves and compares snapshots before rendering the explorer' {

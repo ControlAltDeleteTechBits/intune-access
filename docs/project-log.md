@@ -6,9 +6,9 @@ Last updated: 18 August 2026.
 
 ## Current status
 
-IntuneAccess 1.0.0 is published. The agreed roadmap is implemented locally through version 2.0.0, including the tenant explorer, assignments, Device and User 360, snapshots and conservative policy conflict analysis. The project remains read only and requests no Microsoft Graph write permission.
+IntuneAccess 2.0.0 is published. Version 2.0.1 is prepared as an onboarding release that places the complete two-command Quick start in the Gallery metadata and at the top of the README. The project remains read only and requests no Microsoft Graph write permission.
 
-Positive RBAC validation passes against a test user with built-in and custom assignments. The 2.0.0 local release gate passes; live validation of the later collectors remains before any publication decision.
+Positive RBAC validation passes against a test user with built-in and custom assignments. The 2.0.1 release and local Gallery installation gates pass with no functional change from 2.0.0.
 
 ## Product decisions
 
@@ -43,7 +43,7 @@ Positive RBAC validation passes against a test user with built-in and custom ass
 
 1. The PowerShell module manifest validates.
 2. The module imports in PowerShell 7 and exports 16 intended public commands.
-3. All 77 unit tests pass.
+3. All 78 unit tests pass.
 4. PowerShell Script Analyzer returns no findings with the repository settings.
 5. The HTML report contains no remote runtime dependency, analytics or tracking.
 6. Desktop access paths, native evidence disclosures and permission family filters were checked in the local browser.
@@ -51,10 +51,11 @@ Positive RBAC validation passes against a test user with built-in and custom ass
 8. Seven integration checks passed against a test user with built-in and custom Intune RBAC assignments.
 9. The live result matches the portal role types, Admin Groups, Scope Group and Scope Tag, and retains two managed-device read grants.
 10. A clean consent run using only the documented delegated scopes remains unverified because the existing Microsoft Graph Command Line Tools registration already held broader consent.
-11. Measured command coverage is 81.44 per cent across 77 passing unit tests.
+11. Measured command coverage remains above 81 per cent across 78 passing unit tests.
 12. The 1.0.0 Gallery package passes isolated no-profile import and temporary local PSResourceGet repository installation.
 13. The Gallery package excludes tests, screenshots, development tools and workflow files.
 14. The 2.0.0 Gallery package contains 89 entries and installs all 16 commands from a temporary local repository.
+15. The 2.0.1 Gallery package contains 89 entries, exposes the two-command Quick start in its metadata and installs all 16 commands from a temporary local repository.
 
 ## Release decisions
 
@@ -76,6 +77,13 @@ Positive RBAC validation passes against a test user with built-in and custom ass
 5. Publish only the independently tested `.nupkg`; do not rebuild from the source directory during submission.
 
 ## Progress log
+
+### 18 August 2026
+
+1. Published IntuneAccess 2.0.0 to GitHub and the PowerShell Gallery.
+2. Confirmed a clean device can install the module with `Install-Module -Name IntuneAccess`.
+3. Prepared 2.0.1 to make `Start-IntuneAccess` explicit in the Gallery description, release notes and README Quick start.
+4. Passed 78 tests with at least 81 per cent coverage, a clean analyser scan, isolated package import and local Gallery installation for 2.0.1.
 
 ### 17 August 2026
 

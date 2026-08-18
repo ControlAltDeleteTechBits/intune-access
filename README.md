@@ -6,6 +6,17 @@ The main result is a PowerShell object with an evidence trail. A self contained 
 
 IntuneAccess is an independent community project and is not affiliated with, endorsed by, or supported by Microsoft.
 
+## Quick start
+
+Open PowerShell 7 and run these two commands:
+
+```powershell
+Install-Module -Name IntuneAccess -Scope CurrentUser
+Start-IntuneAccess
+```
+
+The first command installs IntuneAccess from the PowerShell Gallery. The second opens Microsoft sign-in, collects the available read-only Intune evidence, creates the Signal Atlas HTML explorer in Documents and opens it in the default browser.
+
 ## Why IntuneAccess exists
 
 The Intune admin centre exposes rich object-specific views, but common investigations still require an administrator to cross-reference separate pages and exports. IntuneAccess performs that correlation without changing the tenant or sending tenant data to a hosted service.
@@ -60,7 +71,7 @@ It is designed for administrators who need to establish:
 
 ## Example
 
-For the guided end-user workflow, install the module and run one command:
+For the guided end-user workflow, install the module and start the explorer:
 
 ```powershell
 Install-Module -Name IntuneAccess -Scope CurrentUser

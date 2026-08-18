@@ -1,11 +1,11 @@
 @{
     RootModule           = 'IntuneAccess.psm1'
-    ModuleVersion        = '2.0.0'
+    ModuleVersion        = '2.0.1'
     GUID                 = '9fc99074-cfcf-46db-b99b-830e5a81d0df'
     Author               = 'Mark Oldham'
     CompanyName          = 'Control Alt Delete Tech Bits'
     Copyright            = '(c) 2026 Control Alt Delete Tech Bits contributors. MIT licensed.'
-    Description          = 'Read-only, evidence-led analysis of effective Microsoft Intune RBAC access.'
+    Description          = 'Read-only Microsoft Intune evidence explorer. Quick start: Install-Module -Name IntuneAccess -Scope CurrentUser; Start-IntuneAccess'
     PowerShellVersion    = '7.0'
     CompatiblePSEditions = @('Core')
     RequiredModules      = @(
@@ -43,7 +43,7 @@
             ProjectUri   = 'https://github.com/ControlAltDeleteTechBits/intune-access'
             LicenseUri   = 'https://github.com/ControlAltDeleteTechBits/intune-access/blob/main/LICENSE'
             IconUri      = 'https://raw.githubusercontent.com/ControlAltDeleteTechBits/intune-access/main/Assets/IntuneAccess-Gallery-Icon.svg'
-            ReleaseNotes = 'Adds policy setting overlap and potential conflict analysis across Settings Catalog, endpoint security intents and supported legacy device configuration profiles. Release details: https://github.com/ControlAltDeleteTechBits/intune-access/releases/tag/v2.0.0'
+            ReleaseNotes = 'Quick start: Install-Module -Name IntuneAccess -Scope CurrentUser; then run Start-IntuneAccess. This onboarding release makes the required post-install command prominent in the PowerShell Gallery metadata and GitHub README. Release details: https://github.com/ControlAltDeleteTechBits/intune-access/releases/tag/v2.0.1'
         }
     }
 }

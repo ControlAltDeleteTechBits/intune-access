@@ -1,6 +1,24 @@
-# IntuneAccess 2.0.0
+# IntuneAccess 2.0.1
 
-IntuneAccess 2.0.0 completes the agreed local roadmap. The Signal Atlas explorer now connects administrative access, workload targeting, reported outcomes, change history and conservative policy overlap analysis in one read-only report.
+IntuneAccess 2.0.1 is an onboarding release. It makes the complete first-run process visible on the PowerShell Gallery package page and at the top of the GitHub README.
+
+## Quick start
+
+Run both commands in PowerShell 7:
+
+```powershell
+Install-Module -Name IntuneAccess -Scope CurrentUser
+Start-IntuneAccess
+```
+
+`Install-Module` installs the package but does not run it. `Start-IntuneAccess` opens Microsoft sign-in, collects the available read-only Intune evidence, creates the Signal Atlas HTML explorer in Documents and opens it in the default browser.
+
+## Changes since 2.0.0
+
+1. Added the two-command Quick start to the Gallery description and release notes.
+2. Moved the Quick start to the top of the README.
+3. Clarified the expected behaviour after `Install-Module` returns to the PowerShell prompt.
+4. No Graph scopes, collectors, report features or tenant-data handling changed.
 
 ## Guided workflow
 
@@ -33,16 +51,16 @@ Identity redaction creates stable pseudonyms for comparison. It is not irreversi
 
 ## Validation evidence
 
-1. Seventy-seven unit tests pass with 81.44 per cent command coverage.
+1. Seventy-eight unit tests pass with at least 81 per cent command coverage.
 2. PowerShell Script Analyzer reports no findings and a clean process imports all 16 intended commands.
-3. The exact 89-entry Gallery package installed as version 2.0.0 through a temporary local PSResourceGet repository.
+3. The exact Gallery package installed as version 2.0.1 through a temporary local PSResourceGet repository.
 4. The module source contains no Microsoft Graph write scope or write request method.
 
 ## Known limitations
 
 1. Settings Catalog and endpoint security setting contracts used for analysis are Microsoft Graph beta contracts.
 2. Legacy profile analysis compares returned non-null profile properties; it does not claim portal intent that Graph does not expose.
-3. Exact different-group membership intersection and assignment-filter rule evaluation are not calculated in 2.0.0.
+3. Exact different-group membership intersection and assignment-filter rule evaluation are not calculated in 2.0.1.
 4. Microsoft marks the legacy configuration device-status and beta application device-status resources as deprecated. Each call is isolated and labelled.
 5. Settings Catalog, endpoint security and Windows update deployment outcomes remain `NotSupported` until a documented read contract is adopted.
 6. Microsoft Entra administrative roles are not evaluated.

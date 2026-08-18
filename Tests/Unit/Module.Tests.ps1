@@ -32,6 +32,14 @@ Describe 'IntuneAccess module' {
         ($source -join "`n") | Should -Not -Match 'ReadWrite\.All'
     }
 
+    It 'publishes the complete two-command quick start in Gallery metadata' {
+        $manifest = Test-ModuleManifest -Path $modulePath
+        $manifest.Description | Should -Match 'Install-Module -Name IntuneAccess'
+        $manifest.Description | Should -Match 'Start-IntuneAccess'
+        [string] $manifest.PrivateData.PSData.ReleaseNotes | Should -Match 'Install-Module -Name IntuneAccess'
+        [string] $manifest.PrivateData.PSData.ReleaseNotes | Should -Match 'Start-IntuneAccess'
+    }
+
     It 'provides a synopsis and example for every public command' {
         foreach ($command in @(Get-Command -Module IntuneAccess -CommandType Function)) {
             $help = Get-Help -Name $command.Name -Full

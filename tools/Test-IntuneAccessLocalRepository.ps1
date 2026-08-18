@@ -31,15 +31,15 @@ try {
 
     $resource = Find-PSResource `
         -Name IntuneAccess `
-        -Version '2.0.0' `
+        -Version '2.0.1' `
         -Repository $repositoryName
-    if ($resource.Version -ne [version] '2.0.0') {
+    if ($resource.Version -ne [version] '2.0.1') {
         throw "The local repository returned unexpected version '$($resource.Version)'."
     }
 
-    $existing = @(Get-InstalledPSResource -Name IntuneAccess -Version '2.0.0' -ErrorAction SilentlyContinue)
+    $existing = @(Get-InstalledPSResource -Name IntuneAccess -Version '2.0.1' -ErrorAction SilentlyContinue)
     if ($existing.Count -gt 0) {
-        throw 'IntuneAccess 2.0.0 is already installed for this user, so an isolated installation cannot be proved safely.'
+        throw 'IntuneAccess 2.0.1 is already installed for this user, so an isolated installation cannot be proved safely.'
     }
     $graphAuthentication = Get-Module Microsoft.Graph.Authentication -ListAvailable |
         Where-Object Version -GE ([version] '2.0.0') |
@@ -50,7 +50,7 @@ try {
 
     $installed = Install-PSResource `
         -Name IntuneAccess `
-        -Version '2.0.0' `
+        -Version '2.0.1' `
         -Repository $repositoryName `
         -Scope CurrentUser `
         -TrustRepository `
@@ -59,7 +59,7 @@ try {
     $installedByTest = $true
 
     Remove-Module IntuneAccess -Force -ErrorAction SilentlyContinue
-    Import-Module IntuneAccess -RequiredVersion '2.0.0' -Force -ErrorAction Stop
+    Import-Module IntuneAccess -RequiredVersion '2.0.1' -Force -ErrorAction Stop
     $commands = @(Get-Command -Module IntuneAccess | Sort-Object Name)
     if ($commands.Count -ne 16) {
         throw "Expected sixteen exported commands after local repository installation, found $($commands.Count)."
@@ -77,7 +77,7 @@ try {
 finally {
     Remove-Module IntuneAccess -Force -ErrorAction SilentlyContinue
     if ($installedByTest) {
-        Uninstall-PSResource -Name IntuneAccess -Version '2.0.0' -ErrorAction SilentlyContinue
+        Uninstall-PSResource -Name IntuneAccess -Version '2.0.1' -ErrorAction SilentlyContinue
     }
     Unregister-PSResourceRepository -Name $repositoryName -ErrorAction SilentlyContinue
     $resource = $null

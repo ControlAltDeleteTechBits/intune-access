@@ -92,7 +92,7 @@ Describe 'Policy setting overlap and conflict analysis' {
                 WorkloadObjects = $script:policies; WorkloadAssignments = @(); WorkloadGroups = @(); AssignmentFilters = @(); WorkloadCollectionStatus = @()
                 ManagedDevices = @(); ManagedUsers = @(); DeploymentOutcomes = @(); OutcomeCollectionStatus = @()
                 PolicySettings = @($setting); PolicyConflictFindings = @($finding); PolicyConflictCollectionStatus = @([PSCustomObject] @{ WorkloadName = 'Firewall baseline'; State = 'Available'; SettingCount = 1; Reason = '' })
-                Warnings = @(); GraphPermissionsUsed = @(); GeneratedAt = [DateTimeOffset]::Now; ToolVersion = '2.0.0'
+                Warnings = @(); GraphPermissionsUsed = @(); GeneratedAt = [DateTimeOffset]::Now; ToolVersion = '2.0.1'
             }
 
             $html = ConvertTo-IntuneAccessExplorerHtml -TenantRbac $model

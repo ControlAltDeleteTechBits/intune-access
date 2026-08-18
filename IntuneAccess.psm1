@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 
 $script:IntuneAccessModuleRoot = $PSScriptRoot
-$script:IntuneAccessVersion = '2.0.0'
+$script:IntuneAccessVersion = '2.0.1'
 
 foreach ($folder in @('Private', 'Public')) {
     $functions = Get-ChildItem -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath $folder) -Filter '*.ps1' -File |

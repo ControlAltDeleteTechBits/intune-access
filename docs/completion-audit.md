@@ -35,7 +35,7 @@ Audited against the attached IntuneAccess build specification and agreed roadmap
 | Effective model documented | README and `effective-access-model.md` describe source, evidence, conclusion and 2026 Scoped permissions uncertainty. | Verified |
 | Permission matrix documented | `permissions.md` maps each endpoint to a delegated read permission. | Verified against Microsoft Learn |
 | Beta dependencies documented | Architecture, limitations and permission documents identify each beta dependency. | Verified |
-| Pester tests pass | Seventy-seven unit tests pass with 81.44 per cent coverage. Seven earlier positive RBAC integration checks also pass. | Locally and live verified |
+| Pester tests pass | Seventy-eight unit tests pass with at least 81 per cent coverage. Seven earlier positive RBAC integration checks also pass. | Locally and live verified |
 | PSScriptAnalyzer | Repository scan returns no findings with the checked-in settings. | Locally verified |
 | MIT licence | `LICENSE` contains the MIT licence. | Verified |
 | Security policy | `SECURITY.md` covers private reporting and tenant-data handling. | Verified |
@@ -64,7 +64,7 @@ Run `tools/Test-Release.ps1` to perform:
 7. ZIP generation and SHA-256 hashing.
 8. Separate allow-listed Gallery package creation and isolated package import validation.
 
-The 2.0.0 validation run passed on 18 August 2026. The 89-entry Gallery package is expanded into an isolated validation directory, imported with 16 exported commands and installed through a temporary local PSResourceGet repository. Responsive browser inspection remains a separate design check rather than a step performed by `Test-Release.ps1`.
+The 2.0.1 validation run passed on 18 August 2026. Seventy-eight tests pass with at least 81 per cent coverage and no Script Analyzer findings. The 89-entry Gallery package is expanded into an isolated validation directory, imported with 16 exported commands and installed as version 2.0.1 through a temporary local PSResourceGet repository. Responsive browser inspection remains a separate design check rather than a step performed by `Test-Release.ps1`.
 
 ## Outstanding release evidence
 

@@ -23,7 +23,7 @@ Describe 'Live tenant administrator analysis' -Tag 'Integration' -Skip:(-not $ha
         $script:liveAccess.PSObject.Properties.Name | Should -Contain 'RoleAssignments'
         $script:liveAccess.PSObject.Properties.Name | Should -Contain 'EffectivePermissions'
         $script:liveAccess.PSObject.Properties.Name | Should -Contain 'Evidence'
-        $script:liveAccess.ToolVersion | Should -Be '2.0.0'
+        $script:liveAccess.ToolVersion | Should -Be '2.0.1'
     }
 
     It 'retains source IDs and beta data state for every matching assignment' {
