@@ -36,29 +36,40 @@ Confirm that the package result reports version `1.0.0`, nine exported commands,
 6. Upload the source ZIP and SHA-256 file while the release remains a draft.
 7. Publish the GitHub release only after its files and links are correct.
 8. Confirm the manifest project, licence, icon and release-note links resolve publicly.
-9. Enter the Gallery key through a hidden local prompt.
-10. Run the publication command with `WhatIf`.
-11. Review the package name, version and repository.
-12. Remove `WhatIf` only after the review passes.
+9. Record the final package name, version, size and SHA-256 hash.
+10. Obtain explicit approval for the public upload.
+11. Enter the Gallery key through a hidden local prompt only after approval.
+12. Run the publication command once.
+
+Do not use `Publish-PSResource -WhatIf` as a publication safeguard. During the 1.0.0 release with Microsoft.PowerShell.PSResourceGet 1.2.0, the command uploaded the package despite `WhatIf`. Complete package validation without calling `Publish-PSResource`, then obtain approval before invoking the publication command.
 
 ## Controlled publication command
 
 ```powershell
+$packagePath = '.\release\gallery\IntuneAccess.1.0.0.nupkg'
+
+Get-Item -LiteralPath $packagePath |
+    Select-Object Name, Length
+
+Get-FileHash `
+    -LiteralPath $packagePath `
+    -Algorithm SHA256
+
+# Stop here and obtain final approval.
 $galleryKeySecure = Read-Host `
     'PowerShell Gallery API key' `
     -AsSecureString
 
-$galleryKey = [System.Net.NetworkCredential]::new(
-    '',
-    $galleryKeySecure
-).Password
-
 try {
+    $galleryKey = [System.Net.NetworkCredential]::new(
+        '',
+        $galleryKeySecure
+    ).Password
+
     Publish-PSResource `
-        -NupkgPath '.\release\gallery\IntuneAccess.1.0.0.nupkg' `
+        -NupkgPath $packagePath `
         -Repository PSGallery `
-        -ApiKey $galleryKey `
-        -WhatIf
+        -ApiKey $galleryKey
 }
 finally {
     $galleryKey = $null
@@ -66,7 +77,7 @@ finally {
 }
 ```
 
-Run the same command without `WhatIf` only after final approval.
+The hash and package review must be completed before the API key is entered. The `Publish-PSResource` call is the public submission and must run only after final approval.
 
 ## Post-publication validation
 

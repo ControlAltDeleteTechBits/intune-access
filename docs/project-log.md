@@ -106,12 +106,20 @@ Positive RBAC validation now passes against a test user with built-in and custom
 29. Passed the 1.0.0 release gate with 45 tests, 72.8 per cent coverage, nine exported commands and no analyzer findings.
 30. Built and validated `IntuneAccess.1.0.0.nupkg`, then installed and imported it through a temporary local PSResourceGet repository.
 
+### 18 August 2026
+
+1. Created the public `ControlAltDeleteTechBits/intune-access` repository and published the GitHub 1.0.0 release.
+2. Published `IntuneAccess` 1.0.0 to the PowerShell Gallery at <https://www.powershellgallery.com/packages/IntuneAccess/1.0.0>.
+3. Recorded the public Gallery publication time as `2026-08-18 08:35:26` from the Gallery feed.
+4. Downloaded the public package and confirmed its SHA-256 hash matches the tested package: `4e1459c0ea79e4ef42144297f64aeb21fb662f4a141d3c9ec4fea8c7c15497a2`.
+5. Installed the Gallery copy in an isolated path, imported version 1.0.0 and confirmed all nine commands are exported.
+6. Confirmed the Gallery page names Mark Oldham as author, Control Alt Delete Tech Bits as company and Microsoft.Graph.Authentication as a dependency.
+7. Confirmed the project, licence, icon and GitHub release links resolve publicly.
+8. Revoked the one-day, package-restricted Gallery API key and cleared it from the clipboard after publication.
+9. Removed reliance on `Publish-PSResource -WhatIf` after PSResourceGet 1.2.0 treated the dry-run command as a live publication.
+
 ## Next actions
 
-1. Create the public `ControlAltDeleteTechBits/intune-access` repository and confirm the prepared metadata links.
-2. Complete a clean least-privilege consent run using a dedicated Microsoft Entra application, or retain the documented shared-client limitation.
-3. Publish the GitHub 1.0.0 release.
-4. Publish the exact tested Gallery package using a short-lived restricted API key.
-5. Download and independently verify the public Gallery package.
-6. Submit the Awesome Intune directory form after approval.
-7. Post the contribution in the Awesome Intune LinkedIn group after approval.
+1. Complete a clean least-privilege consent run using a dedicated Microsoft Entra application, or retain the documented shared-client limitation.
+2. Submit the Awesome Intune directory form after approval.
+3. Post the contribution in the Awesome Intune LinkedIn group after approval.

@@ -130,13 +130,18 @@ Every requested permission ends in `Read` or `Read.All`. See [docs/permissions.m
 
 ## Installation
 
-PowerShell Gallery publication is prepared but is not yet live. Until publication, clone or download the repository and import the manifest:
+IntuneAccess 1.0.0 is available from the PowerShell Gallery. Install it in PowerShell 7 or later:
 
 ```powershell
-Import-Module .\IntuneAccess\IntuneAccess.psd1
+Install-PSResource IntuneAccess `
+    -Repository PSGallery `
+    -Scope CurrentUser `
+    -TrustRepository
+
+Import-Module IntuneAccess
 ```
 
-The module version is `1.0.0`. The manifest declares `Microsoft.Graph.Authentication` version 2.0.0 or later as a dependency.
+The manifest declares `Microsoft.Graph.Authentication` version 2.0.0 or later as a dependency. See the [IntuneAccess package page](https://www.powershellgallery.com/packages/IntuneAccess/1.0.0) for the published metadata.
 
 ## Connect
 
