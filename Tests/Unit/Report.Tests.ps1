@@ -23,6 +23,8 @@ Describe 'HTML report safety' {
             $html | Should -Not -Match '<script\s+src='
             $html | Should -Not -Match '<link\s+[^>]*href='
             $html | Should -Not -Match 'https?://'
+            $html | Should -Match '\.identity-user&gt;div|\.identity-user>div'
+            $html | Should -Match 'overflow-wrap:anywhere'
         }
     }
 

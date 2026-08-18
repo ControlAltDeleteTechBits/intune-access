@@ -1,8 +1,8 @@
 # Security policy
 
-## Supported version
+## Supported versions
 
-Version 1.0 is the supported stable release. Security fixes are applied to the latest 1.x release.
+Versions 1.0 and 2.0 are supported stable release lines. Security fixes are applied to the latest published release in each supported line where a safe backport is practical.
 
 ## Reporting a security issue
 
@@ -25,4 +25,4 @@ The module must never write access tokens or authorisation headers to output, re
 
 ## Permission policy
 
-The project accepts read only Graph permissions for version 1.x. A request for a write permission is a release blocker unless the project scope and major version are deliberately changed after public review.
+The project accepts read only Graph permissions. A request for a write permission is a release blocker unless the project scope and major version are deliberately changed after public review.

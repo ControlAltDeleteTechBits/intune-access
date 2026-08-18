@@ -5,7 +5,7 @@ function Connect-IntuneAccess {
     .DESCRIPTION
     Requests the scopes needed by the selected feature. No write permission is requested.
     .PARAMETER Feature
-    Selects Core analysis, ScopeTagAudit, ExtendedScopeTagAudit or ManagedDeviceAccess. Core is always included.
+    Selects Core analysis, assignment, operational, policy analysis, scope-tag audit or managed-device access features. Core is always included.
     .EXAMPLE
     Connect-IntuneAccess
     .EXAMPLE
@@ -13,7 +13,7 @@ function Connect-IntuneAccess {
     #>
     [CmdletBinding()]
     param(
-        [ValidateSet('Core', 'ScopeTagAudit', 'ExtendedScopeTagAudit', 'ManagedDeviceAccess')]
+        [ValidateSet('Core', 'AssignmentExplorer', 'OperationalEvidence', 'PolicyAnalysis', 'AuditEvidence', 'ScopeTagAudit', 'ExtendedScopeTagAudit', 'ManagedDeviceAccess')]
         [string[]] $Feature = @('Core')
     )
 
@@ -35,6 +35,22 @@ function Connect-IntuneAccess {
         foreach ($scope in @('DeviceManagementConfiguration.Read.All', 'DeviceManagementApps.Read.All')) {
             if ($scope -notin $scopes) { $scopes.Add($scope) }
         }
+    }
+    if ('AssignmentExplorer' -in $Feature) {
+        foreach ($scope in @('DeviceManagementConfiguration.Read.All', 'DeviceManagementApps.Read.All', 'DeviceManagementScripts.Read.All')) {
+            if ($scope -notin $scopes) { $scopes.Add($scope) }
+        }
+    }
+    if ('OperationalEvidence' -in $Feature) {
+        foreach ($scope in @('DeviceManagementConfiguration.Read.All', 'DeviceManagementApps.Read.All', 'DeviceManagementScripts.Read.All', 'DeviceManagementManagedDevices.Read.All')) {
+            if ($scope -notin $scopes) { $scopes.Add($scope) }
+        }
+    }
+    if ('PolicyAnalysis' -in $Feature -and 'DeviceManagementConfiguration.Read.All' -notin $scopes) {
+        $scopes.Add('DeviceManagementConfiguration.Read.All')
+    }
+    if ('AuditEvidence' -in $Feature -and 'DeviceManagementApps.Read.All' -notin $scopes) {
+        $scopes.Add('DeviceManagementApps.Read.All')
     }
     if ('ExtendedScopeTagAudit' -in $Feature -and 'DeviceManagementScripts.Read.All' -notin $scopes) {
         $scopes.Add('DeviceManagementScripts.Read.All')

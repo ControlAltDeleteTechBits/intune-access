@@ -10,17 +10,19 @@ Current cycle shown on the site: August 2026, closing 31 August 2026 at 23:59 Eu
 
 ## LinkedIn group post draft
 
-I have released IntuneAccess, an open source, read only PowerShell module for explaining effective Microsoft Intune RBAC access.
+I have built IntuneAccess, an open source, read only PowerShell module that joins Microsoft Intune administrative access, workload targeting, reported outcomes and change evidence.
 
 Intune administrators often need to trace several separate objects to understand why a delegated administrator can manage a device or perform an action. IntuneAccess correlates the administrator, Microsoft Entra Admin Groups, Intune role assignments, role definitions, allowed actions, Scope (Groups) and Scope (Tags), then retains the evidence behind each conclusion.
 
-The module returns structured PowerShell objects and can also generate a self contained HTML access map. It requests read permissions only, processes Graph data locally and uses `NotEvaluated` when the available evidence cannot prove a path.
+The module returns structured PowerShell objects and generates a self contained Signal Atlas HTML explorer. It requests read permissions only, processes Graph data locally and uses `NotEvaluated` when the available evidence cannot prove a path.
 
-Version 1.0.0 includes administrator access analysis, duplicate permission evidence, scope tag auditing, managed-device access explanation and 45 automated unit tests.
+Version 2.0.0 adds assignment impact across major Intune workloads, Device and User 360, deployment evidence, local snapshots, change comparison, recent Intune audit events and conservative policy setting conflict analysis. Seventy-seven automated unit tests pass with 81.44 per cent command coverage.
 
-Repository: `[PUBLIC_GITHUB_REPOSITORY_URL]`
+Repository: `https://github.com/ControlAltDeleteTechBits/intune-access`
 
-Release: `[PUBLIC_GITHUB_RELEASE_URL]`
+PowerShell Gallery: `https://www.powershellgallery.com/packages/IntuneAccess`
+
+Version 2.0.0 release: `[PUBLIC_GITHUB_2_0_RELEASE_URL]`
 
 I would value testing feedback from Intune administrators who work with delegated RBAC, custom roles and scope tags.
 
@@ -30,7 +32,7 @@ Tool Name: IntuneAccess
 
 Description:
 
-`Read only PowerShell module that explains effective Microsoft Intune RBAC access by correlating administrators, Microsoft Entra groups, role assignments, role definitions, allowed actions, Scope (Groups) and Scope (Tags). It returns structured evidence and can generate a self contained offline HTML access map.`
+`Read only PowerShell module that joins effective Intune RBAC, workload assignments, Device and User 360, deployment outcomes, local change snapshots and conservative policy conflict evidence in one self contained offline explorer.`
 
 Authors: `[PUBLIC_AUTHOR_NAME]`
 
@@ -38,7 +40,7 @@ Author GitHub URL: `[OPTIONAL_AUTHOR_GITHUB_URL]`
 
 Author LinkedIn URL: `[OPTIONAL_AUTHOR_LINKEDIN_URL]`
 
-Tool URL: `[PUBLIC_GITHUB_REPOSITORY_URL]`
+Tool URL: `https://github.com/ControlAltDeleteTechBits/intune-access`
 
 Category: Reporting
 
@@ -48,12 +50,11 @@ Confirmation required: the tool is Intune related, publicly accessible and the s
 
 ## Information still required
 
-1. Public GitHub repository URL.
-2. Public GitHub release URL.
-3. Public author name.
-4. Optional author GitHub, LinkedIn and X profile URLs.
-5. Confirmation that the maintainer is a member of the Awesome Intune LinkedIn group.
-6. Approval of the final directory description and LinkedIn post.
+1. Public GitHub 2.0.0 release URL after live validation and publication.
+2. Public author name.
+3. Optional author GitHub, LinkedIn and X profile URLs.
+4. Confirmation that the maintainer is a member of the Awesome Intune LinkedIn group.
+5. Approval of the final directory description and LinkedIn post.
 
 ## Submission checks
 

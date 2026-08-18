@@ -54,8 +54,8 @@ try {
     }
 
     $stageManifest = Test-ModuleManifest -Path (Join-Path $stageModule 'IntuneAccess.psd1')
-    if (@($stageManifest.ExportedFunctions.Keys).Count -ne 9) {
-        throw 'The staged module does not export the expected nine commands.'
+    if (@($stageManifest.ExportedFunctions.Keys).Count -ne 16) {
+        throw 'The staged module does not export the expected sixteen commands.'
     }
     if (@($stageManifest.RequiredModules | Where-Object Name -EQ 'Microsoft.Graph.Authentication').Count -ne 1) {
         throw 'The staged module does not declare Microsoft.Graph.Authentication as a dependency.'

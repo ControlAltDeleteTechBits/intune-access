@@ -1,8 +1,30 @@
 #requires -Version 7.0
 
+[CmdletBinding()]
+param(
+    [switch] $Advanced
+)
+
 Import-Module (Join-Path $PSScriptRoot '..\IntuneAccess.psd1') -Force
 
+# Guided interactive workflow: sign in, collect tenant Intune RBAC data, create the explorer and open it.
+if (-not $Advanced) {
+    Start-IntuneAccess
+    return
+}
+
+# Run this example with -Advanced to exercise the individual commands below.
+
 Connect-IntuneAccess
+
+$assignmentImpact = Get-IntuneAssignmentImpact
+$assignmentImpact.Workloads
+$assignmentImpact.Assignments
+
+$policyAnalysis = Get-IntunePolicyConflict `
+    -Workload $assignmentImpact.Workloads `
+    -Assignment $assignmentImpact.Assignments
+$policyAnalysis.PotentialConflicts
 
 $access = Get-IntuneAdminAccess `
     -UserPrincipalName 'helpdesk.user@contoso.com'

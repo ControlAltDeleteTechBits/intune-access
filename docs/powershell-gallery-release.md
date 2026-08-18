@@ -24,7 +24,7 @@ $package = .\tools\New-IntuneAccessGalleryPackage.ps1 -Force
     -PackagePath $package.Package
 ```
 
-Confirm that the package result reports version `1.0.0`, nine exported commands, no validation error and a successful local repository installation.
+Confirm that the package result reports version `2.0.0`, sixteen exported commands, no validation error and a successful local repository installation.
 
 ## Publication order
 
@@ -46,7 +46,7 @@ Do not use `Publish-PSResource -WhatIf` as a publication safeguard. During the 1
 ## Controlled publication command
 
 ```powershell
-$packagePath = '.\release\gallery\IntuneAccess.1.0.0.nupkg'
+$packagePath = '.\release\gallery\IntuneAccess.2.0.0.nupkg'
 
 Get-Item -LiteralPath $packagePath |
     Select-Object Name, Length
@@ -85,11 +85,11 @@ Use an isolated PowerShell 7 environment that does not already contain IntuneAcc
 
 ```powershell
 Find-PSResource IntuneAccess `
-    -Version '1.0.0' `
+    -Version '2.0.0' `
     -Repository PSGallery
 
 Install-PSResource IntuneAccess `
-    -Version '1.0.0' `
+    -Version '2.0.0' `
     -Repository PSGallery `
     -Scope CurrentUser `
     -TrustRepository
@@ -103,7 +103,7 @@ Confirm:
 1. The Gallery page names Mark Oldham as author and Control Alt Delete Tech Bits as company.
 2. The project, licence, icon and release-note links work.
 3. Microsoft.Graph.Authentication appears as a dependency.
-4. Nine commands are exported.
+4. Ten commands are exported, including `Start-IntuneAccess`.
 5. A Core analysis works in the authorised development tenant.
 6. The downloaded package hash is recorded and compared with the locally tested package.
 7. The project log records the publication time, URL and validation evidence.

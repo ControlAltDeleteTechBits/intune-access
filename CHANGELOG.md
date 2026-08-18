@@ -2,6 +2,43 @@
 
 All notable project changes are recorded here.
 
+## 2.0.0
+
+1. Added conservative policy setting overlap and potential conflict analysis.
+2. Normalised supported Settings Catalog, endpoint security intent and legacy device configuration settings while retaining their source API and collection state.
+3. Reserved `PotentialConflict` for different observed values with confirmed exact target and filter overlap evidence; incomplete overlap remains `NotEvaluated`.
+4. Added a 30-day Intune audit trail and exact resource-ID correlation to snapshot changes.
+5. Expanded the Signal Atlas explorer with Policy Settings, Policy Conflicts, Snapshot Changes and Audit Trail views.
+6. Added `Get-IntunePolicyConflict` and completed the local roadmap through 2.0.0.
+7. Corrected managed-device collection to use the documented v1.0 `managedDeviceOwnerType` and `deviceRegistrationState` properties.
+
+## 1.4.0
+
+1. Added local, allow-listed tenant snapshots without authentication context, credentials or access tokens.
+2. Added SHA-256 integrity validation and optional stable identity pseudonymisation.
+3. Added evidence comparison for added, removed and modified RBAC, assignment and policy records.
+4. Added conservative broad-target impact summaries without claiming exact affected membership.
+5. Added `Export-IntuneAccessSnapshot` and `Compare-IntuneAccessSnapshot`.
+
+## 1.3.0
+
+1. Added Device 360 and User 360 views from managed-device identity and supported reported outcomes.
+2. Retained reported state, detail, timestamps and decimal plus hexadecimal error codes.
+3. Isolated failures by workload so available device inventory remains useful.
+4. Added `Get-IntuneDevice360` and `Get-IntuneUser360`.
+
+## 1.2.0
+
+1. Added assignment and impact collection for configuration, compliance, endpoint security, applications, scripts, remediations and Windows updates.
+2. Normalised included, excluded, broad and assignment-filter targets with API provenance and collection state.
+3. Added `Get-IntuneAssignmentImpact` and the corresponding Signal Atlas views.
+
+## 1.1.0
+
+1. Added the guided `Start-IntuneAccess` workflow: delegated sign-in, tenant collection, local HTML generation and automatic opening.
+2. Added a tenant-wide explorer across administrators, Admin Groups, roles, role assignments, Scope Groups, Scope Tags and exact permissions.
+3. Added searchable object navigation, relationship inspection and resilient long identity formatting.
+
 ## 1.0.0
 
 First stable release.

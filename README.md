@@ -1,6 +1,6 @@
 # IntuneAccess
 
-IntuneAccess is an open source, read only PowerShell module that explains the Microsoft Intune RBAC access associated with an administrator. It joins the objects that are usually inspected one at a time: the administrator, Microsoft Entra groups, Intune role assignments, role definitions, allowed actions, Scope (Groups) and Scope (Tags).
+IntuneAccess is an open source, read only PowerShell module that connects Microsoft Intune administration, workload targeting and evidence in one local report. It joins objects that are usually inspected one at a time: administrators, Microsoft Entra groups, Intune roles, scopes, configuration and compliance policies, endpoint security, applications, scripts, updates, targets and assignment filters.
 
 The main result is a PowerShell object with an evidence trail. A self contained HTML report is available when a human readable record is needed.
 
@@ -8,7 +8,13 @@ IntuneAccess is an independent community project and is not affiliated with, end
 
 ## Why IntuneAccess exists
 
-The Intune admin centre exposes each RBAC building block, but answering a question such as "Why can this helpdesk administrator see this device?" can require several separate views. IntuneAccess performs that correlation without changing the tenant.
+The Intune admin centre exposes rich object-specific views, but common investigations still require an administrator to cross-reference separate pages and exports. IntuneAccess performs that correlation without changing the tenant or sending tenant data to a hosted service.
+
+Its evidence chain is:
+
+```text
+Who can change it > who should receive it > what Intune reported > where the evidence stops
+```
 
 It is designed for administrators who need to establish:
 
@@ -17,6 +23,10 @@ It is designed for administrators who need to establish:
 3. Which Admin Groups supplied each assignment.
 4. Which scope groups and scope tags constrain each assignment.
 5. Which conclusions are confirmed and which remain `NotEvaluated`.
+6. Which policies, applications, scripts and updates target each group, broad audience or assignment filter.
+7. Whether an apparent absence is a real empty result, an explicit exclusion, a missing permission or an unavailable Graph endpoint.
+8. What changed between two local snapshots and which broad target could be affected.
+9. Which supported policies set the same definition to different values on a confirmed overlapping target.
 
 ## What it does
 
@@ -30,6 +40,15 @@ It is designed for administrators who need to establish:
 8. Compares legacy merged and Scoped permissions behaviour without guessing the tenant setting.
 9. Compares two administrators and identifies different permission evidence.
 10. Exports complete JSON evidence or flattened CSV datasets.
+11. Collects configuration, compliance, endpoint security, application, script, remediation and Windows update assignments.
+12. Separates confirmed assignment configuration from device or user deployment outcomes.
+13. Records v1.0 or beta API provenance and a collection state for every workload family.
+14. Builds Device 360 and User 360 views from managed-device identity and supported reported outcomes.
+15. Preserves reported state, detail, last-reported time and decimal plus hexadecimal error codes.
+16. Saves integrity-checked local snapshots and compares added, removed and modified evidence.
+17. Offers stable identity pseudonymisation for share-safe snapshot workflows.
+18. Finds same-setting overlaps and labels only evidence-backed cases as potential conflicts.
+19. Shows recent Intune audit events and links resource IDs to matching snapshot changes.
 
 ## What it does not do
 
@@ -41,10 +60,42 @@ It is designed for administrators who need to establish:
 
 ## Example
 
+For the guided end-user workflow, install the module and run one command:
+
 ```powershell
-Import-Module .\IntuneAccess.psd1
+Install-Module -Name IntuneAccess -Scope CurrentUser
+
+Start-IntuneAccess
+```
+
+After sign-in, IntuneAccess collects Intune RBAC relationships, workload assignments, supported outcomes and supported policy settings. It creates the Signal Atlas HTML explorer in Documents and opens it in the default browser.
+
+Supply an account when you want that administrator selected initially:
+
+```powershell
+Start-IntuneAccess `
+    -UserPrincipalName 'helpdesk.user@contoso.com'
+```
+
+For structured objects and advanced analysis, use the individual commands:
+
+```powershell
+Import-Module IntuneAccess
 
 Connect-IntuneAccess
+
+$assignments = Get-IntuneAssignmentImpact
+$assignments.Workloads
+$assignments.Assignments
+
+$device = Get-IntuneDevice360 -DeviceName 'LAPTOP-0234'
+$device.DeploymentOutcomes
+
+$user = Get-IntuneUser360 -UserPrincipalName 'helpdesk.user@contoso.com'
+$user.ManagedDevices
+
+$conflicts = Get-IntunePolicyConflict
+$conflicts.PotentialConflicts
 
 $access = Get-IntuneAdminAccess `
     -UserPrincipalName 'helpdesk.user@contoso.com'
@@ -63,6 +114,10 @@ $access | Export-IntuneAccessReport `
 $access | Export-IntuneAccessData `
     -Path '.\helpdesk-user-intune-access.json' `
     -Format Json
+
+Start-IntuneAccess `
+    -SnapshotPath '.\current.snapshot.json' `
+    -BaselineSnapshotPath '.\baseline.snapshot.json'
 ```
 
 For scope tag auditing or managed device access checks, reconnect with the required read only feature scopes:
@@ -106,6 +161,28 @@ GroupMember.Read.All
 DeviceManagementRBAC.Read.All
 ```
 
+The guided Assignment Explorer also requests:
+
+```text
+DeviceManagementConfiguration.Read.All
+DeviceManagementApps.Read.All
+DeviceManagementScripts.Read.All
+```
+
+Device and User 360 add:
+
+```text
+DeviceManagementManagedDevices.Read.All
+```
+
+The other operational outcome endpoints use the configuration, application and script read scopes already listed. To omit operational collection, run:
+
+```powershell
+Start-IntuneAccess -Feature Core, AssignmentExplorer
+```
+
+The recent Audit Trail uses `DeviceManagementApps.Read.All`, already requested by the default Assignment Explorer. Audit collection can be omitted by supplying an explicit feature list without `AuditEvidence`.
+
 Scope tag auditing adds:
 
 ```text
@@ -130,18 +207,38 @@ Every requested permission ends in `Read` or `Read.All`. See [docs/permissions.m
 
 ## Installation
 
-IntuneAccess 1.0.0 is available from the PowerShell Gallery. Install it in PowerShell 7 or later:
+Install IntuneAccess from the PowerShell Gallery in PowerShell 7 or later:
 
 ```powershell
-Install-PSResource IntuneAccess `
-    -Repository PSGallery `
-    -Scope CurrentUser `
-    -TrustRepository
-
-Import-Module IntuneAccess
+Install-Module -Name IntuneAccess -Scope CurrentUser
 ```
 
-The manifest declares `Microsoft.Graph.Authentication` version 2.0.0 or later as a dependency. See the [IntuneAccess package page](https://www.powershellgallery.com/packages/IntuneAccess/1.0.0) for the published metadata.
+Then start the guided workflow:
+
+```powershell
+Start-IntuneAccess
+```
+
+The manifest declares `Microsoft.Graph.Authentication` version 2.0.0 or later as a dependency. See the [IntuneAccess package page](https://www.powershellgallery.com/packages/IntuneAccess) for the published metadata.
+
+## Guided report
+
+`Start-IntuneAccess` provides the shortest end-user route. It:
+
+1. Opens delegated Microsoft Graph sign-in.
+2. Reads Intune RBAC role assignments and their connected objects.
+3. Enumerates users only from the resolved Admin Groups on those assignments.
+4. Generates a self-contained Signal Atlas HTML explorer in Documents.
+5. Opens the explorer in the default browser.
+6. Lets the user move between RBAC, assignments, devices, users, outcomes, policy settings, conflict findings and snapshot changes without returning to PowerShell.
+
+Use parameters when scripting or selecting the target in advance:
+
+```powershell
+Start-IntuneAccess `
+    -UserPrincipalName 'admin@contoso.com' `
+    -NoOpen
+```
 
 ## Connect
 
@@ -263,13 +360,25 @@ See [docs/effective-access-model.md](docs/effective-access-model.md).
 4. Hidden Microsoft Entra group membership is not read because the default connection does not request `Member.Read.Hidden`.
 5. Managed device access explanation is deliberately conservative and never returns `AccessDenied`.
 6. Scope tag auditing covers a defined set of resource families rather than every Intune object type.
-7. A live tenant is required to validate tenant specific behaviour.
+7. Settings Catalog and endpoint security policy settings use isolated Microsoft Graph beta contracts.
+8. Exact intersection between different target groups and assignment-filter rule evaluation are not calculated; those overlaps remain `NotEvaluated`.
+9. A configured assignment does not prove delivery, and a reported outcome does not prove which assignment produced it.
+10. Supported legacy configuration status and beta application status contracts are deprecated by Microsoft; each read is isolated and labelled.
+11. Settings Catalog, endpoint security and Windows update deployment outcomes remain unsupported until a dependable read contract is adopted.
+12. Identity redaction creates stable pseudonyms, not irreversible anonymisation.
+13. A live tenant is required to validate tenant specific behaviour.
 
 See [docs/limitations.md](docs/limitations.md).
 
 The current requirement-by-requirement status is recorded in [docs/completion-audit.md](docs/completion-audit.md).
 
 Product decisions, design choices, validation evidence and release progress are tracked in [docs/project-log.md](docs/project-log.md).
+
+The agreed versioned product plan is tracked in [docs/roadmap.md](docs/roadmap.md).
+
+Research into current Intune gaps and candidate product opportunities is recorded in [docs/product-opportunities.md](docs/product-opportunities.md).
+
+Recent community problem research and the IntuneAccess value proposition are recorded in [docs/community-research.md](docs/community-research.md).
 
 The current release notes are available in [RELEASE_NOTES.md](RELEASE_NOTES.md).
 

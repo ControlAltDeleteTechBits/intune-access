@@ -1,12 +1,12 @@
 # Completion audit
 
-Audited against the attached IntuneAccess build specification on 17 August 2026.
+Audited against the attached IntuneAccess build specification and agreed roadmap on 18 August 2026.
 
 ## Acceptance criteria
 
 | Requirement | Current evidence | Status |
 | --- | --- | --- |
-| Module imports in PowerShell 7 | Manifest and separate no-profile module imports checked in PowerShell 7.6.4. Nine intended commands are exported. | Locally verified |
+| Module imports in PowerShell 7 | Manifest and separate no-profile module imports checked in PowerShell 7.6.5. Sixteen intended commands are exported. | Locally verified |
 | No Graph write permissions | Connection source contains read scopes only. Unit test rejects any `ReadWrite.All` scope in production source. Graph transport accepts GET only. | Locally verified |
 | Connection is documented | README and command help document delegated connection, selected features, consent and personal-account rejection. | Verified in source |
 | User selection by UPN or object ID | `Get-IntuneAdminAccess` has `ByUpn` and `ById` parameter sets. | Mock tested |
@@ -23,14 +23,19 @@ Audited against the attached IntuneAccess build specification on 17 August 2026.
 | Unknown cases are not guessed | Missing beta properties, nested-only Admin Groups and incomplete resource paths return `NotEvaluated` or a warning. | Mock tested |
 | Structured PowerShell output | Main command returns `IntuneAccess.AdminAccess` with source, evidence and conclusion properties. | Mock tested |
 | Useful default console output | Format view shows administrator, tenant, assignment, permission and warning counts without changing the object. | Unit tested |
+| Public command help | Every exported command has comment-based help and at least one example. | Source inspected and release gated |
 | HTML report | Pipeline and direct-user export paths generate one offline HTML file. Tenant text is encoded. | Unit tested and visually inspected |
+| Guided tenant explorer | `Start-IntuneAccess` collects RBAC, assignments, operational evidence and supported policy settings before opening one local explorer. | Unit tested and visually inspected |
+| Local snapshots | Allow-listed JSON excludes authentication context and supports integrity validation, stable pseudonyms and comparison. | Unit tested |
+| Intune audit correlation | A bounded v1.0 audit collection retains actors, resources and modified properties; exact resource IDs link to snapshot changes. | Unit tested; live validation pending |
+| Policy overlap | Same-setting values are compared and potential conflict is reserved for different values with exact target and filter overlap evidence. | Unit tested; live validation pending |
 | No external HTML dependencies | Report contains inline CSS, no remote fonts, scripts, links, analytics or tracking. | Unit tested |
 | No tenant data upload | No network destination exists outside Microsoft Graph. Processing and report generation are local. | Source inspected |
 | No token logging | No file logger exists and no token or authorisation header is placed in output. | Source inspected |
 | Effective model documented | README and `effective-access-model.md` describe source, evidence, conclusion and 2026 Scoped permissions uncertainty. | Verified |
 | Permission matrix documented | `permissions.md` maps each endpoint to a delegated read permission. | Verified against Microsoft Learn |
 | Beta dependencies documented | Architecture, limitations and permission documents identify each beta dependency. | Verified |
-| Pester tests pass | The 45-test unit suite and seven positive live integration checks pass. Measured command coverage is 72.8 per cent. | Locally and live verified |
+| Pester tests pass | Seventy-seven unit tests pass with 81.44 per cent coverage. Seven earlier positive RBAC integration checks also pass. | Locally and live verified |
 | PSScriptAnalyzer | Repository scan returns no findings with the checked-in settings. | Locally verified |
 | MIT licence | `LICENSE` contains the MIT licence. | Verified |
 | Security policy | `SECURITY.md` covers private reporting and tenant-data handling. | Verified |
@@ -59,10 +64,14 @@ Run `tools/Test-Release.ps1` to perform:
 7. ZIP generation and SHA-256 hashing.
 8. Separate allow-listed Gallery package creation and isolated package import validation.
 
-The 1.0.0 validation run passed on 17 August 2026. The Gallery package is expanded into an isolated validation directory, imported with nine exported commands and installed through a temporary local PSResourceGet repository. Responsive browser inspection remains a separate design check rather than a step performed by `Test-Release.ps1`.
+The 2.0.0 validation run passed on 18 August 2026. The 89-entry Gallery package is expanded into an isolated validation directory, imported with 16 exported commands and installed through a temporary local PSResourceGet repository. Responsive browser inspection remains a separate design check rather than a step performed by `Test-Release.ps1`.
 
 ## Outstanding release evidence
 
 A real test tenant was connected on 17 August 2026. Seven integration checks passed for a user with built-in and custom Intune RBAC assignments. The returned Admin Groups, Scope Group and Scope Tag matched the Intune admin centre, and cumulative managed-device read access retained two granting assignments. The managed device matched the known device scope group, while its observed Intune tag remained Default, so the complete device path correctly remained `NotEvaluated`.
 
 The live run exposed a Graph behaviour where assignment collection responses omitted member and scope arrays although the assignment detail endpoints returned them. Version 1.0.0 hydrates each listed assignment from its detail endpoint and includes a regression test. The Microsoft Graph Command Line Tools registration used for the live run already had broader delegated consent, so a clean least-privilege shared-client result remains outstanding.
+
+The assignment, operational, snapshot and policy-conflict layers added after 1.0.0 are locally verified. They still require the maintainer's live development-tenant comparison with the Intune admin centre before any 2.0.0 publication decision.
+
+The first 2.0.0 live run exposed an invalid managed-device `$select` pair. The collector now uses the documented v1.0 `managedDeviceOwnerType` and `deviceRegistrationState` properties, with a regression-tested compatibility fallback for older fixtures. The release and package gates were rerun after this correction.

@@ -2,13 +2,13 @@
 
 This document records product decisions, design choices, validation evidence, release progress and unresolved work. Update it when a decision changes or a release check produces new evidence.
 
-Last updated: 17 August 2026.
+Last updated: 18 August 2026.
 
 ## Current status
 
-IntuneAccess is prepared as version `1.0.0`. The core module, evidence model, HTML report, Scoped permissions modelling, administrator comparison, structured exports, unit tests and documentation are implemented. The project remains read only and requests no Microsoft Graph write permission.
+IntuneAccess 1.0.0 is published. The agreed roadmap is implemented locally through version 2.0.0, including the tenant explorer, assignments, Device and User 360, snapshots and conservative policy conflict analysis. The project remains read only and requests no Microsoft Graph write permission.
 
-Positive RBAC validation now passes against a test user with built-in and custom assignments. The remaining publication work is the final release gate, public repository and external package publication.
+Positive RBAC validation passes against a test user with built-in and custom assignments. The 2.0.0 local release gate passes; live validation of the later collectors remains before any publication decision.
 
 ## Product decisions
 
@@ -20,6 +20,10 @@ Positive RBAC validation now passes against a test user with built-in and custom
 6. The likely Awesome Intune directory classification is Reporting and PowerShell Module.
 7. The product and Gallery package name remains `IntuneAccess`; IdentityAtlas remains a sibling product.
 8. Scoped permissions mode is never detected through an undocumented endpoint. Both models are shown and the caller must select a tenant mode explicitly.
+9. The agreed product direction connects administrator control, workload targeting and reported endpoint outcome in one evidence chain.
+10. The versioned plan is maintained in `docs/roadmap.md`: 1.1.0 tenant wide RBAC explorer, 1.2.0 assignment and impact explorer, 1.3.0 Device and User 360, 1.4.0 snapshots and change impact, and 2.0.0 policy overlap and conflict analysis.
+11. The core product question is recorded as: who can change it > who should receive it > what Intune reported > where the evidence stops.
+12. Assignment configuration and deployment outcome are separate evidence layers. A returned assignment never proves successful delivery by itself.
 
 ## Design decisions
 
@@ -38,8 +42,8 @@ Positive RBAC validation now passes against a test user with built-in and custom
 ## Validation evidence
 
 1. The PowerShell module manifest validates.
-2. The module imports in PowerShell 7 and exports nine intended public commands.
-3. All 45 unit tests pass.
+2. The module imports in PowerShell 7 and exports 16 intended public commands.
+3. All 77 unit tests pass.
 4. PowerShell Script Analyzer returns no findings with the repository settings.
 5. The HTML report contains no remote runtime dependency, analytics or tracking.
 6. Desktop access paths, native evidence disclosures and permission family filters were checked in the local browser.
@@ -47,9 +51,10 @@ Positive RBAC validation now passes against a test user with built-in and custom
 8. Seven integration checks passed against a test user with built-in and custom Intune RBAC assignments.
 9. The live result matches the portal role types, Admin Groups, Scope Group and Scope Tag, and retains two managed-device read grants.
 10. A clean consent run using only the documented delegated scopes remains unverified because the existing Microsoft Graph Command Line Tools registration already held broader consent.
-11. Measured command coverage is 72.8 per cent across 45 passing unit tests.
+11. Measured command coverage is 81.44 per cent across 77 passing unit tests.
 12. The 1.0.0 Gallery package passes isolated no-profile import and temporary local PSResourceGet repository installation.
 13. The Gallery package excludes tests, screenshots, development tools and workflow files.
+14. The 2.0.0 Gallery package contains 89 entries and installs all 16 commands from a temporary local repository.
 
 ## Release decisions
 
@@ -64,12 +69,11 @@ Positive RBAC validation now passes against a test user with built-in and custom
 
 ## Release blockers
 
-1. Create or identify the public GitHub repository and final repository URL.
-2. Confirm the public author name and optional GitHub or LinkedIn profile URLs.
-3. Complete a clean least privilege consent check or keep the limitation prominent in the release notes.
-4. Confirm the maintainer belongs to the Awesome Intune LinkedIn group before posting the Pick contribution.
-5. Obtain final approval before submitting the directory form or posting to LinkedIn.
-6. Publish only the independently tested `.nupkg`; do not rebuild from the source directory during submission.
+1. Complete a clean least-privilege consent check or keep the limitation prominent in the release notes.
+2. Validate the 1.2.0 to 2.0.0 collectors and findings against the development tenant and Intune admin centre.
+3. Confirm the maintainer belongs to the Awesome Intune LinkedIn group before posting the Pick contribution.
+4. Obtain final approval before publishing a new Gallery version, submitting the directory form or posting to LinkedIn.
+5. Publish only the independently tested `.nupkg`; do not rebuild from the source directory during submission.
 
 ## Progress log
 
@@ -116,10 +120,43 @@ Positive RBAC validation now passes against a test user with built-in and custom
 6. Confirmed the Gallery page names Mark Oldham as author, Control Alt Delete Tech Bits as company and Microsoft.Graph.Authentication as a dependency.
 7. Confirmed the project, licence, icon and GitHub release links resolve publicly.
 8. Revoked the one-day, package-restricted Gallery API key and cleared it from the clipboard after publication.
-9. Removed reliance on `Publish-PSResource -WhatIf` after PSResourceGet 1.2.0 treated the dry-run command as a live publication.
+9. Added a normalised workload and assignment evidence model spanning configuration, compliance, endpoint security, applications, scripts, remediations and Windows update profiles.
+10. Added per-source collection states, API-version provenance, explicit exclusion handling and assignment-filter resolution.
+11. Added Policies and Apps, Assignment Impact, Target Groups and Assignment Filters views to the self-contained Signal Atlas explorer.
+12. Verified navigation, filtering, cross-links, inspector wrapping and the 390 pixel responsive menu in the local browser.
+13. Expanded the unit suite to 56 passing tests before the full release gate.
+14. Passed the 1.2.0 source gate with 56 tests, 79.32 per cent command coverage, 11 clean exports and no Script Analyzer findings.
+15. Built the 1.2.0 Gallery package, validated 75 package entries and installed 11 commands from a temporary local PSResourceGet repository.
+16. Added managed-device inventory and normalised supported configuration, compliance, application, PowerShell script and remediation outcome evidence.
+17. Added Device 360, User 360 and Deployment Outcomes views with cross-links, timestamps, state details and decimal plus hexadecimal error codes.
+18. Kept workload assignment configuration separate from reported operational state and marked unsupported modern outcome families explicitly.
+19. Expanded the unit suite to 63 passing tests and passed the 1.3.0 full source, package and local-repository gates.
+20. Recorded 80.58 per cent coverage, 13 clean exports, archive hash `b61620258d8e35498dd36b1961e166083feaccc75dfad97b8093a455927b16f8` and package hash `399b5f60bd32e282851b2d8dc89dab6f7f06d7406849755a3b5975c6602d65d7` for 1.3.0.
+21. Added allow-listed local snapshots, SHA-256 integrity validation, stable identity pseudonymisation and structured evidence comparison for 1.4.0.
+22. Added Snapshot Changes navigation and conservative broad-target user or device counts.
+23. Added endpoint security intents to the shared workload assignment collector.
+24. Added Settings Catalog, endpoint security intent and supported legacy profile value normalisation for 2.0.0.
+25. Added Policy Settings and Policy Conflicts navigation with exact-target overlap evidence and explicit unevaluated states.
+26. Expanded the unit suite to 72 passing tests before the 2.0.0 full release gate.
+27. Removed reliance on `Publish-PSResource -WhatIf` after PSResourceGet 1.2.0 treated the dry-run command as a live publication.
+28. Confirmed the PowerShell Gallery installation succeeds but identified that installation alone cannot execute module code or open sign-in.
+29. Added `Start-IntuneAccess` for the guided 1.1.0 workflow: sign in, collect tenant-wide Intune RBAC-connected objects, generate the Signal Atlas explorer in Documents and open it automatically.
+30. Limited tenant-wide user collection to direct and transitive members of Admin Groups connected to Intune role assignments; unrelated tenant users and groups are not enumerated.
+31. Added report navigation for administrators, Admin Groups, role assignments, roles, Scope Groups, Scope Tags, permissions and review notes.
+32. Added a clickable object inspector with cross-links between connected RBAC objects.
+33. Fixed long administrator names and user principal names overflowing into adjacent metadata cells.
+34. Passed 50 unit tests with 77.7 per cent measured coverage and no PowerShell Script Analyzer findings.
+35. Adopted the versioned product roadmap from 1.1.0 through 2.0.0 and recorded it in `docs/roadmap.md`.
+36. Reviewed recent `r/Intune` problem reports and recorded community led opportunities and the product value proposition in `docs/community-research.md`.
+37. Passed the 2.0.0 full gate with 77 tests, 81.44 per cent coverage, 16 clean exports and no Script Analyzer findings.
+38. Built the 89-entry `IntuneAccess.2.0.0.nupkg` and installed it through a temporary local PSResourceGet repository. Final hashes are written beside the release artefacts.
+39. Generated the 2.0.0 source archive and SHA-256 checksum.
+40. Checked Policy Conflicts, linked setting values and Snapshot Changes in the local browser at 1280 pixels without horizontal overflow.
+41. Added a bounded 30-day Intune Audit Trail from Graph v1.0 and exact resource-ID correlation to snapshot changes.
 
 ## Next actions
 
 1. Complete a clean least-privilege consent run using a dedicated Microsoft Entra application, or retain the documented shared-client limitation.
 2. Submit the Awesome Intune directory form after approval.
 3. Post the contribution in the Awesome Intune LinkedIn group after approval.
+4. Complete live tenant validation of the locally implemented 2.0.0 collectors before any publication decision.

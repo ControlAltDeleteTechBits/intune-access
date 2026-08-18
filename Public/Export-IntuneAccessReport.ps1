@@ -32,8 +32,10 @@ function Export-IntuneAccessReport {
             'ById'  { Get-IntuneAdminAccess -UserId $UserId }
             default { $InputObject }
         }
-        if ('IntuneAccess.AdminAccess' -notin $access.PSObject.TypeNames) {
-            throw 'InputObject must be a result returned by Get-IntuneAdminAccess.'
+        $isAdministratorReport = 'IntuneAccess.AdminAccess' -in $access.PSObject.TypeNames
+        $isTenantExplorer = 'IntuneAccess.TenantRbac' -in $access.PSObject.TypeNames
+        if (-not $isAdministratorReport -and -not $isTenantExplorer) {
+            throw 'InputObject must be an IntuneAccess administrator result or tenant RBAC collection.'
         }
 
         $resolvedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
@@ -50,7 +52,12 @@ function Export-IntuneAccessReport {
         }
 
         if ($PSCmdlet.ShouldProcess($resolvedPath, 'Write self-contained Intune access report')) {
-            $html = ConvertTo-IntuneAccessHtml -Access $access
+            $html = if ($isTenantExplorer) {
+                ConvertTo-IntuneAccessExplorerHtml -TenantRbac $access
+            }
+            else {
+                ConvertTo-IntuneAccessHtml -Access $access
+            }
             Set-Content -LiteralPath $resolvedPath -Value $html -Encoding utf8NoBOM
             Write-Warning 'The report may contain usernames, group names, device names and administrative configuration. Store and share it accordingly.'
             Get-Item -LiteralPath $resolvedPath
