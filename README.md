@@ -387,6 +387,21 @@ Product decisions, design choices, validation evidence and release progress are 
 
 The agreed versioned product plan is tracked in [docs/roadmap.md](docs/roadmap.md).
 
+## Device roadmap
+
+The agreed work after 2.0.1 extends IntuneAccess from individual Device 360 evidence into a read-only device investigation and estate view:
+
+| Version | Planned capability | Intended result |
+| --- | --- | --- |
+| 2.1.0 | Device inventory and hygiene | Find stale, duplicate, mismatched and incomplete device records. |
+| 2.2.0 | Device assignment explainer | Explain why a device received, missed or could not evaluate a policy or application. |
+| 2.3.0 | Autopilot and enrolment timeline | Show profiles, Enrollment Status Page stages, durations, failures and enrolment evidence. |
+| 2.4.0 | Application and software evidence | Join required applications, installation results, detected software and errors. |
+| 2.5.0 | Update and compliance investigator | Explain patch state, update targeting, compliance failures and stale reporting. |
+| 3.0.0 | Device estate intelligence | Add prioritised findings, historical trends and cross-device investigation. |
+
+The module will remain read only. Device-changing remote actions are not part of this roadmap. Detailed evidence boundaries and completion criteria are recorded in [docs/roadmap.md](docs/roadmap.md).
+
 Research into current Intune gaps and candidate product opportunities is recorded in [docs/product-opportunities.md](docs/product-opportunities.md).
 
 Recent community problem research and the IntuneAccess value proposition are recorded in [docs/community-research.md](docs/community-research.md).

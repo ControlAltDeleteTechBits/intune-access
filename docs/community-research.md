@@ -236,9 +236,11 @@ The practical reasons to use it are:
 
 ## Recommended community led additions
 
-1. Add application requirements, dependencies and supersedence to the existing assignment reasoning.
-2. Add Intune, Microsoft Entra and Autopilot device identity reconciliation.
-3. Add an optional Autopilot and Enrollment Status Page evidence timeline.
-4. Add telemetry staleness, update history and a sanitised support bundle.
-5. Expand normalised setting coverage only where Microsoft Graph exposes a dependable read contract.
-6. Consider offline cross tenant snapshot comparison only after live 2.0 validation.
+1. Version 2.1.0 adds Intune, Microsoft Entra ID and Autopilot device identity reconciliation, evidence age and hygiene findings.
+2. Version 2.2.0 adds the device assignment explainer across groups, exclusions, filters, intent and reported outcome.
+3. Version 2.3.0 adds an optional Autopilot and Enrollment Status Page evidence timeline.
+4. Version 2.4.0 adds application requirements, dependencies, supersedence, detected software and supported error evidence.
+5. Version 2.5.0 adds telemetry staleness, update history and compliance investigation.
+6. Version 3.0.0 adds prioritised findings, historical trends, a sanitised support bundle and cross-device investigation.
+7. Expand normalised setting coverage only where Microsoft Graph exposes a dependable read contract.
+8. Keep offline cross-tenant snapshot comparison as a deferred candidate until the single-tenant device model is validated at scale.

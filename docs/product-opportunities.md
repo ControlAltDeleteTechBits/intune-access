@@ -1,6 +1,6 @@
 # IntuneAccess product opportunities
 
-Research checked on 18 August 2026.
+Research checked on 24 August 2026.
 
 This document records recurring Intune administration problems that IntuneAccess could address without becoming a configuration or remediation product. A gap does not always mean that Microsoft Intune has no related feature. In several cases the available data is split across portal pages, limited to one workload, dependent on additional licensing or unavailable as a durable evidence chain.
 
@@ -166,7 +166,9 @@ IntuneAccess opportunity:
 
 ## Recommended fit with the agreed roadmap
 
-1. Version 1.2.0 delivers the assignment outcome explainer.
-2. Version 1.3.0 adds Device and User 360, application deployment evidence and an optional Autopilot timeline.
-3. Version 1.4.0 adds durable history, change impact, update movement and share safe reports.
-4. Version 2.0.0 delivers resultant state search plus policy overlap and conflict analysis.
+1. Version 2.1.0 delivers richer device inventory, identity reconciliation and hygiene findings.
+2. Version 2.2.0 adds the selected-device assignment explainer.
+3. Version 2.3.0 adds the optional Autopilot and Enrollment Status Page evidence timeline.
+4. Version 2.4.0 joins application intent, installation results, detected software and supported error evidence.
+5. Version 2.5.0 joins update targeting, patch state, compliance failures and telemetry age.
+6. Version 3.0.0 adds prioritised estate findings, historical trends and cross-device investigation.

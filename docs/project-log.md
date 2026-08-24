@@ -2,11 +2,11 @@
 
 This document records product decisions, design choices, validation evidence, release progress and unresolved work. Update it when a decision changes or a release check produces new evidence.
 
-Last updated: 18 August 2026.
+Last updated: 24 August 2026.
 
 ## Current status
 
-IntuneAccess 2.0.0 is published. Version 2.0.1 is prepared as an onboarding release that places the complete two-command Quick start in the Gallery metadata and at the top of the README. The project remains read only and requests no Microsoft Graph write permission.
+IntuneAccess 2.0.1 is published. The agreed roadmap now extends from device inventory and hygiene in 2.1.0 through device estate intelligence in 3.0.0. The project remains read only and requests no Microsoft Graph write permission.
 
 Positive RBAC validation passes against a test user with built-in and custom assignments. The 2.0.1 release and local Gallery installation gates pass with no functional change from 2.0.0.
 
@@ -21,9 +21,10 @@ Positive RBAC validation passes against a test user with built-in and custom ass
 7. The product and Gallery package name remains `IntuneAccess`; IdentityAtlas remains a sibling product.
 8. Scoped permissions mode is never detected through an undocumented endpoint. Both models are shown and the caller must select a tenant mode explicitly.
 9. The agreed product direction connects administrator control, workload targeting and reported endpoint outcome in one evidence chain.
-10. The versioned plan is maintained in `docs/roadmap.md`: 1.1.0 tenant wide RBAC explorer, 1.2.0 assignment and impact explorer, 1.3.0 Device and User 360, 1.4.0 snapshots and change impact, and 2.0.0 policy overlap and conflict analysis.
+10. The versioned plan is maintained in `docs/roadmap.md`: 1.1.0 tenant wide RBAC explorer, 1.2.0 assignment and impact explorer, 1.3.0 Device and User 360, 1.4.0 snapshots and change impact, 2.0.0 policy overlap and conflict analysis, 2.1.0 device inventory and hygiene, 2.2.0 device assignment explanation, 2.3.0 Autopilot and enrolment timeline, 2.4.0 application and software evidence, 2.5.0 update and compliance investigation, and 3.0.0 device estate intelligence.
 11. The core product question is recorded as: who can change it > who should receive it > what Intune reported > where the evidence stops.
 12. Assignment configuration and deployment outcome are separate evidence layers. A returned assignment never proves successful delivery by itself.
+13. The primary module remains read only. Wipe, retire, delete, restart, sync and other device-changing remote actions are excluded from the agreed device roadmap.
 
 ## Design decisions
 
@@ -77,6 +78,12 @@ Positive RBAC validation passes against a test user with built-in and custom ass
 5. Publish only the independently tested `.nupkg`; do not rebuild from the source directory during submission.
 
 ## Progress log
+
+### 24 August 2026
+
+1. Adopted the device-focused roadmap from version 2.1.0 through 3.0.0.
+2. Defined release scope and completion criteria for device hygiene, assignment explanation, Autopilot, application evidence, update and compliance investigation, and estate intelligence.
+3. Retained read-only delegated permissions and excluded device-changing remote actions from the primary module.
 
 ### 18 August 2026
 
