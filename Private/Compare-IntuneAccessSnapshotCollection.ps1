@@ -11,6 +11,13 @@ function Get-IntuneAccessSnapshotRecordKey {
         'Membership' { return "$([string] (Get-IntuneAccessProperty (Get-IntuneAccessProperty $Record 'User') 'Id'))|$([string] (Get-IntuneAccessProperty $Record 'GroupId'))" }
         'Permission' { return [string] (Get-IntuneAccessProperty $Record 'RawAction') }
         'DeploymentOutcome' { return "$([string] (Get-IntuneAccessProperty $Record 'WorkloadId'))|$([string] (Get-IntuneAccessProperty $Record 'Id'))" }
+        'DeviceFinding' { return [string] (Get-IntuneAccessProperty $Record 'FindingId') }
+        'EstateFinding' { return [string] (Get-IntuneAccessProperty $Record 'FindingId') }
+        'DeviceAssignmentExplanation' { return "$([string] (Get-IntuneAccessProperty $Record 'DeviceId'))|$([string] (Get-IntuneAccessProperty $Record 'WorkloadId'))" }
+        'AutopilotTimeline' { return [string] (Get-IntuneAccessProperty $Record 'AutopilotIdentityId') }
+        'DetectedApplication' { return [string] (Get-IntuneAccessProperty $Record 'Id') }
+        'DeviceApplicationEvidence' { return "$([string] (Get-IntuneAccessProperty $Record 'DeviceId'))|$([string] (Get-IntuneAccessProperty $Record 'ApplicationId'))" }
+        'UpdateComplianceInvestigation' { return "$([string] (Get-IntuneAccessProperty $Record 'DeviceId'))|$([string] (Get-IntuneAccessProperty $Record 'WorkloadId'))" }
         default { return [string] (Get-IntuneAccessProperty $Record 'Id') }
     }
 }

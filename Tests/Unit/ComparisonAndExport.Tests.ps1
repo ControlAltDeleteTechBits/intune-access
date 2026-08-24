@@ -78,7 +78,7 @@ Describe 'Administrator comparison and data export' {
         $file = $access | Export-IntuneAccessData -Path $path -Format Json
         $json = Get-Content -Raw -LiteralPath $file.FullName | ConvertFrom-Json -Depth 30
 
-        $json.SchemaVersion | Should -Be '1.0'
+        $json.SchemaVersion | Should -Be '2.0'
         $json.DataType | Should -Be 'IntuneAccess.AdminAccess'
         $json.Data.User.UserPrincipalName | Should -Be 'admin@example.test'
     }

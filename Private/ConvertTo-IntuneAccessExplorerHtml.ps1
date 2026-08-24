@@ -99,6 +99,20 @@ function ConvertTo-IntuneAccessExplorerHtml {
     $policyConflictCollectionStatus = @(Get-IntuneAccessProperty $TenantRbac 'PolicyConflictCollectionStatus' @())
     $auditEvents = @(Get-IntuneAccessProperty $TenantRbac 'AuditEvents' @())
     $auditCollectionStatus = Get-IntuneAccessProperty $TenantRbac 'AuditCollectionStatus'
+    $deviceInventory = @(Get-IntuneAccessProperty $TenantRbac 'DeviceInventory' @())
+    $deviceFindings = @(Get-IntuneAccessProperty $TenantRbac 'DeviceFindings' @())
+    $deviceAssignmentExplanations = @(Get-IntuneAccessProperty $TenantRbac 'DeviceAssignmentExplanations' @())
+    $autopilotTimelines = @(Get-IntuneAccessProperty $TenantRbac 'AutopilotTimelines' @())
+    $detectedApplications = @(Get-IntuneAccessProperty $TenantRbac 'DetectedApplications' @())
+    $deviceApplicationEvidence = @(Get-IntuneAccessProperty $TenantRbac 'DeviceApplicationEvidence' @())
+    $updateComplianceInvestigations = @(Get-IntuneAccessProperty $TenantRbac 'UpdateComplianceInvestigations' @())
+    $estateFindings = @(Get-IntuneAccessProperty $TenantRbac 'EstateFindings' @())
+    $recurringFailures = @(Get-IntuneAccessProperty $TenantRbac 'RecurringFailures' @())
+    $deviceCohorts = @(Get-IntuneAccessProperty $TenantRbac 'DeviceCohorts' @())
+    $crossDeviceInvestigations = @(Get-IntuneAccessProperty $TenantRbac 'CrossDeviceInvestigations' @())
+    $estateHistoricalTrend = Get-IntuneAccessProperty $TenantRbac 'EstateHistoricalTrend'
+    $estateTrendState = if ($null -eq $estateHistoricalTrend) { 'NoBaseline' } else { [string] (Get-IntuneAccessProperty $estateHistoricalTrend 'State' 'NoBaseline') }
+    $estateSummary = "$($deviceInventory.Count) inventory records, $($recurringFailures.Count) recurring evidence groups, $($deviceCohorts.Count) cohorts and $($crossDeviceInvestigations.Count) cross-device investigations"
     $warnings = @(Get-IntuneAccessProperty $TenantRbac 'Warnings' @())
     $tenantName = [string] (Get-IntuneAccessProperty $tenant 'DisplayName' 'Unknown tenant')
     $generated = [DateTimeOffset] (Get-IntuneAccessProperty $TenantRbac 'GeneratedAt' ([DateTimeOffset]::Now))
@@ -140,6 +154,16 @@ function ConvertTo-IntuneAccessExplorerHtml {
     $policySettingKeys = @{}
     $policyConflictKeys = @{}
     $auditEventKeys = @{}
+    $deviceFindingKeys = @{}
+    $assignmentExplanationKeys = @{}
+    $autopilotKeys = @{}
+    $detectedApplicationKeys = @{}
+    $applicationEvidenceKeys = @{}
+    $updateComplianceKeys = @{}
+    $estateFindingKeys = @{}
+    $recurringFailureKeys = @{}
+    $deviceCohortKeys = @{}
+    $crossDeviceKeys = @{}
     for ($index = 0; $index -lt $administrators.Count; $index++) { $userKeys[[string] $administrators[$index].User.Id] = "administrator-$($index + 1)" }
     for ($index = 0; $index -lt $adminGroups.Count; $index++) { $groupKeys[[string] $adminGroups[$index].Id] = "admin-group-$($index + 1)" }
     for ($index = 0; $index -lt $assignments.Count; $index++) { $assignmentKeys[[string] $assignments[$index].Id] = "assignment-$($index + 1)" }
@@ -158,6 +182,16 @@ function ConvertTo-IntuneAccessExplorerHtml {
     for ($index = 0; $index -lt $policySettings.Count; $index++) { $policySettingKeys[[string] $policySettings[$index].Id] = "policy-setting-$($index + 1)" }
     for ($index = 0; $index -lt $policyConflictFindings.Count; $index++) { $policyConflictKeys[[string] $policyConflictFindings[$index].Id] = "policy-conflict-$($index + 1)" }
     for ($index = 0; $index -lt $auditEvents.Count; $index++) { $auditEventKeys[[string] $auditEvents[$index].Id] = "audit-event-$($index + 1)" }
+    for ($index = 0; $index -lt $deviceFindings.Count; $index++) { $deviceFindingKeys[$index] = "device-finding-$($index + 1)" }
+    for ($index = 0; $index -lt $deviceAssignmentExplanations.Count; $index++) { $assignmentExplanationKeys[$index] = "assignment-explanation-$($index + 1)" }
+    for ($index = 0; $index -lt $autopilotTimelines.Count; $index++) { $autopilotKeys[$index] = "autopilot-$($index + 1)" }
+    for ($index = 0; $index -lt $detectedApplications.Count; $index++) { $detectedApplicationKeys[$index] = "detected-app-$($index + 1)" }
+    for ($index = 0; $index -lt $deviceApplicationEvidence.Count; $index++) { $applicationEvidenceKeys[$index] = "application-evidence-$($index + 1)" }
+    for ($index = 0; $index -lt $updateComplianceInvestigations.Count; $index++) { $updateComplianceKeys[$index] = "update-compliance-$($index + 1)" }
+    for ($index = 0; $index -lt $estateFindings.Count; $index++) { $estateFindingKeys[$index] = "estate-finding-$($index + 1)" }
+    for ($index = 0; $index -lt $recurringFailures.Count; $index++) { $recurringFailureKeys[$index] = "recurring-failure-$($index + 1)" }
+    for ($index = 0; $index -lt $deviceCohorts.Count; $index++) { $deviceCohortKeys[$index] = "device-cohort-$($index + 1)" }
+    for ($index = 0; $index -lt $crossDeviceInvestigations.Count; $index++) { $crossDeviceKeys[$index] = "cross-device-$($index + 1)" }
 
     $initialUpn = [string] (Get-IntuneAccessProperty $TenantRbac 'InitialUserPrincipalName')
     $initialAdministrator = $administrators | Where-Object { $_.User.UserPrincipalName -eq $initialUpn } | Select-Object -First 1
@@ -182,6 +216,16 @@ function ConvertTo-IntuneAccessExplorerHtml {
     $policySettingRows = [System.Text.StringBuilder]::new()
     $policyConflictRows = [System.Text.StringBuilder]::new()
     $auditEventRows = [System.Text.StringBuilder]::new()
+    $deviceFindingRows = [System.Text.StringBuilder]::new()
+    $assignmentExplanationRows = [System.Text.StringBuilder]::new()
+    $autopilotRows = [System.Text.StringBuilder]::new()
+    $detectedApplicationRows = [System.Text.StringBuilder]::new()
+    $applicationEvidenceRows = [System.Text.StringBuilder]::new()
+    $updateComplianceRows = [System.Text.StringBuilder]::new()
+    $estateFindingRows = [System.Text.StringBuilder]::new()
+    $recurringFailureRows = [System.Text.StringBuilder]::new()
+    $deviceCohortRows = [System.Text.StringBuilder]::new()
+    $crossDeviceRows = [System.Text.StringBuilder]::new()
     $inspectorPanels = [System.Text.StringBuilder]::new()
 
     foreach ($administrator in $administrators) {
@@ -341,7 +385,8 @@ function ConvertTo-IntuneAccessExplorerHtml {
         $key = $managedDeviceKeys[[string] $managedDevice.Id]
         $deviceOutcomes = @($deploymentOutcomes | Where-Object DeviceId -EQ $managedDevice.Id)
         $deviceErrors = @($deviceOutcomes | Where-Object Category -EQ 'Error').Count
-        Add-ExplorerRow -Builder $managedDeviceRows -Key $key -View 'managed-devices' -Title ([string] $managedDevice.DeviceName) -Meta "$($managedDevice.OperatingSystem) $($managedDevice.OsVersion)" -Badge "$deviceErrors errors" -Icon $iconDevices
+        $deviceSearchMeta = "$($managedDevice.OperatingSystem) $($managedDevice.OsVersion) | $($managedDevice.UserPrincipalName) | serial $($managedDevice.SerialNumber)"
+        Add-ExplorerRow -Builder $managedDeviceRows -Key $key -View 'managed-devices' -Title ([string] $managedDevice.DeviceName) -Meta $deviceSearchMeta -Badge "$deviceErrors errors" -Icon $iconDevices
         $userLink = if ($managedUserKeys.ContainsKey([string] $managedDevice.UserPrincipalName)) { New-ExplorerLink -Key $managedUserKeys[[string] $managedDevice.UserPrincipalName] -View 'managed-users' -Label $managedDevice.UserPrincipalName -Meta 'Associated managed user' } elseif (-not [string]::IsNullOrWhiteSpace([string] $managedDevice.UserPrincipalName)) { New-ExplorerEmptyState "The associated user was not resolved: $($managedDevice.UserPrincipalName)" } else { New-ExplorerEmptyState 'No associated user was returned by Intune.' }
         $outcomeLinks = @($deviceOutcomes | ForEach-Object {
             $outcomeId = "$($_.WorkloadId)::$($_.Id)"
@@ -431,6 +476,81 @@ function ConvertTo-IntuneAccessExplorerHtml {
             $key, (ConvertTo-ExplorerText $finding.SettingDefinitionId), (ConvertTo-ExplorerText "$($finding.FirstPolicyName) compared with $($finding.SecondPolicyName)"), (ConvertTo-ExplorerText $finding.FindingState), (ConvertTo-ExplorerText $finding.TargetOverlapState), (ConvertTo-ExplorerText $finding.ValuesDiffer), @($finding.TargetEvidence).Count, (ConvertTo-ExplorerText $finding.FirstValueJson), $firstPolicyLink, (ConvertTo-ExplorerText $finding.SecondValueJson), $secondPolicyLink, (ConvertTo-ExplorerText $finding.Reason)))
     }
 
+    for ($index = 0; $index -lt $deviceFindings.Count; $index++) {
+        $finding = $deviceFindings[$index]; $key = $deviceFindingKeys[$index]
+        Add-ExplorerRow -Builder $deviceFindingRows -Key $key -View 'device-findings' -Title ([string] $finding.Title) -Meta "$($finding.DeviceName) | $($finding.RuleId)" -Badge ([string] $finding.Severity) -Icon $iconLightbulb
+        $deviceLink = if ($managedDeviceKeys.ContainsKey([string] $finding.DeviceId)) { New-ExplorerLink -Key $managedDeviceKeys[[string] $finding.DeviceId] -View 'managed-devices' -Label $finding.DeviceName -Meta $finding.DeviceId } else { New-ExplorerEmptyState 'The source device was not resolved in this report.' }
+        $null = $inspectorPanels.AppendLine(('<section class="inspector-panel" data-object-panel="{0}" hidden><p class="eyebrow">DEVICE HYGIENE FINDING</p><h2>{1}</h2><p>{2}</p><div class="fact-grid"><span><small>Severity</small><strong>{3}</strong></span><span><small>Category</small><strong>{4}</strong></span><span><small>Rule</small><strong>{5}</strong></span><span><small>Evidence time</small><strong>{6}</strong></span></div><h3>Device</h3><div class="relation-list">{7}</div><h3>Review recommendation</h3><p>{8}</p><h3>Evidence boundary</h3><p>This is a read-only review prompt. It does not recommend an automated lifecycle action.</p></section>' -f $key, (ConvertTo-ExplorerText $finding.Title), (ConvertTo-ExplorerText $finding.Explanation), (ConvertTo-ExplorerText $finding.Severity), (ConvertTo-ExplorerText $finding.Category), (ConvertTo-ExplorerText $finding.RuleId), (ConvertTo-ExplorerText (ConvertTo-ExplorerDateText $finding.EvidenceTimestamp)), $deviceLink, (ConvertTo-ExplorerText $finding.ReviewRecommendation)))
+    }
+
+    for ($index = 0; $index -lt $deviceAssignmentExplanations.Count; $index++) {
+        $item = $deviceAssignmentExplanations[$index]; $key = $assignmentExplanationKeys[$index]
+        Add-ExplorerRow -Builder $assignmentExplanationRows -Key $key -View 'assignment-explanations' -Title ([string] $item.WorkloadName) -Meta "$($item.DeviceName) | $($item.WorkloadType)" -Badge ([string] $item.AssignmentState) -Icon $iconDevices
+        $pathText = @($item.AssignmentPaths | ForEach-Object { "$(ConvertTo-ExplorerText $_.TargetType): $(ConvertTo-ExplorerText $_.PathState) | device $(ConvertTo-ExplorerText $_.DeviceTargetState) | user $(ConvertTo-ExplorerText $_.UserTargetState) | filter $(ConvertTo-ExplorerText $_.FilterState)" }) -join '<br>'
+        if (-not $pathText) { $pathText = 'No configured assignment path was returned.' }
+        $deviceLink = if ($managedDeviceKeys.ContainsKey([string] $item.DeviceId)) { New-ExplorerLink -Key $managedDeviceKeys[[string] $item.DeviceId] -View 'managed-devices' -Label $item.DeviceName -Meta $item.DeviceId } else { '' }
+        $workloadLink = if ($workloadKeys.ContainsKey([string] $item.WorkloadId)) { New-ExplorerLink -Key $workloadKeys[[string] $item.WorkloadId] -View 'workloads' -Label $item.WorkloadName -Meta $item.WorkloadType } else { '' }
+        $null = $inspectorPanels.AppendLine(('<section class="inspector-panel" data-object-panel="{0}" hidden><p class="eyebrow">DEVICE ASSIGNMENT EXPLANATION</p><h2>{1}</h2><p>{2}</p><div class="fact-grid"><span><small>Calculated assignment</small><strong>{3}</strong></span><span><small>Reported outcome</small><strong>{4}</strong></span><span><small>Paths</small><strong>{5}</strong></span></div><h3>Device and workload</h3><div class="relation-list">{6}{7}</div><h3>Source-to-outcome paths</h3><code class="raw-value">{8}</code></section>' -f $key, (ConvertTo-ExplorerText $item.WorkloadName), (ConvertTo-ExplorerText $item.EvidenceBoundary), (ConvertTo-ExplorerText $item.AssignmentState), (ConvertTo-ExplorerText $item.ReportedOutcomeState), @($item.AssignmentPaths).Count, $deviceLink, $workloadLink, $pathText))
+    }
+
+    for ($index = 0; $index -lt $autopilotTimelines.Count; $index++) {
+        $item = $autopilotTimelines[$index]; $key = $autopilotKeys[$index]
+        Add-ExplorerRow -Builder $autopilotRows -Key $key -View 'autopilot' -Title ([string] $item.DeviceName) -Meta "$($item.SerialNumber) | $($item.DeploymentProfileName)" -Badge ([string] $item.EnrollmentState) -Icon $iconCalendar
+        $stageText = @($item.Timeline | ForEach-Object { "$(ConvertTo-ExplorerText $_.Stage): $(ConvertTo-ExplorerText $_.State) | $($_.DurationSeconds) seconds" }) -join '<br>'
+        if (-not $stageText) { $stageText = 'No stage event was returned.' }
+        $null = $inspectorPanels.AppendLine(('<section class="inspector-panel" data-object-panel="{0}" hidden><p class="eyebrow">AUTOPILOT AND ENROLMENT TIMELINE</p><h2>{1}</h2><p>{2}</p><div class="fact-grid"><span><small>Serial</small><strong>{3}</strong></span><span><small>Profile</small><strong>{4}</strong></span><span><small>Profile state</small><strong>{5}</strong></span><span><small>Events</small><strong>{6}</strong></span></div><h3>Observed stages</h3><code class="raw-value">{7}</code><h3>Failure details</h3><code class="raw-value">{8}</code></section>' -f $key, (ConvertTo-ExplorerText $item.DeviceName), (ConvertTo-ExplorerText $item.EvidenceBoundary), (ConvertTo-ExplorerText $item.SerialNumber), (ConvertTo-ExplorerText $item.DeploymentProfileName), (ConvertTo-ExplorerText $item.ProfileAssignmentState), $item.EventCount, $stageText, (ConvertTo-ExplorerText (@($item.FailureDetails) -join '; '))))
+    }
+
+    for ($index = 0; $index -lt $detectedApplications.Count; $index++) {
+        $item = $detectedApplications[$index]; $key = $detectedApplicationKeys[$index]
+        Add-ExplorerRow -Builder $detectedApplicationRows -Key $key -View 'detected-applications' -Title ([string] $item.DisplayName) -Meta "$($item.Publisher) | $($item.Version)" -Badge "$($item.ReportedDeviceCount) devices" -Icon $iconDevices
+        $devicesText = @($item.ManagedDevices | ForEach-Object { "$(ConvertTo-ExplorerText $_.DeviceName) [$((ConvertTo-ExplorerText $_.Id))]" }) -join '<br>'
+        if (-not $devicesText) { $devicesText = 'No device relationship was returned.' }
+        $null = $inspectorPanels.AppendLine(('<section class="inspector-panel" data-object-panel="{0}" hidden><p class="eyebrow">DETECTED SOFTWARE</p><h2>{1}</h2><p>{2}</p><div class="fact-grid"><span><small>Version</small><strong>{3}</strong></span><span><small>Platform</small><strong>{4}</strong></span><span><small>Reported devices</small><strong>{5}</strong></span><span><small>Relationship evidence</small><strong>{6}</strong></span></div><h3>Observed device relationships</h3><code class="raw-value">{7}</code></section>' -f $key, (ConvertTo-ExplorerText $item.DisplayName), (ConvertTo-ExplorerText $item.Publisher), (ConvertTo-ExplorerText $item.Version), (ConvertTo-ExplorerText $item.Platform), $item.ReportedDeviceCount, (ConvertTo-ExplorerText $item.RelationshipState), $devicesText))
+    }
+
+    for ($index = 0; $index -lt $deviceApplicationEvidence.Count; $index++) {
+        $item = $deviceApplicationEvidence[$index]; $key = $applicationEvidenceKeys[$index]
+        Add-ExplorerRow -Builder $applicationEvidenceRows -Key $key -View 'application-evidence' -Title ([string] $item.ApplicationName) -Meta "$($item.DeviceName) | $(@($item.ConfiguredIntents) -join ', ')" -Badge ([string] $item.DetectionState) -Icon $iconDevices
+        $null = $inspectorPanels.AppendLine(('<section class="inspector-panel" data-object-panel="{0}" hidden><p class="eyebrow">APPLICATION AND SOFTWARE EVIDENCE</p><h2>{1}</h2><p>{2}</p><div class="fact-grid"><span><small>Device</small><strong>{3}</strong></span><span><small>Intents</small><strong>{4}</strong></span><span><small>Install results</small><strong>{5}</strong></span><span><small>Detection</small><strong>{6}</strong></span><span><small>Requirements</small><strong>{7}</strong></span><span><small>Relationships</small><strong>{8}</strong></span></div></section>' -f $key, (ConvertTo-ExplorerText $item.ApplicationName), (ConvertTo-ExplorerText $item.EvidenceBoundary), (ConvertTo-ExplorerText $item.DeviceName), (ConvertTo-ExplorerText (@($item.ConfiguredIntents) -join ', ')), @($item.InstallResults).Count, (ConvertTo-ExplorerText $item.DetectionState), @($item.Requirements).Count, @($item.Relationships).Count))
+    }
+
+    for ($index = 0; $index -lt $updateComplianceInvestigations.Count; $index++) {
+        $item = $updateComplianceInvestigations[$index]; $key = $updateComplianceKeys[$index]
+        Add-ExplorerRow -Builder $updateComplianceRows -Key $key -View 'update-compliance' -Title ([string] $item.WorkloadName) -Meta "$($item.DeviceName) | $($item.OsVersion)" -Badge ([string] $item.InvestigationState) -Icon $iconRole
+        $null = $inspectorPanels.AppendLine(('<section class="inspector-panel" data-object-panel="{0}" hidden><p class="eyebrow">UPDATE AND COMPLIANCE INVESTIGATION</p><h2>{1}</h2><p>{2}</p><div class="fact-grid"><span><small>Device</small><strong>{3}</strong></span><span><small>OS version</small><strong>{4}</strong></span><span><small>Target version</small><strong>{5}</strong></span><span><small>Reported state</small><strong>{6}</strong></span><span><small>Investigation</small><strong>{7}</strong></span><span><small>Evidence age</small><strong>{8}</strong></span></div><h3>Evidence boundary</h3><p>{9}</p></section>' -f $key, (ConvertTo-ExplorerText $item.WorkloadName), (ConvertTo-ExplorerText $item.Explanation), (ConvertTo-ExplorerText $item.DeviceName), (ConvertTo-ExplorerText $item.OsVersion), (ConvertTo-ExplorerText (Get-IntuneAccessProperty $item 'TargetVersion')), (ConvertTo-ExplorerText $item.ReportedState), (ConvertTo-ExplorerText $item.InvestigationState), (ConvertTo-ExplorerText (Get-IntuneAccessProperty $item 'EvidenceAgeDays')), (ConvertTo-ExplorerText $item.EvidenceBoundary)))
+    }
+
+    for ($index = 0; $index -lt $estateFindings.Count; $index++) {
+        $item = $estateFindings[$index]; $key = $estateFindingKeys[$index]
+        $estateDeviceId = [string] (Get-IntuneAccessProperty $item 'DeviceId')
+        $estateDevice = $deviceInventory | Where-Object Id -EQ $estateDeviceId | Select-Object -First 1
+        $estateMeta = "$($item.DeviceName) | $($item.SourceType) | $(Get-IntuneAccessProperty $estateDevice 'UserPrincipalName') | serial $(Get-IntuneAccessProperty $estateDevice 'SerialNumber') | $(Get-IntuneAccessProperty $estateDevice 'OperatingSystem') $(Get-IntuneAccessProperty $estateDevice 'OsVersion')"
+        Add-ExplorerRow -Builder $estateFindingRows -Key $key -View 'estate-findings' -Title ([string] $item.Title) -Meta $estateMeta -Badge "$($item.PriorityScore) $($item.Severity)" -Icon $iconLightbulb
+        $null = $inspectorPanels.AppendLine(('<section class="inspector-panel" data-object-panel="{0}" hidden><p class="eyebrow">PRIORITISED ESTATE FINDING</p><h2>{1}</h2><p>{2}</p><div class="fact-grid"><span><small>Priority</small><strong>{3}</strong></span><span><small>Severity</small><strong>{4}</strong></span><span><small>Device</small><strong>{5}</strong></span><span><small>Source</small><strong>{6}</strong></span><span><small>Cause</small><strong>{7}</strong></span></div><h3>Review recommendation</h3><p>{8}</p></section>' -f $key, (ConvertTo-ExplorerText $item.Title), (ConvertTo-ExplorerText $item.Explanation), $item.PriorityScore, (ConvertTo-ExplorerText $item.Severity), (ConvertTo-ExplorerText $item.DeviceName), (ConvertTo-ExplorerText "$($item.SourceType): $($item.SourceId)"), (ConvertTo-ExplorerText $item.CauseState), (ConvertTo-ExplorerText $item.ReviewRecommendation)))
+    }
+
+    for ($index = 0; $index -lt $recurringFailures.Count; $index++) {
+        $item = $recurringFailures[$index]; $key = $recurringFailureKeys[$index]
+        Add-ExplorerRow -Builder $recurringFailureRows -Key $key -View 'recurring-failures' -Title ([string] $item.Title) -Meta "$($item.SourceType) | $($item.SourceId)" -Badge "$($item.DeviceCount) devices" -Icon $iconLightbulb
+        $deviceIds = @($item.DeviceIds | ForEach-Object { ConvertTo-ExplorerText $_ }) -join '<br>'
+        $null = $inspectorPanels.AppendLine(('<section class="inspector-panel" data-object-panel="{0}" hidden><p class="eyebrow">RECURRING EVIDENCE PATTERN</p><h2>{1}</h2><p>{2}</p><div class="fact-grid"><span><small>Devices</small><strong>{3}</strong></span><span><small>Source</small><strong>{4}</strong></span><span><small>Cause</small><strong>{5}</strong></span><span><small>Findings</small><strong>{6}</strong></span></div><h3>Device IDs</h3><code class="raw-value">{7}</code></section>' -f $key, (ConvertTo-ExplorerText $item.Title), (ConvertTo-ExplorerText $item.Explanation), $item.DeviceCount, (ConvertTo-ExplorerText "$($item.SourceType): $($item.SourceId)"), (ConvertTo-ExplorerText $item.CauseState), @($item.FindingIds).Count, $deviceIds))
+    }
+
+    for ($index = 0; $index -lt $deviceCohorts.Count; $index++) {
+        $item = $deviceCohorts[$index]; $key = $deviceCohortKeys[$index]
+        Add-ExplorerRow -Builder $deviceCohortRows -Key $key -View 'device-cohorts' -Title "$($item.Dimension): $($item.Value)" -Meta 'Observed device inventory cohort' -Badge "$($item.DeviceCount) devices" -Icon $iconDevices
+        $deviceIds = @($item.DeviceIds | ForEach-Object { ConvertTo-ExplorerText $_ }) -join '<br>'
+        $null = $inspectorPanels.AppendLine(('<section class="inspector-panel" data-object-panel="{0}" hidden><p class="eyebrow">DEVICE COHORT</p><h2>{1}</h2><p>Devices grouped by an observed inventory value. This is not a targeting or causal claim.</p><div class="fact-grid"><span><small>Dimension</small><strong>{2}</strong></span><span><small>Value</small><strong>{3}</strong></span><span><small>Devices</small><strong>{4}</strong></span><span><small>Findings</small><strong>{5}</strong></span></div><h3>Device IDs</h3><code class="raw-value">{6}</code></section>' -f $key, (ConvertTo-ExplorerText "$($item.Dimension): $($item.Value)"), (ConvertTo-ExplorerText $item.Dimension), (ConvertTo-ExplorerText $item.Value), $item.DeviceCount, $item.FindingCount, $deviceIds))
+    }
+
+    for ($index = 0; $index -lt $crossDeviceInvestigations.Count; $index++) {
+        $item = $crossDeviceInvestigations[$index]; $key = $crossDeviceKeys[$index]
+        Add-ExplorerRow -Builder $crossDeviceRows -Key $key -View 'cross-device' -Title "$($item.SourceType): $($item.SourceId)" -Meta 'Shared evidence source across devices' -Badge "$($item.DeviceCount) devices" -Icon $iconGroups
+        $deviceIds = @($item.DeviceIds | ForEach-Object { ConvertTo-ExplorerText $_ }) -join '<br>'
+        $null = $inspectorPanels.AppendLine(('<section class="inspector-panel" data-object-panel="{0}" hidden><p class="eyebrow">CROSS-DEVICE INVESTIGATION</p><h2>{1}</h2><p>Related findings grouped by their shared source. The grouping supports investigation and does not assert a common root cause.</p><div class="fact-grid"><span><small>Devices</small><strong>{2}</strong></span><span><small>Findings</small><strong>{3}</strong></span><span><small>Highest priority</small><strong>{4}</strong></span><span><small>Source type</small><strong>{5}</strong></span></div><h3>Device IDs</h3><code class="raw-value">{6}</code></section>' -f $key, (ConvertTo-ExplorerText "$($item.SourceType): $($item.SourceId)"), $item.DeviceCount, @($item.FindingIds).Count, $item.HighestPriority, (ConvertTo-ExplorerText $item.SourceType), $deviceIds))
+    }
+
     if ($administrators.Count -eq 0) { $null = $administratorRows.AppendLine((New-ExplorerEmptyState 'No administrator was returned from the connected Admin Groups.')) }
     if ($adminGroups.Count -eq 0) { $null = $groupRows.AppendLine((New-ExplorerEmptyState 'No Admin Group was returned from Intune role assignments.')) }
     if ($assignments.Count -eq 0) { $null = $assignmentRows.AppendLine((New-ExplorerEmptyState 'No Intune role assignment was returned.')) }
@@ -449,6 +569,16 @@ function ConvertTo-IntuneAccessExplorerHtml {
     if ($policySettings.Count -eq 0) { $null = $policySettingRows.AppendLine((New-ExplorerEmptyState 'No supported policy setting value was collected. Review PolicyAnalysis collection status.')) }
     if ($policyConflictFindings.Count -eq 0) { $null = $policyConflictRows.AppendLine((New-ExplorerEmptyState 'No shared observed setting was found across two supported policies. This does not prove that the tenant has no conflict.')) }
     if ($auditEvents.Count -eq 0) { $null = $auditEventRows.AppendLine((New-ExplorerEmptyState 'No recent Intune audit event was returned. Review AuditEvidence collection status.')) }
+    if ($deviceFindings.Count -eq 0) { $null = $deviceFindingRows.AppendLine((New-ExplorerEmptyState 'No device hygiene finding was produced from the collected evidence.')) }
+    if ($deviceAssignmentExplanations.Count -eq 0) { $null = $assignmentExplanationRows.AppendLine((New-ExplorerEmptyState 'No device assignment explanation was collected.')) }
+    if ($autopilotTimelines.Count -eq 0) { $null = $autopilotRows.AppendLine((New-ExplorerEmptyState 'Autopilot evidence was not selected or no registration was returned.')) }
+    if ($detectedApplications.Count -eq 0) { $null = $detectedApplicationRows.AppendLine((New-ExplorerEmptyState 'No detected software evidence was returned.')) }
+    if ($deviceApplicationEvidence.Count -eq 0) { $null = $applicationEvidenceRows.AppendLine((New-ExplorerEmptyState 'No joined application and device evidence was returned.')) }
+    if ($updateComplianceInvestigations.Count -eq 0) { $null = $updateComplianceRows.AppendLine((New-ExplorerEmptyState 'No update or compliance investigation record was produced.')) }
+    if ($estateFindings.Count -eq 0) { $null = $estateFindingRows.AppendLine((New-ExplorerEmptyState 'No prioritised estate finding was produced.')) }
+    if ($recurringFailures.Count -eq 0) { $null = $recurringFailureRows.AppendLine((New-ExplorerEmptyState 'No recurring evidence pattern was observed across more than one device.')) }
+    if ($deviceCohorts.Count -eq 0) { $null = $deviceCohortRows.AppendLine((New-ExplorerEmptyState 'No device inventory cohort was produced.')) }
+    if ($crossDeviceInvestigations.Count -eq 0) { $null = $crossDeviceRows.AppendLine((New-ExplorerEmptyState 'No shared evidence source was available for cross-device investigation.')) }
     if ($inspectorPanels.Length -eq 0) { $null = $inspectorPanels.AppendLine('<section class="inspector-panel" data-object-panel="none"><p class="eyebrow">NO OBJECTS</p><h2>No Intune RBAC object was collected</h2><p>Review the collection notes and signed-in account permissions.</p></section>') }
 
     $warningItems = if ($warnings.Count -gt 0) { @($warnings | ForEach-Object { '<li>{0}</li>' -f (ConvertTo-ExplorerText $_) }) -join '' } else { '<li>No collection warning was produced.</li>' }
@@ -501,7 +631,17 @@ $fontCss
 <button class="nav-item" type="button" data-view="workload-assignments" data-title="Assignment Impact" data-subtitle="Included, excluded, broad and filtered workload targets"><img src="$iconRole" alt=""><span><strong>Assignment Impact</strong><small>Configured targets</small></span><b class="nav-count">$($workloadAssignments.Count)</b></button>
 <button class="nav-item" type="button" data-view="target-groups" data-title="Target Groups" data-subtitle="Microsoft Entra groups targeted by collected Intune workloads"><img src="$iconGroups" alt=""><span><strong>Target Groups</strong><small>Policy and app targets</small></span><b class="nav-count">$($workloadGroups.Count)</b></button>
 <button class="nav-item" type="button" data-view="assignment-filters" data-title="Assignment Filters" data-subtitle="Filters connected to collected workload assignments"><img src="$iconLock" alt=""><span><strong>Assignment Filters</strong><small>Include and exclude rules</small></span><b class="nav-count">$($assignmentFilters.Count)</b></button>
+<button class="nav-item" type="button" data-view="estate-findings" data-title="Estate Intelligence" data-subtitle="Prioritised, traceable device estate findings"><img src="$iconLightbulb" alt=""><span><strong>Estate Intelligence</strong><small>Prioritised findings</small></span><b class="nav-count">$($estateFindings.Count)</b></button>
+<button class="nav-item" type="button" data-view="recurring-failures" data-title="Recurring Evidence" data-subtitle="Repeated returned evidence grouped without asserting root cause"><img src="$iconLightbulb" alt=""><span><strong>Recurring Evidence</strong><small>Repeated patterns</small></span><b class="nav-count">$($recurringFailures.Count)</b></button>
+<button class="nav-item" type="button" data-view="device-cohorts" data-title="Device Cohorts" data-subtitle="Fleet segments grouped by observed inventory attributes"><img src="$iconDevices" alt=""><span><strong>Device Cohorts</strong><small>Fleet segments</small></span><b class="nav-count">$($deviceCohorts.Count)</b></button>
+<button class="nav-item" type="button" data-view="cross-device" data-title="Cross-Device Investigation" data-subtitle="Findings connected by their policy, application or evidence source"><img src="$iconGroups" alt=""><span><strong>Cross-Device</strong><small>Shared evidence source</small></span><b class="nav-count">$($crossDeviceInvestigations.Count)</b></button>
 <button class="nav-item" type="button" data-view="managed-devices" data-title="Device 360" data-subtitle="Managed-device identity, health and reported workload outcomes"><img src="$iconDevices" alt=""><span><strong>Device 360</strong><small>Devices and outcomes</small></span><b class="nav-count">$($managedDevices.Count)</b></button>
+<button class="nav-item" type="button" data-view="device-findings" data-title="Device Hygiene" data-subtitle="Stale, duplicate, mismatched and incomplete device evidence"><img src="$iconLightbulb" alt=""><span><strong>Device Hygiene</strong><small>Inventory findings</small></span><b class="nav-count">$($deviceFindings.Count)</b></button>
+<button class="nav-item" type="button" data-view="assignment-explanations" data-title="Device Assignment Explainer" data-subtitle="Separate device and user target paths, filters, exclusions and outcomes"><img src="$iconGroups" alt=""><span><strong>Assignment Explainer</strong><small>Why targeted or missed</small></span><b class="nav-count">$($deviceAssignmentExplanations.Count)</b></button>
+<button class="nav-item" type="button" data-view="autopilot" data-title="Autopilot Timeline" data-subtitle="Optional registration, profile, ESP and enrolment evidence"><img src="$iconCalendar" alt=""><span><strong>Autopilot Timeline</strong><small>Enrolment stages</small></span><b class="nav-count">$($autopilotTimelines.Count)</b></button>
+<button class="nav-item" type="button" data-view="application-evidence" data-title="Application Evidence" data-subtitle="Application intent, reported results, detection and relationships"><img src="$iconDevices" alt=""><span><strong>Application Evidence</strong><small>Intent and results</small></span><b class="nav-count">$($deviceApplicationEvidence.Count)</b></button>
+<button class="nav-item" type="button" data-view="detected-applications" data-title="Detected Software" data-subtitle="Publisher, version, platform and observed device relationships"><img src="$iconDevices" alt=""><span><strong>Detected Software</strong><small>Software inventory</small></span><b class="nav-count">$($detectedApplications.Count)</b></button>
+<button class="nav-item" type="button" data-view="update-compliance" data-title="Update and Compliance" data-subtitle="Patch targeting, OS evidence, compliance and reporting age"><img src="$iconRole" alt=""><span><strong>Update and Compliance</strong><small>Investigation evidence</small></span><b class="nav-count">$($updateComplianceInvestigations.Count)</b></button>
 <button class="nav-item" type="button" data-view="managed-users" data-title="User 360" data-subtitle="Managed users, their devices and connected outcome evidence"><img src="$iconUser" alt=""><span><strong>User 360</strong><small>Users and devices</small></span><b class="nav-count">$($managedUsers.Count)</b></button>
 <button class="nav-item" type="button" data-view="deployment-outcomes" data-title="Deployment Outcomes" data-subtitle="Reported success, error, pending and not-applicable evidence"><img src="$iconRole" alt=""><span><strong>Deployment Outcomes</strong><small>Reported states</small></span><b class="nav-count">$($deploymentOutcomes.Count)</b></button>
 <button class="nav-item" type="button" data-view="policy-conflicts" data-title="Policy Conflicts" data-subtitle="Observed values, conservative target overlap and potential conflict evidence"><img src="$iconLightbulb" alt=""><span><strong>Policy Conflicts</strong><small>Overlap analysis</small></span><b class="nav-count">$(@($policyConflictFindings | Where-Object FindingState -EQ 'PotentialConflict').Count)</b></button>
@@ -520,12 +660,22 @@ $fontCss
 <main id="main-content" class="content-shell"><header class="page-heading"><div><p class="eyebrow">INTUNE EVIDENCE EXPLORER</p><h1 id="view-title">Overview</h1><p id="view-subtitle">Tenant-wide Intune access and assignment summary</p></div><button class="mobile-nav" id="mobile-nav" type="button" aria-controls="product-nav" aria-expanded="false">Sections</button><label class="search-control"><span class="eyebrow">FILTER CURRENT VIEW</span><input id="object-search" type="search" placeholder="Search names, IDs and descriptions" aria-label="Filter current view"></label></header>
 <div class="workspace">
 <div>
-<section class="view-panel" data-view-panel="overview"><div class="summary-grid"><div class="summary-card"><small>Managed workloads</small><strong>$($workloadObjects.Count)</strong></div><div class="summary-card"><small>Workload targets</small><strong>$($workloadAssignments.Count)</strong></div><div class="summary-card"><small>Managed devices</small><strong>$($managedDevices.Count)</strong></div><div class="summary-card"><small>Reported outcomes</small><strong>$($deploymentOutcomes.Count)</strong></div></div><div class="overview-panel"><p class="eyebrow">EVIDENCE STARTING POINTS</p><h2>Who can change it, who should receive it and what Intune reported</h2><p>Open Policies and Apps to inspect configured targets, filters and exclusions. Use Device 360, User 360 and Deployment Outcomes for reported operational evidence. RBAC sections trace administrators, roles, scopes and permissions. Missing outcome data is never presented as success.</p><div class="overview-paths">$workloadRows</div></div></section>
+<section class="view-panel" data-view-panel="overview"><div class="summary-grid"><div class="summary-card"><small>Managed devices</small><strong>$($managedDevices.Count)</strong></div><div class="summary-card"><small>Prioritised findings</small><strong>$($estateFindings.Count)</strong></div><div class="summary-card"><small>Device hygiene findings</small><strong>$($deviceFindings.Count)</strong></div><div class="summary-card"><small>Reported outcomes</small><strong>$($deploymentOutcomes.Count)</strong></div></div><div class="overview-panel"><p class="eyebrow">EVIDENCE STARTING POINTS</p><h2>Find the device, trace its targeting and inspect what Intune reported</h2><p>Estate Intelligence ranks review prompts. Device Hygiene shows record quality. Assignment Explainer separates user and device paths, exclusions, filter evaluation and reported outcomes. Application, update, compliance, Autopilot and RBAC evidence remain traceable to their source. Missing outcome data is never presented as success.</p><p>$(ConvertTo-ExplorerText $estateSummary). Historical comparison: $(ConvertTo-ExplorerText $estateTrendState).</p><div class="overview-paths">$estateFindingRows</div></div></section>
 <section class="view-panel" data-view-panel="workloads" hidden><div class="collection-list">$workloadRows</div></section>
 <section class="view-panel" data-view-panel="workload-assignments" hidden><div class="collection-list">$workloadAssignmentRows</div></section>
 <section class="view-panel" data-view-panel="target-groups" hidden><div class="collection-list">$workloadGroupRows</div></section>
 <section class="view-panel" data-view-panel="assignment-filters" hidden><div class="collection-list">$filterRows</div></section>
+<section class="view-panel" data-view-panel="estate-findings" hidden><div class="collection-list">$estateFindingRows</div></section>
+<section class="view-panel" data-view-panel="recurring-failures" hidden><div class="collection-list">$recurringFailureRows</div></section>
+<section class="view-panel" data-view-panel="device-cohorts" hidden><div class="collection-list">$deviceCohortRows</div></section>
+<section class="view-panel" data-view-panel="cross-device" hidden><div class="collection-list">$crossDeviceRows</div></section>
 <section class="view-panel" data-view-panel="managed-devices" hidden><div class="collection-list">$managedDeviceRows</div></section>
+<section class="view-panel" data-view-panel="device-findings" hidden><div class="collection-list">$deviceFindingRows</div></section>
+<section class="view-panel" data-view-panel="assignment-explanations" hidden><div class="collection-list">$assignmentExplanationRows</div></section>
+<section class="view-panel" data-view-panel="autopilot" hidden><div class="collection-list">$autopilotRows</div></section>
+<section class="view-panel" data-view-panel="application-evidence" hidden><div class="collection-list">$applicationEvidenceRows</div></section>
+<section class="view-panel" data-view-panel="detected-applications" hidden><div class="collection-list">$detectedApplicationRows</div></section>
+<section class="view-panel" data-view-panel="update-compliance" hidden><div class="collection-list">$updateComplianceRows</div></section>
 <section class="view-panel" data-view-panel="managed-users" hidden><div class="collection-list">$managedUserRows</div></section>
 <section class="view-panel" data-view-panel="deployment-outcomes" hidden><div class="collection-list">$deploymentOutcomeRows</div></section>
 <section class="view-panel" data-view-panel="policy-conflicts" hidden><div class="collection-list">$policyConflictRows</div></section>

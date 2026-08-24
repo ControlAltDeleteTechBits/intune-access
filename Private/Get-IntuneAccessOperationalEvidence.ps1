@@ -16,7 +16,7 @@ function Get-IntuneAccessOperationalEvidence {
     # managedDevice uses managedDeviceOwnerType and deviceRegistrationState in the
     # documented v1.0 contract. Older internal fixtures used ownerType and
     # managementState, so the normalisation below keeps those names as fallbacks.
-    $rawDevices = @(Invoke-IntuneAccessGraphRequest -Uri 'deviceManagement/managedDevices?$select=id,deviceName,userId,userPrincipalName,userDisplayName,azureADDeviceId,operatingSystem,osVersion,complianceState,managementAgent,deviceEnrollmentType,lastSyncDateTime,model,manufacturer,serialNumber,managedDeviceOwnerType,deviceRegistrationState,enrolledDateTime' -ApiVersion v1.0)
+    $rawDevices = @(Invoke-IntuneAccessGraphRequest -Uri 'deviceManagement/managedDevices?$select=id,deviceName,userId,userPrincipalName,userDisplayName,azureADDeviceId,operatingSystem,osVersion,complianceState,managementAgent,deviceEnrollmentType,lastSyncDateTime,model,manufacturer,serialNumber,managedDeviceOwnerType,deviceRegistrationState,enrolledDateTime,isEncrypted,jailBroken,deviceCategoryDisplayName,totalStorageSpaceInBytes,freeStorageSpaceInBytes,imei,meid,wiFiMacAddress,ethernetMacAddress,phoneNumber,subscriberCarrier' -ApiVersion v1.0)
     $devices = @($rawDevices | ForEach-Object {
         [PSCustomObject] @{
             PSTypeName          = 'IntuneAccess.ManagedDevice'
@@ -38,6 +38,17 @@ function Get-IntuneAccessOperationalEvidence {
             SerialNumber        = [string] (Get-IntuneAccessProperty $_ 'serialNumber')
             Ownership           = [string] (Get-IntuneAccessProperty $_ 'managedDeviceOwnerType' (Get-IntuneAccessProperty $_ 'ownerType' ''))
             ManagementState     = [string] (Get-IntuneAccessProperty $_ 'deviceRegistrationState' (Get-IntuneAccessProperty $_ 'managementState' ''))
+            IsEncrypted         = Get-IntuneAccessProperty $_ 'isEncrypted'
+            JailBroken          = [string] (Get-IntuneAccessProperty $_ 'jailBroken')
+            DeviceCategory      = [string] (Get-IntuneAccessProperty $_ 'deviceCategoryDisplayName')
+            TotalStorageBytes   = Get-IntuneAccessProperty $_ 'totalStorageSpaceInBytes'
+            FreeStorageBytes    = Get-IntuneAccessProperty $_ 'freeStorageSpaceInBytes'
+            Imei                = [string] (Get-IntuneAccessProperty $_ 'imei')
+            Meid                = [string] (Get-IntuneAccessProperty $_ 'meid')
+            WifiMacAddress      = [string] (Get-IntuneAccessProperty $_ 'wiFiMacAddress')
+            EthernetMacAddress  = [string] (Get-IntuneAccessProperty $_ 'ethernetMacAddress')
+            PhoneNumber         = [string] (Get-IntuneAccessProperty $_ 'phoneNumber')
+            SubscriberCarrier   = [string] (Get-IntuneAccessProperty $_ 'subscriberCarrier')
             SourceApiVersion    = 'v1.0'
         }
     })

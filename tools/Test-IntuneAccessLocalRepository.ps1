@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory)] [ValidateNotNullOrEmpty()] [string] $PackagePath
+    [Parameter(Mandatory)] [ValidateNotNullOrEmpty()] [string] $PackagePath,
+    [string] $Version = '3.0.0'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -31,15 +32,15 @@ try {
 
     $resource = Find-PSResource `
         -Name IntuneAccess `
-        -Version '2.0.1' `
+        -Version $Version `
         -Repository $repositoryName
-    if ($resource.Version -ne [version] '2.0.1') {
+    if ($resource.Version -ne [version] $Version) {
         throw "The local repository returned unexpected version '$($resource.Version)'."
     }
 
-    $existing = @(Get-InstalledPSResource -Name IntuneAccess -Version '2.0.1' -ErrorAction SilentlyContinue)
+    $existing = @(Get-InstalledPSResource -Name IntuneAccess -Version $Version -ErrorAction SilentlyContinue)
     if ($existing.Count -gt 0) {
-        throw 'IntuneAccess 2.0.1 is already installed for this user, so an isolated installation cannot be proved safely.'
+        throw "IntuneAccess $Version is already installed for this user, so an isolated installation cannot be proved safely."
     }
     $graphAuthentication = Get-Module Microsoft.Graph.Authentication -ListAvailable |
         Where-Object Version -GE ([version] '2.0.0') |
@@ -50,7 +51,7 @@ try {
 
     $installed = Install-PSResource `
         -Name IntuneAccess `
-        -Version '2.0.1' `
+        -Version $Version `
         -Repository $repositoryName `
         -Scope CurrentUser `
         -TrustRepository `
@@ -59,10 +60,12 @@ try {
     $installedByTest = $true
 
     Remove-Module IntuneAccess -Force -ErrorAction SilentlyContinue
-    Import-Module IntuneAccess -RequiredVersion '2.0.1' -Force -ErrorAction Stop
+    Import-Module IntuneAccess -RequiredVersion $Version -Force -ErrorAction Stop
     $commands = @(Get-Command -Module IntuneAccess | Sort-Object Name)
-    if ($commands.Count -ne 16) {
-        throw "Expected sixteen exported commands after local repository installation, found $($commands.Count)."
+    $manifest = Test-ModuleManifest -Path (Join-Path (Split-Path $PSScriptRoot -Parent) 'IntuneAccess.psd1')
+    $expectedCommandCount = @($manifest.ExportedFunctions.Keys).Count
+    if ($commands.Count -ne $expectedCommandCount) {
+        throw "Expected $expectedCommandCount exported commands after local repository installation, found $($commands.Count)."
     }
 
     [PSCustomObject] @{
@@ -77,7 +80,7 @@ try {
 finally {
     Remove-Module IntuneAccess -Force -ErrorAction SilentlyContinue
     if ($installedByTest) {
-        Uninstall-PSResource -Name IntuneAccess -Version '2.0.1' -ErrorAction SilentlyContinue
+        Uninstall-PSResource -Name IntuneAccess -Version $Version -ErrorAction SilentlyContinue
     }
     Unregister-PSResourceRepository -Name $repositoryName -ErrorAction SilentlyContinue
     $resource = $null

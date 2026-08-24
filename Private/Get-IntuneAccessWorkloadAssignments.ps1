@@ -89,6 +89,8 @@ function Get-IntuneAccessWorkloadAssignments {
                 SourceCollection    = $source.Name
                 Platform            = [string] (Get-IntuneAccessProperty $sourceItem 'platforms' (Get-IntuneAccessProperty $sourceItem 'operatingSystem' ''))
                 Technologies        = [string] (Get-IntuneAccessProperty $sourceItem 'technologies' '')
+                TargetVersion       = [string] (Get-IntuneAccessProperty $sourceItem 'featureUpdateVersion' (Get-IntuneAccessProperty $sourceItem 'releaseDateDisplayName' ''))
+                DeadlineDateTime    = Get-IntuneAccessProperty $sourceItem 'rolloutSettings' (Get-IntuneAccessProperty $sourceItem 'deadlineDateTime')
                 ODataType           = [string] (Get-IntuneAccessProperty $sourceItem '@odata.type' '')
                 CreatedDateTime     = Get-IntuneAccessProperty $sourceItem 'createdDateTime'
                 LastModifiedDateTime = Get-IntuneAccessProperty $sourceItem 'lastModifiedDateTime'

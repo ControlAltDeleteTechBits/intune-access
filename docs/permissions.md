@@ -1,6 +1,6 @@
 # Microsoft Graph permissions
 
-This matrix was checked against Microsoft Learn on 17 August 2026. All permissions are delegated and read only.
+This matrix was checked against Microsoft Learn on 24 August 2026. All permissions are delegated and read only.
 
 | Feature | Endpoint | Delegated permission | Reason |
 | --- | --- | --- | --- |
@@ -42,6 +42,13 @@ This matrix was checked against Microsoft Learn on 17 August 2026. All permissio
 | Remediation device state | `/deviceManagement/deviceHealthScripts/{id}/deviceRunStates` on beta | `DeviceManagementScripts.Read.All` | Reads detection and remediation states. The current documented response does not guarantee a device relationship, so unmatched records remain `NotEvaluated`. |
 | Managed device tag enrichment | `/deviceManagement/managedDevices` on beta | `DeviceManagementManagedDevices.Read.All` | Reads scope tag IDs. A failure leaves stable device data available and tag matching `NotEvaluated`. |
 | Microsoft Entra device lookup and membership | `/devices` and `/devices/{id}/transitiveMemberOf` | `Device.Read.All` | Tests whether a managed device is within an assignment scope group. |
+| Device inventory reconciliation | `/devices` | `Device.Read.All` | Correlates Intune records with Microsoft Entra device identity, OS, trust and activity evidence. |
+| Detected software inventory | `/deviceManagement/detectedApps` and `/detectedApps/{id}/managedDevices` | `DeviceManagementManagedDevices.Read.All` | Reads detected software and its returned managed-device relationships through v1.0. |
+| Application definition evidence | `/deviceAppManagement/mobileApps` and `/mobileApps/{id}/relationships` | `DeviceManagementApps.Read.All` | Reads requirement, detection, dependency and supersedence evidence. Relationship enrichment uses beta. |
+| Autopilot identities | `/deviceManagement/windowsAutopilotDeviceIdentities` | `DeviceManagementServiceConfig.Read.All` | Reads optional registration, profile assignment and device correlation evidence through beta. |
+| Autopilot events | `/deviceManagement/autopilotEvents` | `DeviceManagementManagedDevices.Read.All` | Reads optional enrolment stage, duration and failure evidence through beta. |
+| Autopilot deployment profiles | `/deviceManagement/windowsAutopilotDeploymentProfiles` | `DeviceManagementServiceConfig.Read.All` | Reads optional deployment profile evidence through beta. |
+| Enrolment Status Page profiles | `/deviceManagement/deviceEnrollmentConfigurations` | `DeviceManagementServiceConfig.Read.All` | Reads optional enrolment configuration evidence through beta. |
 
 ## Feature sets
 
@@ -73,7 +80,7 @@ DeviceManagementApps.Read.All
 DeviceManagementScripts.Read.All
 ```
 
-`Start-IntuneAccess` selects `Core`, `AssignmentExplorer`, `OperationalEvidence`, `PolicyAnalysis` and `AuditEvidence` by default. Each workload source has its own collection state, so a missing permission or unavailable beta endpoint does not hide successful evidence from other sources.
+`Start-IntuneAccess` selects `Core`, `AssignmentExplorer`, `OperationalEvidence`, `PolicyAnalysis`, `AuditEvidence`, `DeviceIntelligence`, `ApplicationEvidence`, `UpdateCompliance` and `EstateIntelligence` by default. Each source has its own collection state, so a missing permission or unavailable beta endpoint does not hide successful evidence from other sources.
 
 ### PolicyAnalysis
 
@@ -124,6 +131,48 @@ DeviceManagementManagedDevices.Read.All
 ```
 
 The guided workflow selects this feature by default. Use `Start-IntuneAccess -Feature Core, AssignmentExplorer` to omit managed-device inventory, deployment outcomes and policy setting analysis.
+
+### DeviceIntelligence and EstateIntelligence
+
+Add:
+
+```text
+DeviceManagementManagedDevices.Read.All
+Device.Read.All
+```
+
+Estate intelligence also uses the application and configuration read scopes already requested by the default workflow.
+
+### ApplicationEvidence
+
+Adds:
+
+```text
+DeviceManagementApps.Read.All
+DeviceManagementManagedDevices.Read.All
+Device.Read.All
+```
+
+### UpdateCompliance
+
+Adds:
+
+```text
+DeviceManagementConfiguration.Read.All
+DeviceManagementManagedDevices.Read.All
+Device.Read.All
+```
+
+### Autopilot
+
+Adds:
+
+```text
+DeviceManagementManagedDevices.Read.All
+DeviceManagementServiceConfig.Read.All
+```
+
+Autopilot is opt-in and is not selected by the default guided workflow.
 
 ## Consent and administrator rights
 

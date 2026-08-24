@@ -23,10 +23,11 @@ function Compare-IntuneAccessSnapshot {
     $reference = Get-Content -LiteralPath $referenceResolved -Raw | ConvertFrom-Json -Depth 50
     $difference = Get-Content -LiteralPath $differenceResolved -Raw | ConvertFrom-Json -Depth 50
     foreach ($snapshot in @($reference, $difference)) {
-        if ([string] (Get-IntuneAccessProperty $snapshot 'Schema') -ne 'https://controlaltdeletetechbits.github.io/intune-access/schemas/snapshot-1.0.json' -or
-            [string] (Get-IntuneAccessProperty $snapshot 'SchemaVersion') -ne '1.0' -or
+        $schemaVersion = [string] (Get-IntuneAccessProperty $snapshot 'SchemaVersion')
+        if ($schemaVersion -notin @('1.0', '2.0') -or
+            [string] (Get-IntuneAccessProperty $snapshot 'Schema') -ne "https://controlaltdeletetechbits.github.io/intune-access/schemas/snapshot-$schemaVersion.json" -or
             $null -eq (Get-IntuneAccessProperty $snapshot 'Data')) {
-            throw 'Both files must be IntuneAccess snapshot schema version 1.0.'
+            throw 'Both files must be supported IntuneAccess snapshot schema version 1.0 or 2.0.'
         }
         $expectedHash = [string] (Get-IntuneAccessProperty $snapshot 'IntegritySha256')
         $actualHash = Get-IntuneAccessSnapshotHash -Value ((Get-IntuneAccessProperty $snapshot 'Data') | ConvertTo-Json -Depth 40 -Compress)
@@ -51,6 +52,15 @@ function Compare-IntuneAccessSnapshot {
         AssignmentFilters   = 'AssignmentFilter'
         PolicySettings      = 'PolicySetting'
         PolicyConflictFindings = 'PolicyConflictFinding'
+        ManagedDevices      = 'ManagedDevice'
+        DeviceInventory     = 'DeviceInventoryRecord'
+        DeviceFindings      = 'DeviceFinding'
+        DeviceAssignmentExplanations = 'DeviceAssignmentExplanation'
+        AutopilotTimelines  = 'AutopilotTimeline'
+        DetectedApplications = 'DetectedApplication'
+        DeviceApplicationEvidence = 'DeviceApplicationEvidence'
+        UpdateComplianceInvestigations = 'UpdateComplianceInvestigation'
+        EstateFindings      = 'EstateFinding'
     }
     $changes = [Collections.Generic.List[object]]::new()
     foreach ($entry in $collectionMap.GetEnumerator()) {

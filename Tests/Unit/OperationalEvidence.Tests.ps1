@@ -76,6 +76,12 @@ Describe 'Device and User 360 operational evidence' {
             Mock Get-IntuneAccessOperationalEvidence {
                 [PSCustomObject] @{ ManagedDevices = @($device); ManagedUsers = @($user); DeploymentOutcomes = @($outcome); CollectionStatus = @(); Warnings = @() }
             }
+            Mock Get-IntuneAccessDeviceIntelligence { [PSCustomObject] @{ Inventory = @(); Findings = @(); Warnings = @() } }
+            Mock Get-IntuneAccessDeviceMembership { [PSCustomObject] @{ State = 'NotEvaluated'; GroupIds = @(); Groups = @() } }
+            Mock Get-IntuneAccessManagedDeviceUserMembership { [PSCustomObject] @{ State = 'NotEvaluated'; GroupIds = @(); Groups = @() } }
+            Mock Resolve-IntuneAccessDeviceAssignment { @() }
+            Mock Get-IntuneAccessApplicationEvidence { [PSCustomObject] @{ DeviceApplicationEvidence = @(); Warnings = @() } }
+            Mock Get-IntuneAccessUpdateComplianceEvidence { [PSCustomObject] @{ Investigations = @(); Warnings = @() } }
 
             $result = Get-IntuneDevice360 -DeviceName 'PC-001'
 

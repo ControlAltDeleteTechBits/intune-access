@@ -10,7 +10,7 @@ function Start-IntuneAccess {
     .PARAMETER UserPrincipalName
     The administrator to select initially in the explorer. Tenant-wide RBAC data is still collected.
     .PARAMETER Feature
-    Selects the read-only feature scopes used for the connection. Core, AssignmentExplorer, OperationalEvidence, PolicyAnalysis and AuditEvidence are the defaults.
+    Selects the read-only feature scopes used for the connection. The default includes the 3.0 device estate explorer. Autopilot is opt-in because it requests DeviceManagementServiceConfig.Read.All and uses beta evidence.
     .PARAMETER Path
     Destination HTML file. A timestamped file in Documents is used by default.
     .PARAMETER SnapshotPath
@@ -34,8 +34,8 @@ function Start-IntuneAccess {
         [ValidateNotNullOrEmpty()]
         [string] $UserPrincipalName,
 
-        [ValidateSet('Core', 'AssignmentExplorer', 'OperationalEvidence', 'PolicyAnalysis', 'AuditEvidence', 'ScopeTagAudit', 'ExtendedScopeTagAudit', 'ManagedDeviceAccess')]
-        [string[]] $Feature = @('Core', 'AssignmentExplorer', 'OperationalEvidence', 'PolicyAnalysis', 'AuditEvidence'),
+        [ValidateSet('Core', 'AssignmentExplorer', 'OperationalEvidence', 'PolicyAnalysis', 'AuditEvidence', 'ScopeTagAudit', 'ExtendedScopeTagAudit', 'ManagedDeviceAccess', 'DeviceIntelligence', 'Autopilot', 'ApplicationEvidence', 'UpdateCompliance', 'EstateIntelligence')]
+        [string[]] $Feature = @('Core', 'AssignmentExplorer', 'OperationalEvidence', 'PolicyAnalysis', 'AuditEvidence', 'DeviceIntelligence', 'ApplicationEvidence', 'UpdateCompliance', 'EstateIntelligence'),
 
         [ValidateNotNullOrEmpty()]
         [string] $Path,
@@ -51,7 +51,7 @@ function Start-IntuneAccess {
         [switch] $Force
     )
 
-    $activity = 'IntuneAccess tenant RBAC explorer'
+    $activity = 'IntuneAccess read-only evidence explorer'
     try {
         Write-Progress -Activity $activity -Status 'Opening delegated Microsoft Graph sign-in' -PercentComplete 5
         $connection = Connect-IntuneAccess -Feature $Feature
@@ -63,6 +63,12 @@ function Start-IntuneAccess {
             -IncludeWorkloadAssignments:('AssignmentExplorer' -in $Feature) `
             -IncludeOperationalEvidence:('OperationalEvidence' -in $Feature) `
             -IncludePolicyAnalysis:('PolicyAnalysis' -in $Feature) `
+            -IncludeDeviceIntelligence:('DeviceIntelligence' -in $Feature -or 'EstateIntelligence' -in $Feature) `
+            -IncludeAssignmentExplanations:('DeviceIntelligence' -in $Feature -or 'EstateIntelligence' -in $Feature) `
+            -IncludeAutopilot:('Autopilot' -in $Feature) `
+            -IncludeApplicationEvidence:('ApplicationEvidence' -in $Feature -or 'EstateIntelligence' -in $Feature) `
+            -IncludeUpdateCompliance:('UpdateCompliance' -in $Feature -or 'EstateIntelligence' -in $Feature) `
+            -IncludeEstateIntelligence:('EstateIntelligence' -in $Feature) `
             -IncludeAuditEvidence:('AuditEvidence' -in $Feature)
 
         if ([string]::IsNullOrWhiteSpace($Path)) {
@@ -88,6 +94,11 @@ function Start-IntuneAccess {
             if (-not [string]::IsNullOrWhiteSpace($BaselineSnapshotPath)) {
                 $snapshotComparison = Compare-IntuneAccessSnapshot -ReferencePath $BaselineSnapshotPath -DifferencePath $snapshot.FullName -AuditEvent @(Get-IntuneAccessProperty $tenantRbac 'AuditEvents' @())
                 $tenantRbac | Add-Member -NotePropertyName SnapshotComparison -NotePropertyValue $snapshotComparison -Force
+                $tenantRbac | Add-Member -NotePropertyName EstateHistoricalTrend -NotePropertyValue ([PSCustomObject] @{
+                    State = 'Compared'
+                    Changes = @($snapshotComparison.Changes)
+                    Explanation = 'Changes were calculated locally from the supplied baseline and current snapshot.'
+                }) -Force
             }
         }
 
@@ -114,6 +125,12 @@ function Start-IntuneAccess {
             PolicySettings    = @(Get-IntuneAccessProperty $tenantRbac 'PolicySettings' @()).Count
             PotentialPolicyConflicts = @(Get-IntuneAccessProperty $tenantRbac 'PolicyConflictFindings' @() | Where-Object FindingState -EQ 'PotentialConflict').Count
             AuditEvents        = @(Get-IntuneAccessProperty $tenantRbac 'AuditEvents' @()).Count
+            DeviceFindings     = @(Get-IntuneAccessProperty $tenantRbac 'DeviceFindings' @()).Count
+            AssignmentExplanations = @(Get-IntuneAccessProperty $tenantRbac 'DeviceAssignmentExplanations' @()).Count
+            AutopilotTimelines = @(Get-IntuneAccessProperty $tenantRbac 'AutopilotTimelines' @()).Count
+            DetectedApplications = @(Get-IntuneAccessProperty $tenantRbac 'DetectedApplications' @()).Count
+            UpdateComplianceInvestigations = @(Get-IntuneAccessProperty $tenantRbac 'UpdateComplianceInvestigations' @()).Count
+            EstateFindings     = @(Get-IntuneAccessProperty $tenantRbac 'EstateFindings' @()).Count
             ReportPath       = [string] $report.FullName
             Opened           = -not $NoOpen.IsPresent
             ReadOnly         = $true

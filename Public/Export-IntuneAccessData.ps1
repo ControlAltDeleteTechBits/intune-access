@@ -3,7 +3,7 @@ function Export-IntuneAccessData {
     .SYNOPSIS
     Exports IntuneAccess evidence as JSON or a set of CSV files.
     .PARAMETER InputObject
-    An IntuneAccess administrator result, comparison or Scoped permissions result.
+    An IntuneAccess evidence result.
     .PARAMETER Path
     A JSON file path or a CSV destination directory.
     .PARAMETER Format
@@ -27,10 +27,16 @@ function Export-IntuneAccessData {
         $supportedTypes = @(
             'IntuneAccess.AdminAccess',
             'IntuneAccess.AdminAccessComparison',
-            'IntuneAccess.ScopedPermissionImpact'
+            'IntuneAccess.ScopedPermissionImpact',
+            'IntuneAccess.TenantRbac',
+            'IntuneAccess.DeviceIntelligence',
+            'IntuneAccess.DeviceEstateInsight',
+            'IntuneAccess.ApplicationEvidence',
+            'IntuneAccess.UpdateComplianceEvidence',
+            'IntuneAccess.AutopilotEvidence'
         )
         if (@($InputObject.PSObject.TypeNames | Where-Object { $_ -in $supportedTypes }).Count -eq 0) {
-            throw 'InputObject must be an IntuneAccess administrator, comparison or Scoped permissions result.'
+            throw 'InputObject must be an IntuneAccess supported evidence result.'
         }
 
         $resolvedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
@@ -47,8 +53,8 @@ function Export-IntuneAccessData {
             }
             if ($PSCmdlet.ShouldProcess($resolvedPath, 'Write IntuneAccess JSON evidence')) {
                 $envelope = [ordered] @{
-                    Schema        = 'https://controlaltdeletetechbits.github.io/intune-access/schemas/evidence-1.0.json'
-                    SchemaVersion = '1.0'
+                    Schema        = 'https://controlaltdeletetechbits.github.io/intune-access/schemas/evidence-2.0.json'
+                    SchemaVersion = '2.0'
                     DataType      = @($InputObject.PSObject.TypeNames | Where-Object { $_ -like 'IntuneAccess.*' })[0]
                     ToolVersion   = $script:IntuneAccessVersion
                     ExportedAt    = [DateTimeOffset]::Now
@@ -61,7 +67,41 @@ function Export-IntuneAccessData {
         }
 
         if ('IntuneAccess.AdminAccess' -notin $InputObject.PSObject.TypeNames) {
-            throw 'CSV export currently accepts only a result returned by Get-IntuneAdminAccess.'
+            $csvDatasets = [ordered] @{}
+            if ('IntuneAccess.TenantRbac' -in $InputObject.PSObject.TypeNames) {
+                $csvDatasets['device-inventory.csv'] = @(Get-IntuneAccessProperty $InputObject 'DeviceInventory' @())
+                $csvDatasets['device-findings.csv'] = @(Get-IntuneAccessProperty $InputObject 'DeviceFindings' @())
+                $csvDatasets['assignment-explanations.csv'] = @(Get-IntuneAccessProperty $InputObject 'DeviceAssignmentExplanations' @() | Select-Object DeviceId, DeviceName, WorkloadId, WorkloadName, WorkloadType, AssignmentState, ReportedOutcomeState, EvidenceBoundary)
+                $csvDatasets['application-evidence.csv'] = @(Get-IntuneAccessProperty $InputObject 'DeviceApplicationEvidence' @() | Select-Object ApplicationId, ApplicationName, DeviceId, DeviceName, @{ Name = 'ConfiguredIntents'; Expression = { @($_.ConfiguredIntents) -join ';' } }, DetectionState, EvidenceBoundary)
+                $csvDatasets['update-compliance.csv'] = @(Get-IntuneAccessProperty $InputObject 'UpdateComplianceInvestigations' @() | Select-Object DeviceId, DeviceName, UserPrincipalName, OperatingSystem, OsVersion, WorkloadId, WorkloadName, WorkloadType, TargetVersion, ReportedState, InvestigationState, Explanation, EvidenceAgeDays, EvidenceTimestamp)
+                $csvDatasets['estate-findings.csv'] = @(Get-IntuneAccessProperty $InputObject 'EstateFindings' @() | Select-Object FindingId, PriorityScore, Severity, Category, Title, DeviceId, DeviceName, SourceType, SourceId, EvidenceTimestamp, Explanation, ReviewRecommendation, CauseState)
+            }
+            elseif ('IntuneAccess.DeviceIntelligence' -in $InputObject.PSObject.TypeNames) {
+                $csvDatasets['device-inventory.csv'] = @($InputObject.Inventory)
+                $csvDatasets['device-findings.csv'] = @($InputObject.Findings)
+            }
+            elseif ('IntuneAccess.DeviceEstateInsight' -in $InputObject.PSObject.TypeNames) {
+                $csvDatasets['estate-findings.csv'] = @($InputObject.PrioritisedFindings)
+                $csvDatasets['recurring-failures.csv'] = @($InputObject.RecurringFailures | Select-Object Signature, Title, SourceType, SourceId, DeviceCount, @{ Name = 'DeviceIds'; Expression = { @($_.DeviceIds) -join ';' } }, CauseState, Explanation)
+                $csvDatasets['device-cohorts.csv'] = @($InputObject.Cohorts | Select-Object Dimension, Value, DeviceCount, FindingCount, @{ Name = 'DeviceIds'; Expression = { @($_.DeviceIds) -join ';' } })
+            }
+            elseif ('IntuneAccess.ApplicationEvidence' -in $InputObject.PSObject.TypeNames) { $csvDatasets['application-evidence.csv'] = @($InputObject.DeviceApplicationEvidence) }
+            elseif ('IntuneAccess.UpdateComplianceEvidence' -in $InputObject.PSObject.TypeNames) { $csvDatasets['update-compliance.csv'] = @($InputObject.Investigations) }
+            elseif ('IntuneAccess.AutopilotEvidence' -in $InputObject.PSObject.TypeNames) { $csvDatasets['autopilot-timelines.csv'] = @($InputObject.Timelines | Select-Object AutopilotIdentityId, ManagedDeviceId, DeviceName, SerialNumber, EntraDeviceId, GroupTag, EnrollmentState, DeploymentProfileName, ProfileAssignmentState, LastContactedDateTime, EventCount, CorrelationState, EvidenceBoundary) }
+            else { throw 'CSV export is not available for this IntuneAccess result type.' }
+
+            if ((Test-Path -LiteralPath $resolvedPath) -and @(Get-ChildItem -LiteralPath $resolvedPath -File -ErrorAction SilentlyContinue).Count -gt 0 -and -not $Force) { throw "The CSV destination contains files: $resolvedPath. Use -Force to replace the IntuneAccess datasets." }
+            if (-not (Test-Path -LiteralPath $resolvedPath)) { $null = New-Item -ItemType Directory -Path $resolvedPath -Force }
+            if (-not $PSCmdlet.ShouldProcess($resolvedPath, 'Write IntuneAccess CSV evidence datasets')) { return }
+            $writtenEvidence = [System.Collections.Generic.List[IO.FileInfo]]::new()
+            foreach ($dataset in $csvDatasets.GetEnumerator()) {
+                $filePath = Join-Path $resolvedPath $dataset.Key
+                $rows = @($dataset.Value)
+                if ($rows.Count -gt 0) { $rows | Export-Csv -LiteralPath $filePath -NoTypeInformation -Encoding utf8 -Force }
+                else { Set-Content -LiteralPath $filePath -Value 'NoData' -Encoding utf8NoBOM }
+                $writtenEvidence.Add((Get-Item -LiteralPath $filePath))
+            }
+            return $writtenEvidence.ToArray()
         }
         if ((Test-Path -LiteralPath $resolvedPath) -and
             @(Get-ChildItem -LiteralPath $resolvedPath -File -ErrorAction SilentlyContinue).Count -gt 0 -and

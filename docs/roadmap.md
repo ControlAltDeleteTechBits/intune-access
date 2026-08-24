@@ -77,7 +77,7 @@ Version 2.0.0 will not claim the final value enforced on a device unless Microso
 
 ## Version 2.1.0
 
-Status: planned.
+Status: implemented in the 3.0.0 source; live representative-tenant validation remains.
 
 Add device inventory and hygiene so administrators can find stale, duplicate, mismatched and incomplete device records.
 
@@ -92,7 +92,7 @@ The release is complete when every hygiene finding contains the affected device,
 
 ## Version 2.2.0
 
-Status: planned.
+Status: implemented in the 3.0.0 source; live representative-tenant validation remains.
 
 Add a device assignment explainer that shows why a device received, missed or could not evaluate a policy or application.
 
@@ -107,7 +107,7 @@ The release is complete when a selected device can display a source-to-outcome p
 
 ## Version 2.3.0
 
-Status: planned.
+Status: implemented as an optional 3.0.0 feature; live Autopilot validation remains.
 
 Add an optional Windows Autopilot and enrolment timeline showing profiles, Enrollment Status Page stages, durations, failures and enrolment evidence.
 
@@ -122,7 +122,7 @@ The release is complete when an Autopilot attempt can be reconstructed from retu
 
 ## Version 2.4.0
 
-Status: planned.
+Status: implemented in the 3.0.0 source; live application-evidence validation remains.
 
 Add application and software evidence that joins required applications, installation results, detected software and errors.
 
@@ -137,7 +137,7 @@ The release is complete when application intent, reported state and detected evi
 
 ## Version 2.5.0
 
-Status: planned.
+Status: implemented in the 3.0.0 source; live update and compliance validation remains.
 
 Add an update and compliance investigator that explains patch state, update targeting, compliance failures and stale reporting.
 
@@ -152,7 +152,7 @@ The release is complete when administrators can distinguish missing targeting, d
 
 ## Version 3.0.0
 
-Status: planned.
+Status: implemented locally; release gates and representative live validation remain.
 
 Add device estate intelligence with prioritised findings, historical trends and cross-device investigation.
 

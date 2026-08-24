@@ -24,7 +24,7 @@ $package = .\tools\New-IntuneAccessGalleryPackage.ps1 -Force
     -PackagePath $package.Package
 ```
 
-Confirm that the package result reports version `2.0.1`, sixteen exported commands, no validation error and a successful local repository installation.
+Confirm that the package result reports version `3.0.0`, 22 exported commands, no validation error and a successful local repository installation.
 
 ## Publication order
 
@@ -46,7 +46,7 @@ Do not use `Publish-PSResource -WhatIf` as a publication safeguard. During the 1
 ## Controlled publication command
 
 ```powershell
-$packagePath = '.\release\gallery\IntuneAccess.2.0.1.nupkg'
+$packagePath = '.\release\gallery\IntuneAccess.3.0.0.nupkg'
 
 Get-Item -LiteralPath $packagePath |
     Select-Object Name, Length
@@ -85,11 +85,11 @@ Use an isolated PowerShell 7 environment that does not already contain IntuneAcc
 
 ```powershell
 Find-PSResource IntuneAccess `
-    -Version '2.0.1' `
+    -Version '3.0.0' `
     -Repository PSGallery
 
 Install-PSResource IntuneAccess `
-    -Version '2.0.1' `
+    -Version '3.0.0' `
     -Repository PSGallery `
     -Scope CurrentUser `
     -TrustRepository

@@ -9,6 +9,13 @@ function Get-IntuneAccessTenantRbac {
         [switch] $IncludeOperationalEvidence,
         [switch] $IncludePolicyAnalysis,
 
+        [switch] $IncludeDeviceIntelligence,
+        [switch] $IncludeAssignmentExplanations,
+        [switch] $IncludeAutopilot,
+        [switch] $IncludeApplicationEvidence,
+        [switch] $IncludeUpdateCompliance,
+        [switch] $IncludeEstateIntelligence,
+
         [switch] $IncludeAuditEvidence
     )
 
@@ -29,6 +36,12 @@ function Get-IntuneAccessTenantRbac {
     $operationalEvidence = $null
     $policyAnalysis = $null
     $auditEvidence = $null
+    $deviceIntelligence = $null
+    $assignmentExplanations = $null
+    $autopilotEvidence = $null
+    $applicationEvidence = $null
+    $updateComplianceEvidence = $null
+    $estateInsight = $null
 
     foreach ($userGroup in @($memberships | Group-Object { $_.User.Id })) {
         $userMemberships = @($userGroup.Group)
@@ -120,18 +133,42 @@ function Get-IntuneAccessTenantRbac {
     $warnings.Add('Microsoft Entra administrative roles are outside the Intune RBAC model and can provide additional Intune access not shown here.')
     $warnings.Add('The active March 2026 Scoped permissions model is not exposed by a documented Microsoft Graph contract used here.')
 
-    if ($IncludeWorkloadAssignments -or $IncludeOperationalEvidence -or $IncludePolicyAnalysis) {
+    if ($IncludeWorkloadAssignments -or $IncludeOperationalEvidence -or $IncludePolicyAnalysis -or $IncludeAssignmentExplanations -or $IncludeApplicationEvidence -or $IncludeUpdateCompliance -or $IncludeEstateIntelligence) {
         $workloadInventory = Get-IntuneAccessWorkloadAssignments
         foreach ($warning in @($workloadInventory.Warnings)) {
             $warnings.Add([string] $warning)
         }
     }
 
-    if ($IncludeOperationalEvidence) {
+    if ($IncludeOperationalEvidence -or $IncludeDeviceIntelligence -or $IncludeAssignmentExplanations -or $IncludeAutopilot -or $IncludeApplicationEvidence -or $IncludeUpdateCompliance -or $IncludeEstateIntelligence) {
         $operationalEvidence = Get-IntuneAccessOperationalEvidence -Workload $workloadInventory.Workloads
         foreach ($warning in @($operationalEvidence.Warnings)) {
             $warnings.Add([string] $warning)
         }
+    }
+
+    if ($IncludeDeviceIntelligence -or $IncludeEstateIntelligence) {
+        $deviceIntelligence = Get-IntuneAccessDeviceIntelligence -ManagedDevice $operationalEvidence.ManagedDevices
+        foreach ($warning in @($deviceIntelligence.Warnings)) { $warnings.Add([string] $warning) }
+    }
+    if ($IncludeAssignmentExplanations) {
+        $assignmentExplanations = Get-IntuneAccessFleetAssignmentExplanation -ManagedDevice $operationalEvidence.ManagedDevices -Workload $workloadInventory.Workloads -Assignment $workloadInventory.Assignments -DeploymentOutcome $operationalEvidence.DeploymentOutcomes
+        foreach ($warning in @($assignmentExplanations.Warnings)) { $warnings.Add([string] $warning) }
+    }
+    if ($IncludeAutopilot) {
+        $autopilotEvidence = Get-IntuneAccessAutopilotEvidence -ManagedDevice $operationalEvidence.ManagedDevices
+        foreach ($warning in @($autopilotEvidence.Warnings)) { $warnings.Add([string] $warning) }
+    }
+    if ($IncludeApplicationEvidence -or $IncludeEstateIntelligence) {
+        $applicationEvidence = Get-IntuneAccessApplicationEvidence -Workload $workloadInventory.Workloads -Assignment $workloadInventory.Assignments -ManagedDevice $operationalEvidence.ManagedDevices -DeploymentOutcome $operationalEvidence.DeploymentOutcomes
+        foreach ($warning in @($applicationEvidence.Warnings)) { $warnings.Add([string] $warning) }
+    }
+    if ($IncludeUpdateCompliance -or $IncludeEstateIntelligence) {
+        $updateComplianceEvidence = Get-IntuneAccessUpdateComplianceEvidence -Workload $workloadInventory.Workloads -Assignment $workloadInventory.Assignments -ManagedDevice $operationalEvidence.ManagedDevices -DeploymentOutcome $operationalEvidence.DeploymentOutcomes
+        foreach ($warning in @($updateComplianceEvidence.Warnings)) { $warnings.Add([string] $warning) }
+    }
+    if ($IncludeEstateIntelligence) {
+        $estateInsight = Get-IntuneAccessEstateInsight -DeviceIntelligence $deviceIntelligence -ApplicationEvidence $applicationEvidence -UpdateComplianceEvidence $updateComplianceEvidence -AutopilotEvidence $autopilotEvidence -DeploymentOutcome $operationalEvidence.DeploymentOutcomes
     }
 
     if ($IncludePolicyAnalysis) {
@@ -157,6 +194,27 @@ function Get-IntuneAccessTenantRbac {
     $policyConflictCollectionStatus = if ($null -eq $policyAnalysis) { @() } else { @($policyAnalysis.CollectionStatus) }
     $auditEvents = if ($null -eq $auditEvidence) { @() } else { @($auditEvidence.Events) }
     $auditCollectionStatus = if ($null -eq $auditEvidence) { $null } else { $auditEvidence.CollectionStatus }
+    $deviceInventory = if ($null -eq $deviceIntelligence) { @() } else { @($deviceIntelligence.Inventory) }
+    $deviceFindings = if ($null -eq $deviceIntelligence) { @() } else { @($deviceIntelligence.Findings) }
+    $deviceIntelligenceStatus = if ($null -eq $deviceIntelligence) { $null } else { $deviceIntelligence.CollectionStatus }
+    $deviceAssignmentExplanations = if ($null -eq $assignmentExplanations) { @() } else { @($assignmentExplanations.Explanations) }
+    $assignmentExplanationStatus = if ($null -eq $assignmentExplanations) { $null } else { $assignmentExplanations.CollectionStatus }
+    $autopilotTimelines = if ($null -eq $autopilotEvidence) { @() } else { @($autopilotEvidence.Timelines) }
+    $autopilotProfiles = if ($null -eq $autopilotEvidence) { @() } else { @($autopilotEvidence.DeploymentProfiles) }
+    $espProfiles = if ($null -eq $autopilotEvidence) { @() } else { @($autopilotEvidence.EspProfiles) }
+    $autopilotCollectionStatus = if ($null -eq $autopilotEvidence) { @() } else { @($autopilotEvidence.CollectionStatus) }
+    $applicationDefinitions = if ($null -eq $applicationEvidence) { @() } else { @($applicationEvidence.ApplicationDefinitions) }
+    $detectedApplications = if ($null -eq $applicationEvidence) { @() } else { @($applicationEvidence.DetectedApplications) }
+    $deviceApplicationEvidence = if ($null -eq $applicationEvidence) { @() } else { @($applicationEvidence.DeviceApplicationEvidence) }
+    $applicationCollectionStatus = if ($null -eq $applicationEvidence) { @() } else { @($applicationEvidence.CollectionStatus) }
+    $updateComplianceInvestigations = if ($null -eq $updateComplianceEvidence) { @() } else { @($updateComplianceEvidence.Investigations) }
+    $updateComplianceCollectionStatus = if ($null -eq $updateComplianceEvidence) { $null } else { $updateComplianceEvidence.CollectionStatus }
+    $estateFindings = if ($null -eq $estateInsight) { @() } else { @($estateInsight.PrioritisedFindings) }
+    $recurringFailures = if ($null -eq $estateInsight) { @() } else { @($estateInsight.RecurringFailures) }
+    $deviceCohorts = if ($null -eq $estateInsight) { @() } else { @($estateInsight.Cohorts) }
+    $crossDeviceInvestigations = if ($null -eq $estateInsight) { @() } else { @($estateInsight.CrossDeviceInvestigations) }
+    $estateHistoricalTrend = if ($null -eq $estateInsight) { $null } else { $estateInsight.HistoricalTrend }
+    $shareSafeBundle = if ($null -eq $estateInsight) { $null } else { $estateInsight.ShareSafeBundle }
     $permissionsUsed = @($analysisScopes)
     if ($null -ne $workloadInventory) {
         $permissionsUsed = @($permissionsUsed + @($workloadInventory.GraphPermissionsUsed) | Select-Object -Unique)
@@ -166,6 +224,9 @@ function Get-IntuneAccessTenantRbac {
     }
     if ($null -ne $auditEvidence) {
         $permissionsUsed = @($permissionsUsed + @($auditEvidence.GraphPermissionsUsed) | Select-Object -Unique)
+    }
+    foreach ($evidenceSource in @($deviceIntelligence, $autopilotEvidence, $applicationEvidence, $updateComplianceEvidence)) {
+        if ($null -ne $evidenceSource) { $permissionsUsed = @($permissionsUsed + @($evidenceSource.GraphPermissionsUsed) | Select-Object -Unique) }
     }
 
     [PSCustomObject] @{
@@ -193,6 +254,27 @@ function Get-IntuneAccessTenantRbac {
         PolicyConflictCollectionStatus = $policyConflictCollectionStatus
         AuditEvents             = $auditEvents
         AuditCollectionStatus   = $auditCollectionStatus
+        DeviceInventory         = $deviceInventory
+        DeviceFindings          = $deviceFindings
+        DeviceIntelligenceStatus = $deviceIntelligenceStatus
+        DeviceAssignmentExplanations = $deviceAssignmentExplanations
+        AssignmentExplanationStatus = $assignmentExplanationStatus
+        AutopilotTimelines      = $autopilotTimelines
+        AutopilotProfiles       = $autopilotProfiles
+        EspProfiles             = $espProfiles
+        AutopilotCollectionStatus = $autopilotCollectionStatus
+        ApplicationDefinitions = $applicationDefinitions
+        DetectedApplications    = $detectedApplications
+        DeviceApplicationEvidence = $deviceApplicationEvidence
+        ApplicationCollectionStatus = $applicationCollectionStatus
+        UpdateComplianceInvestigations = $updateComplianceInvestigations
+        UpdateComplianceCollectionStatus = $updateComplianceCollectionStatus
+        EstateFindings          = $estateFindings
+        RecurringFailures       = $recurringFailures
+        DeviceCohorts           = $deviceCohorts
+        CrossDeviceInvestigations = $crossDeviceInvestigations
+        EstateHistoricalTrend   = $estateHistoricalTrend
+        ShareSafeBundle         = $shareSafeBundle
         Warnings               = $warnings.ToArray()
         InitialUserPrincipalName = $InitialUserPrincipalName
         GraphPermissionsUsed   = $permissionsUsed

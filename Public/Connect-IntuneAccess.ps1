@@ -5,7 +5,7 @@ function Connect-IntuneAccess {
     .DESCRIPTION
     Requests the scopes needed by the selected feature. No write permission is requested.
     .PARAMETER Feature
-    Selects Core analysis, assignment, operational, policy analysis, scope-tag audit or managed-device access features. Core is always included.
+    Selects Core analysis and optional read-only evidence features. Core is always included.
     .EXAMPLE
     Connect-IntuneAccess
     .EXAMPLE
@@ -13,7 +13,7 @@ function Connect-IntuneAccess {
     #>
     [CmdletBinding()]
     param(
-        [ValidateSet('Core', 'AssignmentExplorer', 'OperationalEvidence', 'PolicyAnalysis', 'AuditEvidence', 'ScopeTagAudit', 'ExtendedScopeTagAudit', 'ManagedDeviceAccess')]
+        [ValidateSet('Core', 'AssignmentExplorer', 'OperationalEvidence', 'PolicyAnalysis', 'AuditEvidence', 'ScopeTagAudit', 'ExtendedScopeTagAudit', 'ManagedDeviceAccess', 'DeviceIntelligence', 'Autopilot', 'ApplicationEvidence', 'UpdateCompliance', 'EstateIntelligence')]
         [string[]] $Feature = @('Core')
     )
 
@@ -57,6 +57,22 @@ function Connect-IntuneAccess {
     }
     if ('ManagedDeviceAccess' -in $Feature) {
         foreach ($scope in @('DeviceManagementManagedDevices.Read.All', 'Device.Read.All')) {
+            if ($scope -notin $scopes) { $scopes.Add($scope) }
+        }
+    }
+    if (@('DeviceIntelligence', 'ApplicationEvidence', 'UpdateCompliance', 'EstateIntelligence') | Where-Object { $_ -in $Feature }) {
+        foreach ($scope in @('DeviceManagementManagedDevices.Read.All', 'Device.Read.All')) {
+            if ($scope -notin $scopes) { $scopes.Add($scope) }
+        }
+    }
+    if (@('ApplicationEvidence', 'EstateIntelligence') | Where-Object { $_ -in $Feature }) {
+        if ('DeviceManagementApps.Read.All' -notin $scopes) { $scopes.Add('DeviceManagementApps.Read.All') }
+    }
+    if (@('UpdateCompliance', 'EstateIntelligence') | Where-Object { $_ -in $Feature }) {
+        if ('DeviceManagementConfiguration.Read.All' -notin $scopes) { $scopes.Add('DeviceManagementConfiguration.Read.All') }
+    }
+    if ('Autopilot' -in $Feature) {
+        foreach ($scope in @('DeviceManagementManagedDevices.Read.All', 'DeviceManagementServiceConfig.Read.All')) {
             if ($scope -notin $scopes) { $scopes.Add($scope) }
         }
     }

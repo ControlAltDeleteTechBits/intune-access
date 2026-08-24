@@ -2,6 +2,19 @@
 
 All notable project changes are recorded here.
 
+## 3.0.0
+
+- Handles update and compliance workload records that omit `SourceApiVersion`, retaining `NotReturned` in collection provenance rather than stopping the report.
+
+1. Added device inventory, Microsoft Entra reconciliation and evidence-backed hygiene rules.
+2. Added device and associated-user assignment explanations with exclusions and conservative filter evaluation.
+3. Added optional Autopilot, deployment profile, Enrolment Status Page and enrolment timeline evidence.
+4. Added application definitions, detected software, installation results, requirements, detection rules and relationships.
+5. Added update and compliance investigations with distinct targeting, stale, failure and unavailable states.
+6. Added prioritised estate findings, recurring evidence groups, device cohorts, cross-device investigations and share-safe bundles.
+7. Extended Signal Atlas, JSON, CSV and snapshot schema 2.0 for every device dataset.
+8. Added six public commands and expanded the unit suite to 98 tests.
+
 ## 2.0.1
 
 1. Added a prominent two-command Quick start to the GitHub README.

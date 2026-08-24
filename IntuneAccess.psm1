@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 
 $script:IntuneAccessModuleRoot = $PSScriptRoot
-$script:IntuneAccessVersion = '2.0.1'
+$script:IntuneAccessVersion = '3.0.0'
 
 foreach ($folder in @('Private', 'Public')) {
     $functions = Get-ChildItem -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath $folder) -Filter '*.ps1' -File |
@@ -21,12 +21,18 @@ Export-ModuleMember -Function @(
     'Export-IntuneAccessSnapshot'
     'Get-IntuneAdminAccess'
     'Get-IntuneAssignmentImpact'
+    'Get-IntuneApplicationEvidence'
+    'Get-IntuneAutopilotTimeline'
     'Get-IntuneDevice360'
+    'Get-IntuneDeviceAssignmentExplanation'
+    'Get-IntuneDeviceEstateInsight'
+    'Get-IntuneDeviceHygiene'
     'Get-IntunePolicyConflict'
     'Get-IntuneRoleAssignment'
     'Get-IntuneScopedPermissionImpact'
     'Get-IntuneScopeTagAudit'
     'Get-IntuneUser360'
+    'Get-IntuneUpdateCompliance'
     'Start-IntuneAccess'
     'Test-IntuneResourceAccess'
 )

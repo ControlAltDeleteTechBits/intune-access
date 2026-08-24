@@ -60,6 +60,12 @@ It is designed for administrators who need to establish:
 17. Offers stable identity pseudonymisation for share-safe snapshot workflows.
 18. Finds same-setting overlaps and labels only evidence-backed cases as potential conflicts.
 19. Shows recent Intune audit events and links resource IDs to matching snapshot changes.
+20. Reconciles Intune and Microsoft Entra device identities and finds stale, duplicate, mismatched and incomplete records.
+21. Explains device and associated-user assignment paths, exclusions and supported filter rules separately from reported outcomes.
+22. Provides optional Autopilot, deployment profile, Enrolment Status Page and enrolment-stage evidence.
+23. Joins application intent, installation results, detected software, requirements, detection rules and relationships.
+24. Investigates update targeting, OS evidence, compliance state and reporting age without treating configuration as delivery.
+25. Ranks traceable estate findings, groups recurring evidence, builds device cohorts and creates a stable pseudonymised share-safe bundle.
 
 ## What it does not do
 
@@ -101,6 +107,19 @@ $assignments.Assignments
 
 $device = Get-IntuneDevice360 -DeviceName 'LAPTOP-0234'
 $device.DeploymentOutcomes
+
+$hygiene = Get-IntuneDeviceHygiene
+$hygiene.Findings
+
+Get-IntuneDeviceAssignmentExplanation -DeviceName 'LAPTOP-0234'
+
+$applications = Get-IntuneApplicationEvidence -DeviceName 'LAPTOP-0234'
+$updates = Get-IntuneUpdateCompliance -DeviceName 'LAPTOP-0234'
+$estate = Get-IntuneDeviceEstateInsight
+
+$historicalEstate = Get-IntuneDeviceEstateInsight `
+    -ReferenceSnapshotPath '.\before.snapshot.json' `
+    -DifferenceSnapshotPath '.\after.snapshot.json'
 
 $user = Get-IntuneUser360 -UserPrincipalName 'helpdesk.user@contoso.com'
 $user.ManagedDevices
@@ -184,6 +203,7 @@ Device and User 360 add:
 
 ```text
 DeviceManagementManagedDevices.Read.All
+Device.Read.All
 ```
 
 The other operational outcome endpoints use the configuration, application and script read scopes already listed. To omit operational collection, run:
@@ -213,6 +233,14 @@ Managed device explanation adds:
 DeviceManagementManagedDevices.Read.All
 Device.Read.All
 ```
+
+The optional Autopilot timeline adds:
+
+```text
+DeviceManagementServiceConfig.Read.All
+```
+
+Run `Start-IntuneAccess -Feature Core, AssignmentExplorer, OperationalEvidence, DeviceIntelligence, ApplicationEvidence, UpdateCompliance, EstateIntelligence, Autopilot` when Autopilot evidence is required. Autopilot is not part of the default consent request.
 
 Every requested permission ends in `Read` or `Read.All`. See [docs/permissions.md](docs/permissions.md) for the endpoint matrix and consent notes.
 
@@ -372,10 +400,10 @@ See [docs/effective-access-model.md](docs/effective-access-model.md).
 5. Managed device access explanation is deliberately conservative and never returns `AccessDenied`.
 6. Scope tag auditing covers a defined set of resource families rather than every Intune object type.
 7. Settings Catalog and endpoint security policy settings use isolated Microsoft Graph beta contracts.
-8. Exact intersection between different target groups and assignment-filter rule evaluation are not calculated; those overlaps remain `NotEvaluated`.
+8. Device assignment explanation evaluates direct and transitive group membership plus a conservative subset of single-clause assignment filters. Compound and unsupported filter rules remain `NotEvaluated`.
 9. A configured assignment does not prove delivery, and a reported outcome does not prove which assignment produced it.
 10. Supported legacy configuration status and beta application status contracts are deprecated by Microsoft; each read is isolated and labelled.
-11. Settings Catalog, endpoint security and Windows update deployment outcomes remain unsupported until a dependable read contract is adopted.
+11. Settings Catalog, endpoint security and some Windows update deployment outcomes remain unavailable where a dependable read contract is not adopted.
 12. Identity redaction creates stable pseudonyms, not irreversible anonymisation.
 13. A live tenant is required to validate tenant specific behaviour.
 
@@ -387,18 +415,18 @@ Product decisions, design choices, validation evidence and release progress are 
 
 The agreed versioned product plan is tracked in [docs/roadmap.md](docs/roadmap.md).
 
-## Device roadmap
+## Device intelligence releases
 
-The agreed work after 2.0.1 extends IntuneAccess from individual Device 360 evidence into a read-only device investigation and estate view:
+Version 3.0.0 completes the agreed device investigation and estate roadmap:
 
-| Version | Planned capability | Intended result |
+| Version | Capability | Result |
 | --- | --- | --- |
-| 2.1.0 | Device inventory and hygiene | Find stale, duplicate, mismatched and incomplete device records. |
-| 2.2.0 | Device assignment explainer | Explain why a device received, missed or could not evaluate a policy or application. |
-| 2.3.0 | Autopilot and enrolment timeline | Show profiles, Enrollment Status Page stages, durations, failures and enrolment evidence. |
-| 2.4.0 | Application and software evidence | Join required applications, installation results, detected software and errors. |
-| 2.5.0 | Update and compliance investigator | Explain patch state, update targeting, compliance failures and stale reporting. |
-| 3.0.0 | Device estate intelligence | Add prioritised findings, historical trends and cross-device investigation. |
+| 2.1.0 | Device inventory and hygiene | Implemented in 3.0.0. |
+| 2.2.0 | Device assignment explainer | Implemented in 3.0.0. |
+| 2.3.0 | Autopilot and enrolment timeline | Implemented as an optional feature in 3.0.0. |
+| 2.4.0 | Application and software evidence | Implemented in 3.0.0. |
+| 2.5.0 | Update and compliance investigator | Implemented in 3.0.0. |
+| 3.0.0 | Device estate intelligence | Implemented in 3.0.0. |
 
 The module will remain read only. Device-changing remote actions are not part of this roadmap. Detailed evidence boundaries and completion criteria are recorded in [docs/roadmap.md](docs/roadmap.md).
 

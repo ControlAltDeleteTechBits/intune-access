@@ -15,7 +15,7 @@ if (-not $Advanced) {
 
 # Run this example with -Advanced to exercise the individual commands below.
 
-Connect-IntuneAccess
+Connect-IntuneAccess -Feature Core, AssignmentExplorer, OperationalEvidence, DeviceIntelligence, ApplicationEvidence, UpdateCompliance, EstateIntelligence
 
 $assignmentImpact = Get-IntuneAssignmentImpact
 $assignmentImpact.Workloads
@@ -25,6 +25,20 @@ $policyAnalysis = Get-IntunePolicyConflict `
     -Workload $assignmentImpact.Workloads `
     -Assignment $assignmentImpact.Assignments
 $policyAnalysis.PotentialConflicts
+
+$hygiene = Get-IntuneDeviceHygiene
+$hygiene.Findings | Format-Table Severity, RuleId, DeviceName, EvidenceTimestamp
+
+Get-IntuneDeviceAssignmentExplanation -DeviceName 'LAPTOP-0234'
+Get-IntuneApplicationEvidence -DeviceName 'LAPTOP-0234'
+Get-IntuneUpdateCompliance -DeviceName 'LAPTOP-0234'
+
+$estate = Get-IntuneDeviceEstateInsight
+$estate.PrioritisedFindings | Format-Table PriorityScore, Severity, DeviceName, Title
+
+# Autopilot is optional and requires a new connection with its service-configuration read scope.
+# Connect-IntuneAccess -Feature Core, OperationalEvidence, Autopilot
+# Get-IntuneAutopilotTimeline -SerialNumber 'PF123ABC'
 
 $access = Get-IntuneAdminAccess `
     -UserPrincipalName 'helpdesk.user@contoso.com'

@@ -66,12 +66,18 @@ function ConvertTo-IntuneAccessSnapshot {
     foreach ($collectionName in @(
         'Administrators', 'AdminGroups', 'RoleAssignments', 'RoleDefinitions', 'ScopeGroups', 'ScopeTags',
         'Permissions', 'Memberships', 'WorkloadObjects', 'WorkloadAssignments', 'WorkloadGroups',
-        'AssignmentFilters', 'ManagedDevices', 'ManagedUsers', 'DeploymentOutcomes', 'PolicySettings', 'PolicyConflictFindings', 'AuditEvents'
+        'AssignmentFilters', 'ManagedDevices', 'ManagedUsers', 'DeploymentOutcomes', 'PolicySettings', 'PolicyConflictFindings', 'AuditEvents',
+        'DeviceInventory', 'DeviceFindings', 'DeviceAssignmentExplanations', 'AutopilotTimelines', 'AutopilotProfiles', 'EspProfiles',
+        'ApplicationDefinitions', 'DetectedApplications', 'DeviceApplicationEvidence', 'UpdateComplianceInvestigations',
+        'EstateFindings', 'RecurringFailures', 'DeviceCohorts', 'CrossDeviceInvestigations'
     )) {
         $data[$collectionName] = @(Get-IntuneAccessProperty $TenantRbac $collectionName @())
     }
     $data['WorkloadCollectionStatus'] = @(Get-IntuneAccessProperty $TenantRbac 'WorkloadCollectionStatus' @())
     $data['OutcomeCollectionStatus'] = @(Get-IntuneAccessProperty $TenantRbac 'OutcomeCollectionStatus' @())
+    foreach ($statusName in @('DeviceIntelligenceStatus', 'AssignmentExplanationStatus', 'AutopilotCollectionStatus', 'ApplicationCollectionStatus', 'UpdateComplianceCollectionStatus')) {
+        $data[$statusName] = Get-IntuneAccessProperty $TenantRbac $statusName
+    }
 
     $snapshotTenant = [PSCustomObject] [ordered] @{
         Id          = [string] (Get-IntuneAccessProperty $tenant 'Id' '')
@@ -86,8 +92,8 @@ function ConvertTo-IntuneAccessSnapshot {
     $dataJson = $snapshotData | ConvertTo-Json -Depth 40 -Compress
     [PSCustomObject] [ordered] @{
         PSTypeName      = 'IntuneAccess.Snapshot'
-        Schema          = 'https://controlaltdeletetechbits.github.io/intune-access/schemas/snapshot-1.0.json'
-        SchemaVersion   = '1.0'
+        Schema          = 'https://controlaltdeletetechbits.github.io/intune-access/schemas/snapshot-2.0.json'
+        SchemaVersion   = '2.0'
         ToolVersion     = $script:IntuneAccessVersion
         ExportedAt      = [DateTimeOffset]::Now
         Tenant          = $snapshotTenant

@@ -19,7 +19,7 @@ function Assert-IntuneAccessConnection {
 
     $environment = [string] (Get-IntuneAccessProperty $context 'Environment')
     if (-not [string]::IsNullOrWhiteSpace($environment) -and $environment -ne 'Global') {
-        throw "Microsoft Graph environment '$environment' is not supported in IntuneAccess 2.0.1. Use the Global commercial cloud."
+        throw "Microsoft Graph environment '$environment' is not supported in IntuneAccess $script:IntuneAccessVersion. Use the Global commercial cloud."
     }
 
     if ($RequiredScope) {

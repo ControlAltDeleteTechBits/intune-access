@@ -6,9 +6,9 @@ Last updated: 24 August 2026.
 
 ## Current status
 
-IntuneAccess 2.0.1 is published. The agreed roadmap now extends from device inventory and hygiene in 2.1.0 through device estate intelligence in 3.0.0. The project remains read only and requests no Microsoft Graph write permission.
+IntuneAccess 2.0.1 is published. Version 3.0.0 is implemented locally and completes the agreed device roadmap from inventory and hygiene through estate intelligence. The project remains read only and requests no Microsoft Graph write permission.
 
-Positive RBAC validation passes against a test user with built-in and custom assignments. The 2.0.1 release and local Gallery installation gates pass with no functional change from 2.0.0.
+Positive RBAC validation passes against a test user with built-in and custom assignments. A representative 3.0.0 live device-evidence run completed on 24 August 2026 with four managed devices, 137 detected applications, 88 assignment explanations and ten prioritised estate findings. The first pass found a valid workload response without `SourceApiVersion`; the collector now retains `NotReturned` and has regression coverage. Autopilot sources were reachable but returned no identity or event fixture. The final source gate has 99 passing tests, 79.58 per cent command coverage and no Script Analyzer findings. Exact package and local repository gates are rerun after every source or documentation change.
 
 ## Product decisions
 
@@ -25,6 +25,11 @@ Positive RBAC validation passes against a test user with built-in and custom ass
 11. The core product question is recorded as: who can change it > who should receive it > what Intune reported > where the evidence stops.
 12. Assignment configuration and deployment outcome are separate evidence layers. A returned assignment never proves successful delivery by itself.
 13. The primary module remains read only. Wipe, retire, delete, restart, sync and other device-changing remote actions are excluded from the agreed device roadmap.
+14. Autopilot stays opt-in so `DeviceManagementServiceConfig.Read.All` is requested only when an administrator selects that feature.
+15. Fleet assignment explanation is bounded to 250 devices in the guided report. Exact-device investigation remains available separately.
+16. Detected-application device relationship reads are bounded to 500 by default, and unqueried records are labelled `NotCollected`.
+17. Estate priority scores are deterministic review aids. Recurring evidence groups always use `CauseState = NotAsserted`.
+18. Snapshot schema 2.0 adds the device datasets while the comparer continues to accept schema 1.0 baselines.
 
 ## Design decisions
 
