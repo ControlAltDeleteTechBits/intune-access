@@ -74,6 +74,7 @@ function ConvertTo-IntuneAccessExplorerHtml {
         }
     }
 
+    $actionCentreHtml = ConvertTo-IntuneAccessActionCentreHtml -Collection $TenantRbac
     $tenant = Get-IntuneAccessProperty $TenantRbac 'Tenant'
     $administrators = @(Get-IntuneAccessProperty $TenantRbac 'Administrators' @())
     $adminGroups = @(Get-IntuneAccessProperty $TenantRbac 'AdminGroups' @())
@@ -627,6 +628,10 @@ $fontCss
 <div class="app-frame">
 <aside class="product-nav" id="product-nav" aria-label="Intune evidence sections"><div class="nav-intro"><strong>$(ConvertTo-ExplorerText $tenantName)</strong><small>Intune relationships and evidence</small></div><nav>
 <button class="nav-item selected" type="button" data-view="overview" data-title="Overview" data-subtitle="Tenant-wide Intune access and assignment summary" aria-current="page"><img src="$iconTenant" alt=""><span><strong>Overview</strong><small>Collection summary</small></span></button>
+<button class="nav-item" type="button" data-view="action-centre" data-title="Findings Centre" data-subtitle="Evidence, resolution guides and change plans for external review"><img src="$iconLightbulb" alt=""><span><strong>Findings Centre</strong><small>Review and prepare</small></span></button>
+<button class="nav-item" type="button" data-view="remediation-effectiveness" data-title="Remediation Effectiveness" data-subtitle="Separate detection, remediation and repeated execution evidence"><img src="$iconRole" alt=""><span><strong>Remediations</strong><small>Results and recurrence</small></span></button>
+<button class="nav-item" type="button" data-view="remediation-library" data-title="Reviewed Script Library" data-subtitle="Export scripts for review and external testing only"><img src="$iconRole" alt=""><span><strong>Script Library</strong><small>Export for review</small></span></button>
+<button class="nav-item" type="button" data-view="finding-verification" data-title="Finding Verification" data-subtitle="Before and after evidence, not assumed recovery"><img src="$iconCalendar" alt=""><span><strong>Verification</strong><small>Compare observations</small></span></button>
 <button class="nav-item" type="button" data-view="workloads" data-title="Policies and Apps" data-subtitle="Configuration, compliance, security, application, script and update objects"><img src="$iconDevices" alt=""><span><strong>Policies and Apps</strong><small>Managed workloads</small></span><b class="nav-count">$($workloadObjects.Count)</b></button>
 <button class="nav-item" type="button" data-view="workload-assignments" data-title="Assignment Impact" data-subtitle="Included, excluded, broad and filtered workload targets"><img src="$iconRole" alt=""><span><strong>Assignment Impact</strong><small>Configured targets</small></span><b class="nav-count">$($workloadAssignments.Count)</b></button>
 <button class="nav-item" type="button" data-view="target-groups" data-title="Target Groups" data-subtitle="Microsoft Entra groups targeted by collected Intune workloads"><img src="$iconGroups" alt=""><span><strong>Target Groups</strong><small>Policy and app targets</small></span><b class="nav-count">$($workloadGroups.Count)</b></button>
@@ -661,6 +666,7 @@ $fontCss
 <div class="workspace">
 <div>
 <section class="view-panel" data-view-panel="overview"><div class="summary-grid"><div class="summary-card"><small>Managed devices</small><strong>$($managedDevices.Count)</strong></div><div class="summary-card"><small>Prioritised findings</small><strong>$($estateFindings.Count)</strong></div><div class="summary-card"><small>Device hygiene findings</small><strong>$($deviceFindings.Count)</strong></div><div class="summary-card"><small>Reported outcomes</small><strong>$($deploymentOutcomes.Count)</strong></div></div><div class="overview-panel"><p class="eyebrow">EVIDENCE STARTING POINTS</p><h2>Find the device, trace its targeting and inspect what Intune reported</h2><p>Estate Intelligence ranks review prompts. Device Hygiene shows record quality. Assignment Explainer separates user and device paths, exclusions, filter evaluation and reported outcomes. Application, update, compliance, Autopilot and RBAC evidence remain traceable to their source. Missing outcome data is never presented as success.</p><p>$(ConvertTo-ExplorerText $estateSummary). Historical comparison: $(ConvertTo-ExplorerText $estateTrendState).</p><div class="overview-paths">$estateFindingRows</div></div></section>
+$actionCentreHtml
 <section class="view-panel" data-view-panel="workloads" hidden><div class="collection-list">$workloadRows</div></section>
 <section class="view-panel" data-view-panel="workload-assignments" hidden><div class="collection-list">$workloadAssignmentRows</div></section>
 <section class="view-panel" data-view-panel="target-groups" hidden><div class="collection-list">$workloadGroupRows</div></section>
@@ -707,6 +713,9 @@ $fontCss
   var productNav=document.getElementById('product-nav');
   var mobileNav=document.getElementById('mobile-nav');
   function showView(name){
+    var actionView=['action-centre','remediation-effectiveness','remediation-library','finding-verification'].includes(name);
+    document.querySelector('.workspace').classList.toggle('action-workspace',actionView);
+    document.getElementById('object-inspector').hidden=actionView;
     viewPanels.forEach(function(panel){panel.hidden=panel.getAttribute('data-view-panel')!==name;});
     navItems.forEach(function(item){var selected=item.getAttribute('data-view')===name;item.classList.toggle('selected',selected);if(selected){item.setAttribute('aria-current','page');title.textContent=item.getAttribute('data-title');subtitle.textContent=item.getAttribute('data-subtitle');}else{item.removeAttribute('aria-current');}});
     search.value='';filterRows('');productNav.classList.remove('open');mobileNav.setAttribute('aria-expanded','false');

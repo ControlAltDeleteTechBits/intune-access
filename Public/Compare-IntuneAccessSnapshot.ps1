@@ -20,8 +20,8 @@ function Compare-IntuneAccessSnapshot {
 
     $referenceResolved = (Resolve-Path -LiteralPath $ReferencePath -ErrorAction Stop).Path
     $differenceResolved = (Resolve-Path -LiteralPath $DifferencePath -ErrorAction Stop).Path
-    $reference = Get-Content -LiteralPath $referenceResolved -Raw | ConvertFrom-Json -Depth 50
-    $difference = Get-Content -LiteralPath $differenceResolved -Raw | ConvertFrom-Json -Depth 50
+    $reference = ConvertFrom-IntuneAccessSnapshotJson -Json (Get-Content -LiteralPath $referenceResolved -Raw)
+    $difference = ConvertFrom-IntuneAccessSnapshotJson -Json (Get-Content -LiteralPath $differenceResolved -Raw)
     foreach ($snapshot in @($reference, $difference)) {
         $schemaVersion = [string] (Get-IntuneAccessProperty $snapshot 'SchemaVersion')
         if ($schemaVersion -notin @('1.0', '2.0') -or
@@ -35,6 +35,14 @@ function Compare-IntuneAccessSnapshot {
     }
     if ([string] (Get-IntuneAccessProperty $reference 'IdentityMode') -ne [string] (Get-IntuneAccessProperty $difference 'IdentityMode')) {
         throw 'Snapshots must use the same identity mode before they can be compared.'
+    }
+    $referenceTenant = [string] (Get-IntuneAccessProperty $reference.Tenant 'Id' '')
+    $differenceTenant = [string] (Get-IntuneAccessProperty $difference.Tenant 'Id' '')
+    if ([string]::IsNullOrWhiteSpace($referenceTenant) -or $referenceTenant -cne $differenceTenant) {
+        throw 'Snapshots must identify the same tenant. Missing or different tenant IDs cannot be compared.'
+    }
+    if ([DateTimeOffset] $difference.ExportedAt -le [DateTimeOffset] $reference.ExportedAt) {
+        throw 'The difference snapshot must be later than the reference snapshot.'
     }
 
     $collectionMap = [ordered] @{
@@ -103,6 +111,8 @@ function Compare-IntuneAccessSnapshot {
         IdentityMode     = [string] $difference.IdentityMode
         Tenant           = $difference.Tenant
         Changes          = @($changes | Sort-Object EntityType, Name, ChangeType)
+        FindingVerification = @(Compare-IntuneAccessFindingEvidence -Before $reference.Data -After $difference.Data -BeforeAt ([DateTimeOffset] $reference.ExportedAt) -AfterAt ([DateTimeOffset] $difference.ExportedAt))
+        ActionCentre = Get-IntuneAccessActionCentre -Collection $difference.Data -PreviousOutcome @(Get-IntuneAccessProperty $reference.Data 'DeploymentOutcomes' @()) -AsOf ([DateTimeOffset] $difference.ExportedAt)
         AddedCount       = @($changes | Where-Object ChangeType -EQ 'Added').Count
         RemovedCount     = @($changes | Where-Object ChangeType -EQ 'Removed').Count
         ModifiedCount    = @($changes | Where-Object ChangeType -EQ 'Modified').Count

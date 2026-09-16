@@ -229,7 +229,7 @@ function Get-IntuneAccessTenantRbac {
         if ($null -ne $evidenceSource) { $permissionsUsed = @($permissionsUsed + @($evidenceSource.GraphPermissionsUsed) | Select-Object -Unique) }
     }
 
-    [PSCustomObject] @{
+    $result = [PSCustomObject] @{
         PSTypeName              = 'IntuneAccess.TenantRbac'
         Tenant                 = $tenant
         Administrators         = @($administrators | Sort-Object { $_.User.UserPrincipalName })
@@ -282,4 +282,6 @@ function Get-IntuneAccessTenantRbac {
         GeneratedAt            = [DateTimeOffset]::Now
         ToolVersion            = $script:IntuneAccessVersion
     }
+    $result | Add-Member -NotePropertyName ActionCentre -NotePropertyValue (Get-IntuneAccessActionCentre -Collection $result)
+    $result
 }

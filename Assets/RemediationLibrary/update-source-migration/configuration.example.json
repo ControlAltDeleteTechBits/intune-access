@@ -1,0 +1,9 @@
+{
+  "PolicyMappings": [],
+  "ExpectedSources": {
+    "Quality": "WindowsUpdate",
+    "Feature": "WindowsUpdate",
+    "Driver": "WindowsUpdate",
+    "Other": "WindowsUpdate"
+  }
+}

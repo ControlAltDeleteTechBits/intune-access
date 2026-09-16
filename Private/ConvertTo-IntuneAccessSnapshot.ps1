@@ -5,8 +5,7 @@ function Get-IntuneAccessSnapshotHash {
     )
 
     $bytes = [Text.Encoding]::UTF8.GetBytes($Value)
-    $hash = [Security.Cryptography.SHA256]::HashData($bytes)
-    ([Convert]::ToHexString($hash)).ToLowerInvariant()
+    Get-IntuneAccessByteHash -Bytes $bytes
 }
 
 function Copy-IntuneAccessSnapshotValue {
@@ -22,7 +21,7 @@ function Copy-IntuneAccessSnapshotValue {
 
     if ($Value -is [string]) {
         if (-not [string]::IsNullOrWhiteSpace($RedactionKey) -and
-            $PropertyName -match '(?i)(^id$|ids$|name$|displayname$|userprincipalname$|mail$|account$|serialnumber$|ipaddress$|oldvalue$|newvalue$|description$|tenant)') {
+            $PropertyName -match '(?i)(^id$|ids$|name$|displayname$|userprincipalname$|mail$|account$|serialnumber$|ipaddress$|oldvalue$|newvalue$|description$|tenant|ScriptOutput$|ScriptError$|StateDetail$)') {
             $digest = Get-IntuneAccessSnapshotHash -Value "$RedactionKey`n$Value"
             return "redacted-$($digest.Substring(0, 16))"
         }
@@ -75,6 +74,10 @@ function ConvertTo-IntuneAccessSnapshot {
     }
     $data['WorkloadCollectionStatus'] = @(Get-IntuneAccessProperty $TenantRbac 'WorkloadCollectionStatus' @())
     $data['OutcomeCollectionStatus'] = @(Get-IntuneAccessProperty $TenantRbac 'OutcomeCollectionStatus' @())
+    $data['PolicyConflictCollectionStatus'] = @(Get-IntuneAccessProperty $TenantRbac 'PolicyConflictCollectionStatus' @())
+    # Keep the collection time inside the integrity-covered data, distinct from
+    # file export time. Re-exporting old evidence must not make it fresh.
+    $data['CollectedAt'] = Get-IntuneAccessProperty $TenantRbac 'GeneratedAt'
     foreach ($statusName in @('DeviceIntelligenceStatus', 'AssignmentExplanationStatus', 'AutopilotCollectionStatus', 'ApplicationCollectionStatus', 'UpdateComplianceCollectionStatus')) {
         $data[$statusName] = Get-IntuneAccessProperty $TenantRbac $statusName
     }

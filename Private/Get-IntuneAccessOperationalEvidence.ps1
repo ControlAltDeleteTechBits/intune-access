@@ -74,7 +74,7 @@ function Get-IntuneAccessOperationalEvidence {
             'Compliance policies' { $statusEndpoint = "$($workloadObject.SourceEndpoint)/$([uri]::EscapeDataString([string] $workloadObject.Id))/deviceStatuses" }
             'Applications' { $statusEndpoint = "$($workloadObject.SourceEndpoint)/$([uri]::EscapeDataString([string] $workloadObject.Id))/deviceStatuses"; $apiVersion = 'beta' }
             'PowerShell scripts' { $statusEndpoint = "$($workloadObject.SourceEndpoint)/$([uri]::EscapeDataString([string] $workloadObject.Id))/deviceRunStates?`$expand=managedDevice(`$select=id,deviceName,userPrincipalName)"; $apiVersion = 'beta' }
-            'Remediations' { $statusEndpoint = "$($workloadObject.SourceEndpoint)/$([uri]::EscapeDataString([string] $workloadObject.Id))/deviceRunStates"; $apiVersion = 'beta' }
+            'Remediations' { $statusEndpoint = "$($workloadObject.SourceEndpoint)/$([uri]::EscapeDataString([string] $workloadObject.Id))/deviceRunStates?`$expand=managedDevice(`$select=id,deviceName,userPrincipalName)"; $apiVersion = 'beta' }
             default { $reason = 'No documented GET outcome contract is adopted for this workload family.' }
         }
 

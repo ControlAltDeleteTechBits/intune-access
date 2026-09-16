@@ -99,11 +99,11 @@ The 3.0.0 release-candidate validation run passed on 24 August 2026. Ninety-nine
 
 ## Outstanding release evidence
 
-A real test tenant was connected on 17 August 2026. Seven integration checks passed for a user with built-in and custom Intune RBAC assignments. The returned Admin Groups, Scope Group and Scope Tag matched the Intune admin centre, and cumulative managed-device read access retained two granting assignments. The managed device matched the known device scope group, while its observed Intune tag remained Default, so the complete device path correctly remained `NotEvaluated`.
+Integration testing covered built-in and custom RBAC assignments, portal comparison and cumulative access. Incomplete scope evidence remains NotEvaluated. Private fixture configuration and observed tenant records are excluded.
 
 The live run exposed a Graph behaviour where assignment collection responses omitted member and scope arrays although the assignment detail endpoints returned them. Version 1.0.0 hydrates each listed assignment from its detail endpoint and includes a regression test. The Microsoft Graph Command Line Tools registration used for the live run already had broader delegated consent, so a clean least-privilege shared-client result remains outstanding.
 
-The 3.0.0 live device-evidence run on 24 August 2026 completed read only against four managed devices. It produced five hygiene findings, 88 assignment explanations, eight update and compliance investigation records, ten estate findings, one recurring evidence group, eight cohorts and five cross-device investigations. Autopilot beta sources were available, but the tenant returned no Autopilot identities or events, so positive live stage-duration evidence remains outstanding. The first run also showed that a valid workload can omit `SourceApiVersion`; the collector now records `NotReturned`, and a regression assertion covers the response shape.
+Read-only device-evidence collection and report generation were exercised. Positive Autopilot stage-duration evidence remains unverified. A missing SourceApiVersion response is handled as NotReturned and covered by a regression assertion.
 
 The assignment, operational, snapshot and policy-conflict layers added after 1.0.0 are locally verified. They still require the maintainer's live development-tenant comparison with the Intune admin centre before any 2.0.0 publication decision.
 

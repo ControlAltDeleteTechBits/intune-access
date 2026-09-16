@@ -20,8 +20,12 @@ function Invoke-IntuneAccessGraphRequest {
     }
 
     $items = [System.Collections.Generic.List[object]]::new()
+    $visitedPages = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 
     do {
+        if (-not $visitedPages.Add($nextUri)) {
+            throw 'Microsoft Graph returned a repeated pagination link. Collection was stopped; partial results are not returned as complete.'
+        }
         $attempt = 0
         while ($true) {
             try {

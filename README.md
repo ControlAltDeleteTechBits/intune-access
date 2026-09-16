@@ -1,5 +1,9 @@
 # IntuneAccess
 
+Version 4.0.0 adds findings, resolution guides and export-only investigation packages. See [V4 validation and testing limits](docs/v4-release-audit-current.md) before using the investigation outputs. Installation from the Gallery requires the version to have been published.
+
+V4 adds findings resolution guides, local expected decisions with review dates, selected change plan exports, an export-only reviewed PowerShell library, remediation effectiveness reporting and conservative verification between snapshots. IntuneAccess never uploads or executes the exported scripts. Change making scripts affect devices only if an administrator runs them separately.
+
 IntuneAccess is an open source, read only PowerShell module that connects Microsoft Intune administration, workload targeting and evidence in one local report. It joins objects that are usually inspected one at a time: administrators, Microsoft Entra groups, Intune roles, scopes, configuration and compliance policies, endpoint security, applications, scripts, updates, targets and assignment filters.
 
 The main result is a PowerShell object with an evidence trail. A self contained HTML report is available when a human readable record is needed.

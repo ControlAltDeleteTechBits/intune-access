@@ -73,7 +73,7 @@ Describe 'Tenant-wide Intune RBAC explorer' {
 
         It 'renders encoded tenant data, navigation, relationships and long identity wrapping' {
             $administrator = [PSCustomObject] @{
-                User = [PSCustomObject] @{ Id = 'user-1'; DisplayName = 'CADTB <Admin>'; UserPrincipalName = 'CADTB-Intune-Administration@controlaltdeletetechbits.onmicrosoft.com'; UserType = 'Member' }
+                User = [PSCustomObject] @{ Id = 'user-1'; DisplayName = 'Example <Admin>'; UserPrincipalName = 'Example-Intune-Administration@long-organisation-name.example.test'; UserType = 'Member' }
                 AdminGroupMemberships = @()
                 RoleAssignments = @()
                 EffectivePermissions = @()
@@ -101,8 +101,12 @@ Describe 'Tenant-wide Intune RBAC explorer' {
             $html | Should -Match 'data-view="permissions"'
             $html | Should -Match 'data-inspect="administrator-1"'
             $html | Should -Match 'Example &amp; Sons'
-            $html | Should -Match 'CADTB &lt;Admin&gt;'
-            $html | Should -Not -Match 'https?://'
+            $html | Should -Match 'Example &lt;Admin&gt;'
+            # Documentation links in inert evidence are allowed; remote resources
+            # and background requests are not part of a self-contained report.
+            [bool] ($html -match '(?i)(?:src|href)\s*=\s*["'']https?://') | Should -BeFalse
+            [bool] ($html -match '(?i)url\(["'']?https?://') | Should -BeFalse
+            $html.Contains("connect-src 'none'") | Should -BeTrue
             $html | Should -Match 'overflow-wrap:anywhere'
             $html | Should -Match 'Content-Security-Policy'
         }

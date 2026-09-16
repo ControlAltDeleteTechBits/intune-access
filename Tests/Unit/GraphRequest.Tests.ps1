@@ -52,5 +52,20 @@ Describe 'Graph request handling' {
             $result.Count | Should -Be 0
             Should -Invoke Invoke-MgGraphRequest -Times 1
         }
+        It 'stops a repeated page instead of returning partial success' {
+            Mock Invoke-MgGraphRequest {
+                [PSCustomObject] @{value=@([PSCustomObject]@{id='one'});'@odata.nextLink'=$Uri}
+            }
+            {Invoke-IntuneAccessGraphRequest -Uri 'things'} | Should -Throw '*repeated pagination link*'
+            Should -Invoke Invoke-MgGraphRequest -Times 1
+        }
+        It 'stops a multi-page cycle without making a third request' {
+            Mock Invoke-MgGraphRequest {
+                $next=if($Uri -eq 'https://graph.microsoft.com/v1.0/things'){'https://graph.microsoft.com/v1.0/things?page=2'}else{'https://graph.microsoft.com/v1.0/things'}
+                [PSCustomObject] @{value=@([PSCustomObject]@{id='one'});'@odata.nextLink'=$next}
+            }
+            {Invoke-IntuneAccessGraphRequest -Uri 'things'} | Should -Throw '*partial results*'
+            Should -Invoke Invoke-MgGraphRequest -Times 2
+        }
     }
 }

@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string] $Version = '3.0.0',
+    [string] $Version = '4.0.0',
     [string] $OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) 'release')
 )
 
@@ -12,6 +12,7 @@ $unitTestPath = Join-Path $moduleRoot 'Tests\Unit'
 
 Write-Verbose 'Validating the module manifest.'
 $manifest = Test-ModuleManifest -Path $manifestPath
+if ([string] $manifest.Version -ne $Version) { throw 'Requested release version does not match the manifest.' }
 
 Write-Verbose 'Checking PowerShell syntax.'
 $parseErrors = [System.Collections.Generic.List[object]]::new()
@@ -71,7 +72,9 @@ if ($analysis.Count -gt 0) {
 
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
 $archivePath = Join-Path $OutputDirectory "IntuneAccess-$Version.zip"
-Compress-Archive -LiteralPath $moduleRoot -DestinationPath $archivePath -Force
+$archiveInputs = @('Public', 'Private', 'Assets', 'Tests', 'docs', 'examples', 'tools', 'IntuneAccess.psd1', 'IntuneAccess.psm1', 'IntuneAccess.Format.ps1xml', 'LICENSE', 'README.md', 'RELEASE_NOTES.md', 'CHANGELOG.md', 'SECURITY.md', 'THIRD-PARTY-NOTICES.md', 'PSScriptAnalyzerSettings.psd1') | ForEach-Object { Join-Path $moduleRoot $_ }
+# Do not archive the whole working tree: local reports and git metadata are not release assets.
+Compress-Archive -LiteralPath $archiveInputs -DestinationPath $archivePath -Force
 
 $hash = Get-FileHash -LiteralPath $archivePath -Algorithm SHA256
 $checksumPath = "$archivePath.sha256"

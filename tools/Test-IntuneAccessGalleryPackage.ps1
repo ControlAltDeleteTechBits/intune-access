@@ -18,7 +18,25 @@ finally {
     $archive.Dispose()
 }
 
-$forbiddenPrefixes = @('Tests/', 'screenshots/', 'tools/', '.github/')
+$forbiddenPrefixes = @('Tests/', 'screenshots/', 'tools/', '.github/', 'Assets/RemediationLibrary/user-app-migration/')
+foreach ($required in @(
+    'docs/v4-release-audit-current.md',
+    'Assets/RemediationLibrary/application-detection/Convert-ApplicationRules.ps1',
+    'Assets/RemediationLibrary/application-detection/New-DetectionProposal.ps1',
+    'Assets/RemediationLibrary/policy-residue/Review-PolicyHistory.ps1',
+    'Assets/RemediationLibrary/update-source-migration/Review-UpdatePolicies.ps1',
+    'Private/ConvertFrom-IntuneAccessSnapshotJson.ps1',
+    'Private/Get-IntuneAccessByteHash.ps1',
+    'Assets/RemediationLibrary/investigation-common/Collect-Evidence.ps1',
+    'Assets/RemediationLibrary/investigation-common/Review-Evidence.ps1',
+    'Assets/RemediationLibrary/investigation-common/Compare-Evidence.ps1'
+    'Assets/RemediationLibrary/investigation-common/Get-AdditionalDeviceEvidence.ps1'
+)) {
+    if ($required -notin $entryNames) { throw "The investigation runtime asset is missing: $required" }
+}
+foreach ($required in @('Assets/action-centre.html', 'Assets/RemediationLibrary/ime-service/Detect.ps1', 'Assets/RemediationLibrary/ime-service/Remediate.ps1', 'Assets/RemediationLibrary/ime-service/README.md', 'Assets/RemediationLibrary/system-disk-space/Detect.ps1', 'Assets/RemediationLibrary/system-disk-space/README.md', 'docs/v4-local-testing.md', 'Private/Compare-IntuneAccessFindingEvidence.ps1')) {
+    if ($required -notin $entryNames) { throw "The V4 package is missing a required runtime asset: $required" }
+}
 foreach ($prefix in $forbiddenPrefixes) {
     if (@($entryNames | Where-Object { $_.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase) }).Count -gt 0) {
         throw "The Gallery package contains development content under '$prefix'."
@@ -38,6 +56,13 @@ try {
 $ErrorActionPreference = 'Stop'
 Import-Module '__MANIFEST__' -Force
 $commands = @(Get-Command -Module IntuneAccess | Sort-Object Name)
+$library = @(& (Get-Module IntuneAccess) { Get-IntuneAccessRemediationLibrary })
+if ($library.Count -ne 6 -or 'user-app-migration' -in $library.Id -or @($library | Where-Object ExecutionAllowed -NE $false).Count -gt 0) {
+    throw 'The isolated package does not supply the six expected export-only library entries.'
+}
+foreach ($item in $library) {
+    if ([Convert]::FromBase64String($item.PackageBase64).Length -eq 0) { throw 'An exported library archive is empty.' }
+}
 [PSCustomObject] @{
     PowerShellVersion = $PSVersionTable.PSVersion.ToString()
     CommandCount = $commands.Count

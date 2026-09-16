@@ -1,0 +1,12 @@
+{
+  "Rules": [
+    {
+      "Id": "example",
+      "Type": "Registry",
+      "Path": "HKLM\\SOFTWARE\\ExampleVendor\\ExampleApp",
+      "Name": "Version",
+      "View": "Registry64",
+      "ExpectedValue": "1.0.0"
+    }
+  ]
+}

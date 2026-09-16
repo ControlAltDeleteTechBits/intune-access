@@ -76,6 +76,15 @@ function Get-IntuneAccessApplicationEvidence {
                 UninstallCommandLine = [string] (Get-IntuneAccessProperty $app 'uninstallCommandLine')
                 DetectionRules   = @(Get-IntuneAccessProperty $app 'detectionRules' @())
                 RequirementRules = @(Get-IntuneAccessProperty $app 'requirementRules' @())
+                Rules = @((Get-IntuneAccessProperty $app 'rules' @()) | ForEach-Object {
+                    $rule=$_;$safe=[ordered]@{}
+                    foreach($field in @('@odata.type','ruleType','check32BitOn64System','keyPath','valueName','operationType','operator','comparisonValue','path','fileOrFolderName','productCode','productVersion')){
+                        $value=Get-IntuneAccessProperty $rule $field
+                        if($null -ne $value){$safe[$field]=$value}
+                    }
+                    [pscustomobject]$safe
+                })
+                InstallExperience = [pscustomobject]@{runAsAccount=Get-IntuneAccessProperty (Get-IntuneAccessProperty $app 'installExperience') 'runAsAccount'}
                 MinimumSupportedOperatingSystem = Get-IntuneAccessProperty $app 'minimumSupportedOperatingSystem'
                 Relationships    = @($relationships | ForEach-Object { [PSCustomObject] @{ Id = [string] (Get-IntuneAccessProperty $_ 'id'); TargetId = [string] (Get-IntuneAccessProperty $_ 'targetId'); RelationshipType = [string] (Get-IntuneAccessProperty $_ '@odata.type') } })
                 RelationshipState = $relationshipState

@@ -2,6 +2,20 @@
 
 All notable project changes are recorded here.
 
+## 4.0.0
+
+1. Findings Centre with affected objects, resolution guides and local expected decisions.
+2. Selected change plans and reviewed script ZIP exports, with no execution or upload capability.
+3. Separate remediation detection and repair states, script evidence and distinct observation history.
+4. Snapshot verification requiring positive evidence rather than assuming disappearance means recovery.
+5. Tenant and chronology checks for snapshot comparisons, collection timestamps and additional script output pseudonymisation.
+6. Four read-only endpoint investigation exports: selected application detection rules, update policy evidence, policy history and working/affected comparisons.
+7. Application execution-context checks and preservation of supported numeric and version comparison operators; unsupported conditions remain explicit.
+8. Compatible hashing and timestamp parsing, corrected signed error formatting, plain-text library notes and repeated-pagination protection.
+9. Deferred application migration excluded from installable Gallery packages; development source retained.
+
+Default read-scope collection and owner-reported HTML acceptance completed on 16 September 2026. Separate-device incident validation was waived by the owner; optional Autopilot was not part of this permissions test. See docs/v4-release-audit-current.md for evidence and remaining limits. Publication is a separate step.
+
 ## 3.0.0
 
 - Handles update and compliance workload records that omit `SourceApiVersion`, retaining `NotReturned` in collection provenance rather than stopping the report.

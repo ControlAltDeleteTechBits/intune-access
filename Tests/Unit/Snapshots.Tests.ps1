@@ -2,6 +2,17 @@ $modulePath = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 
 Import-Module $modulePath -Force
 
 Describe 'Local IntuneAccess snapshots' {
+    InModuleScope IntuneAccess {
+        It 'preserves nested string tokens using the compatibility parser' {
+            $json='{"stamp":"2026-09-15T10:00:00.0000000+00:00","items":["2026-09-15T14:00:00+03:00",{"stamp":"2026-09-15T10:00:00Z"}],"number":12,"empty":[]}'
+            $result=ConvertFrom-IntuneAccessSnapshotJson -Json $json -CompatibilityParser
+            $result.stamp | Should -BeExactly '2026-09-15T10:00:00.0000000+00:00'
+            $result.items[0] | Should -BeExactly '2026-09-15T14:00:00+03:00'
+            $result.items[1].stamp | Should -BeExactly '2026-09-15T10:00:00Z'
+            $result.number | Should -Be 12
+            @($result.empty).Count | Should -Be 0
+        }
+    }
     BeforeEach {
         $script:baseModel = [PSCustomObject] @{
             PSTypeName = 'IntuneAccess.TenantRbac'
@@ -66,6 +77,17 @@ Describe 'Local IntuneAccess snapshots' {
         $html | Should -Match 'All devices target; 1 managed device records were present'
     }
 
+    It 'preserves timestamp strings with UTC and non-local offsets during integrity validation' {
+        $beforePath=Join-Path $TestDrive 'offset-before.json'
+        $afterPath=Join-Path $TestDrive 'offset-after.json'
+        $script:baseModel.GeneratedAt='2026-09-15T10:00:00.0000000+00:00'
+        $script:baseModel.AuditEvents[0].ActivityDateTime='2026-09-15T14:00:00+03:00'
+        $null=$script:baseModel|Export-IntuneAccessSnapshot -Path $beforePath
+        $script:baseModel.GeneratedAt='2026-09-15T11:00:00.0000000+00:00'
+        $null=$script:baseModel|Export-IntuneAccessSnapshot -Path $afterPath
+        {Compare-IntuneAccessSnapshot -ReferencePath $beforePath -DifferencePath $afterPath} | Should -Not -Throw
+    }
+
     It 'uses stable pseudonyms while removing clear tenant and identity values' {
         $firstPath = Join-Path $TestDrive 'redacted-1.json'
         $secondPath = Join-Path $TestDrive 'redacted-2.json'
@@ -86,5 +108,20 @@ Describe 'Local IntuneAccess snapshots' {
         (Get-Content -LiteralPath $beforePath -Raw).Replace('PC-001', 'PC-999') | Set-Content -LiteralPath $afterPath
 
         { Compare-IntuneAccessSnapshot -ReferencePath $beforePath -DifferencePath $afterPath } | Should -Throw '*integrity*'
+    }
+    It 'rejects different tenants even when both snapshots have valid integrity' {
+        $beforePath = Join-Path $TestDrive 'tenant-before.json'
+        $afterPath = Join-Path $TestDrive 'tenant-after.json'
+        $null = $script:baseModel | Export-IntuneAccessSnapshot -Path $beforePath
+        $script:baseModel.Tenant.Id = 'different-tenant'
+        $null = $script:baseModel | Export-IntuneAccessSnapshot -Path $afterPath
+        { Compare-IntuneAccessSnapshot -ReferencePath $beforePath -DifferencePath $afterPath } | Should -Throw '*same tenant*'
+    }
+    It 'rejects reverse chronological comparison' {
+        $beforePath = Join-Path $TestDrive 'chronology-before.json'
+        $afterPath = Join-Path $TestDrive 'chronology-after.json'
+        $null = $script:baseModel | Export-IntuneAccessSnapshot -Path $beforePath
+        $null = $script:baseModel | Export-IntuneAccessSnapshot -Path $afterPath
+        { Compare-IntuneAccessSnapshot -ReferencePath $afterPath -DifferencePath $beforePath } | Should -Throw '*later than*'
     }
 }

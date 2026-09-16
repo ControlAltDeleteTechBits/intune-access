@@ -47,9 +47,20 @@ try {
         Copy-Item -LiteralPath (Join-Path $moduleRoot $directory) -Destination $stageModule -Recurse
     }
 
+    # Retain deferred development source in Git, not in the installable package.
+    $deferredSource = Join-Path $stageModule 'Assets/RemediationLibrary/user-app-migration'
+    if (Test-Path -LiteralPath $deferredSource) {
+        $resolvedDeferred = (Resolve-Path -LiteralPath $deferredSource).Path
+        $resolvedStage = (Resolve-Path -LiteralPath $stageModule).Path.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+        if (-not $resolvedDeferred.StartsWith($resolvedStage, [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'Deferred source is outside the temporary package staging directory.'
+        }
+        Remove-Item -LiteralPath $resolvedDeferred -Recurse -Force
+    }
+
     $stageDocs = Join-Path $stageModule 'docs'
     $null = New-Item -ItemType Directory -Path $stageDocs -Force
-    foreach ($document in @('architecture.md', 'effective-access-model.md', 'limitations.md', 'permissions.md', 'troubleshooting.md')) {
+    foreach ($document in @('architecture.md', 'effective-access-model.md', 'limitations.md', 'permissions.md', 'troubleshooting.md', 'v4-local-testing.md', 'v4-release-audit-current.md')) {
         Copy-Item -LiteralPath (Join-Path $moduleRoot "docs\$document") -Destination $stageDocs
     }
 

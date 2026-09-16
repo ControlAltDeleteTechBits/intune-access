@@ -1,0 +1,11 @@
+{
+  "Rules": [
+    {
+      "Id": "review-only-example",
+      "Type": "Registry",
+      "Path": "HKLM\\SOFTWARE\\Policies\\ExampleVendor\\ExamplePolicy",
+      "Name": "Enabled",
+      "View": "Registry64"
+    }
+  ]
+}

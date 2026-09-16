@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)] [ValidateNotNullOrEmpty()] [string] $PackagePath,
-    [string] $Version = '3.0.0'
+    [string] $Version = '4.0.0'
 )
 
 $ErrorActionPreference = 'Stop'

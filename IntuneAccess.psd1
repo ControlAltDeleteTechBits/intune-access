@@ -1,6 +1,6 @@
 @{
     RootModule           = 'IntuneAccess.psm1'
-    ModuleVersion        = '3.0.0'
+    ModuleVersion        = '4.0.0'
     GUID                 = '9fc99074-cfcf-46db-b99b-830e5a81d0df'
     Author               = 'Mark Oldham'
     CompanyName          = 'Control Alt Delete Tech Bits'
@@ -49,7 +49,7 @@
             ProjectUri   = 'https://github.com/ControlAltDeleteTechBits/intune-access'
             LicenseUri   = 'https://github.com/ControlAltDeleteTechBits/intune-access/blob/main/LICENSE'
             IconUri      = 'https://raw.githubusercontent.com/ControlAltDeleteTechBits/intune-access/main/Assets/IntuneAccess-Gallery-Icon.svg'
-            ReleaseNotes = 'IntuneAccess 3.0.0 adds device inventory and hygiene, device assignment explanations, optional Autopilot and enrolment timelines, application and detected-software evidence, update and compliance investigation, prioritised estate findings, cohorts, recurring evidence patterns and share-safe bundles. Quick start: Install-Module -Name IntuneAccess -Scope CurrentUser; Start-IntuneAccess. Release details: https://github.com/ControlAltDeleteTechBits/intune-access/releases/tag/v3.0.0'
+            ReleaseNotes = 'IntuneAccess 4.0.0: findings resolution guides, local expected decisions, selected change plans, export-only reviewed script packages, remediation effectiveness and conservative snapshot verification. No tenant changes or script execution. Default read-scope collection and owner HTML acceptance verified; controlled endpoint incident validation remains unverified. See RELEASE_NOTES.md for limits. Quick start: Install-Module -Name IntuneAccess -Scope CurrentUser; Start-IntuneAccess.'
         }
     }
 }

@@ -100,7 +100,7 @@ Positive RBAC validation passes against a test user with built-in and custom ass
 ### 17 August 2026
 
 1. Completed the initial module implementation, mocked Graph correlation and safety documentation.
-2. Connected to a test tenant and passed six integration checks for the empty assignment path.
+2. Passed integration checks for empty assignment handling.
 3. Fixed empty Graph collections being misread as synthetic records.
 4. Generated and compared three report design directions informed by VibeCurb.
 5. Selected Signal Atlas.
@@ -121,11 +121,11 @@ Positive RBAC validation passes against a test user with built-in and custom ass
 20. Added a Windows and Linux GitHub Actions validation workflow.
 21. Expanded the unit suite to 44 passing tests and raised measured coverage to 72.59%.
 22. Added an opt-in extended scope-tag audit for compliance policies, Settings Catalog and endpoint security policies, and remediation scripts. The extra Microsoft Graph permission is requested only when this mode is selected.
-23. Created two administrator groups, one device scope group, one custom scope tag, one custom role and built-in and custom assignments in the test tenant.
+23. Prepared controlled RBAC integration fixtures; private configuration is excluded.
 24. Found that the Graph assignment collection omitted member and scope arrays while each assignment detail endpoint returned them.
 25. Added assignment detail hydration and a regression test; all 45 unit tests passed.
 26. Passed seven live integration checks against the positive fixture and confirmed duplicate managed-device read evidence.
-27. Confirmed the managed device matches the intended device scope group. Its Intune object still carries the Default tag, so the full path remains conservatively `NotEvaluated`.
+27. Verified conservative NotEvaluated handling for incomplete device-scope evidence.
 28. Promoted all active release metadata to 1.0.0 and removed the module prerelease marker.
 29. Passed the 1.0.0 release gate with 45 tests, 72.8 per cent coverage, nine exported commands and no analyzer findings.
 30. Built and validated `IntuneAccess.1.0.0.nupkg`, then installed and imported it through a temporary local PSResourceGet repository.
@@ -139,7 +139,7 @@ Positive RBAC validation passes against a test user with built-in and custom ass
 5. Installed the Gallery copy in an isolated path, imported version 1.0.0 and confirmed all nine commands are exported.
 6. Confirmed the Gallery page names Mark Oldham as author, Control Alt Delete Tech Bits as company and Microsoft.Graph.Authentication as a dependency.
 7. Confirmed the project, licence, icon and GitHub release links resolve publicly.
-8. Revoked the one-day, package-restricted Gallery API key and cleared it from the clipboard after publication.
+8. Completed publication credential cleanup.
 9. Added a normalised workload and assignment evidence model spanning configuration, compliance, endpoint security, applications, scripts, remediations and Windows update profiles.
 10. Added per-source collection states, API-version provenance, explicit exclusion handling and assignment-filter resolution.
 11. Added Policies and Apps, Assignment Impact, Target Groups and Assignment Filters views to the self-contained Signal Atlas explorer.

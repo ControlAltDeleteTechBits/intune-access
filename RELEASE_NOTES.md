@@ -1,4 +1,26 @@
-# IntuneAccess 3.0.0
+# IntuneAccess 4.0.0
+
+Release preparation dated 16 September 2026. Publication is a separate authorised step. Exact artefact hashes and final gate receipts are retained in the release handover.
+
+This release adds a Findings Centre with resolution guides, affected objects and local expected decisions; selected change plans for external review; six script packages for export only; remediation effectiveness across distinct snapshot observations; and evidence-based verification that does not treat missing devices as fixed.
+
+The IME service package contains a change making script. The disk space package is detection only. Neither is executed or uploaded by IntuneAccess. Review the included package instructions, licensing prerequisites, context, risks and recovery limitations before external testing.
+
+Four additional investigation packages cover application detection, update source policies, possible policy residue and working/affected endpoint comparison. They collect and review evidence without changing device configuration. Application review supports selected registry comparisons, literal file existence and regular file-version comparisons, with account-context checks. Update review can relate explicitly mapped settings to snapshot policy IDs and device assignments. Policy history supports selected named settings and distinguishes current targeting from possible residue. Comparison can include optional bounded certificate and event metadata without private keys or event messages.
+
+Unsupported rules, uncertain ownership and insufficient evidence remain unevaluated. A match is not proof of application health; targeting is not proof of policy enforcement; a difference is not proof of cause. Vendor-specific application migration is deferred and excluded from the installable package, with development source retained in the repository.
+
+The source tests pass on PowerShell 7.0.13 and the current runtime. Live collection and snapshot comparison have been exercised. A disposable unassigned Settings catalogue policy also passed exact update-source definition and value checks through the module's read-only collector, with zero assignments confirmed.
+
+On 16 September 2026, a fresh process using an isolated temporary application verified exactly the nine documented default Graph read scopes, plus standard identity scopes. Read-only collection and HTML/snapshot exports completed successfully. No failed collection status was recorded. Unsupported workload outcome sources remained explicitly NotSupported. Optional Autopilot was not included. This validates the default collection permissions, not every optional feature or every tenant configuration.
+
+The release owner manually confirmed report appearance, Script Library ZIP download, evidence imports, saved decisions after refresh and change-plan exports. This was not an automated browser run. Browser version, invalid-file recovery, keyboard traversal, narrow-window behaviour and runtime network isolation were not individually verified.
+
+On 16 September 2026, the release owner chose to proceed without separate-device validation. Endpoint investigations have not been validated against a controlled affected/reference device pair, Intune application detection parity or real remediation before/after outcomes. These are validation limits, not evidence of a successful device fix.
+
+Use docs/v4-local-testing.md for the local workflow and outstanding acceptance checks. Browser data, reports, plans, script outputs and snapshots can contain sensitive information. Pseudonymisation is not guaranteed anonymisation.
+
+## Previous release: 3.0.0
 
 IntuneAccess 3.0.0 completes the agreed read-only device investigation roadmap. Signal Atlas now connects device record quality, assignment paths, enrolment, applications, updates, compliance and estate-level findings with the existing RBAC and policy evidence.
 

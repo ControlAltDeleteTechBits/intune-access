@@ -1,0 +1,301 @@
+<style>
+.workspace.action-workspace{grid-template-columns:minmax(0,1fr)}
+.action-workspace .review-card{margin-bottom:18px;overflow-wrap:anywhere;cursor:default}
+.action-workspace .review-card:hover{background:var(--surface)}
+.action-workspace .review-card button{padding:9px 13px;margin:6px 8px 6px 0;border:1px solid var(--line-dark);background:var(--surface);cursor:pointer}
+.action-workspace .review-card button:disabled{opacity:.5;cursor:not-allowed}
+.action-workspace .review-card button:focus-visible,.action-workspace input:focus-visible,.action-workspace summary:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.action-workspace .review-card button:hover:not(:disabled){background:var(--yellow-soft)}
+.action-workspace form{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-top:20px}
+.action-workspace form label{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1 1 220px}
+.action-workspace input[type=text],.action-workspace input[type=date]{max-width:100%;padding:9px;border:1px solid var(--line-dark)}
+.action-workspace summary{padding:12px 0;cursor:pointer}
+.action-workspace pre{font:12px/1.5 var(--font-mono);background:var(--paper);padding:12px;max-height:400px;overflow:auto}
+</style>
+<section class="view-panel" data-view-panel="action-centre" hidden>
+  <div class="review-card">
+    <h2>Findings and remediation plans</h2>
+    <p>Review the evidence, prepare a change plan and apply approved changes outside IntuneAccess. No device or tenant changes can be made here.</p>
+    <p>Expected decisions are stored in this browser for this tenant. They do not alter findings or prove resolution. Export a copy before moving devices or clearing browser data.</p>
+    <button type="button" id="action-export-plan">Export selected change plan</button>
+    <button type="button" id="action-export-decisions">Export local decisions</button>
+    <label>Import exported decisions <input id="action-import-decisions" type="file" accept=".json,application/json"></label>
+    <p id="action-message" role="status"></p>
+  </div>
+  <div id="action-findings"></div>
+</section>
+<section class="view-panel" data-view-panel="remediation-effectiveness" hidden>
+  <div class="review-card"><h2>Remediation effectiveness</h2><p>Reported script success is not proof that the problem is resolved. History requires distinct execution observations from comparable snapshots.</p></div>
+  <div id="action-remediations"></div>
+</section>
+<section class="view-panel" data-view-panel="remediation-library" hidden>
+  <div class="review-card"><h2>Reviewed script library</h2><p>Export only. Review the complete source, prerequisites, risks and recovery instructions before external testing and deployment. IntuneAccess never runs or uploads these files. A change making script changes a device only if you run it separately.</p></div>
+  <div id="action-library"></div>
+  <div class="review-card">
+    <h2>Application detection investigation</h2>
+    <p>Export collected application rules, then use Convert-ApplicationRules.ps1 from the application detection package to prepare endpoint collection. Unsupported rules remain unevaluated. This does not deploy a script or change detection in Intune.</p>
+    <label for="investigation-application">Application</label>
+    <select id="investigation-application"></select>
+    <button id="investigation-application-export" type="button">Export application rules</button>
+    <p id="investigation-application-status" role="status"></p>
+  </div>
+  <div class="review-card">
+    <h2>Review external endpoint evidence</h2>
+    <p>Import review.json or comparison.json produced by an exported investigation package. Files stay in this page and are not uploaded or saved in browser storage. Device and tenant identity are not independently verified; these observations are not merged into tenant findings.</p>
+    <label>Choose an endpoint review or comparison <input id="endpoint-review-import" type="file" accept=".json,application/json"></label>
+    <button id="endpoint-review-clear" type="button">Clear imported evidence</button>
+    <p id="endpoint-review-status" role="status"></p>
+    <div id="endpoint-review-results"></div>
+  </div>
+</section>
+<script type="application/json" id="action-data">__INTUNEACCESS_ACTION_DATA__</script>
+<section class="view-panel" data-view-panel="finding-verification" hidden>
+  <div class="review-card"><h2>Verify later evidence</h2><p>Observation cleared means fresh evidence cleared the particular finding, not that IntuneAccess applied a fix or proved its cause. Missing devices and unavailable evidence cannot prove resolution.</p></div>
+  <div id="action-verification"></div>
+</section>
+<script>
+(function () {
+  'use strict';
+  var data = JSON.parse(document.getElementById('action-data').textContent);
+  var message = document.getElementById('action-message');
+  var storageKey = 'IntuneAccess:decisions:v1:' + data.TenantId;
+  var decisions = Object.create(null);
+  var selected = new Set();
+  var dispositionRefresh = [];
+  function say(text) { message.textContent = text; }
+  function element(tag, text, parent) {
+    var node = document.createElement(tag);
+    if (text !== undefined) node.textContent = String(text);
+    if (parent) parent.appendChild(node);
+    return node;
+  }
+  function paragraph(parent, heading, value) {
+    element('h3', heading, parent);
+    if (Array.isArray(value)) {
+      var list = element('ol', undefined, parent);
+      value.forEach(function (item) { element('li', item, list); });
+    } else { element('p', value || 'Not available', parent); }
+  }
+  function download(name, contents, mime) {
+    var url = URL.createObjectURL(new Blob([contents], {type: mime}));
+    var link = element('a'); link.href = url; link.download = name;
+    document.body.appendChild(link); link.click(); link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  var appSelect = document.getElementById('investigation-application');
+  var appExport = document.getElementById('investigation-application-export');
+  var appStatus = document.getElementById('investigation-application-status');
+  var investigationApps = Array.isArray(data.Applications) ? data.Applications : [];
+  investigationApps.forEach(function (app, index) {
+    var option = element('option', app.displayName || app.id || 'Unnamed application', appSelect);
+    option.value = String(index);
+  });
+  function updateAppSelection() {
+    var app = investigationApps[Number(appSelect.value)];
+    var available = app && Array.isArray(app.rules) && app.rules.some(function (rule) { return rule.ruleType === 'detection'; });
+    appExport.disabled = !available;
+    appStatus.textContent = available ? 'Collected rule metadata is available. Verify its age and execution context before using it.' : 'No exportable detection rules were collected for this selection. Recollect application evidence; absence is not a passing detection result.';
+  }
+  appSelect.addEventListener('change', updateAppSelection);
+  updateAppSelection();
+  appExport.addEventListener('click', function () {
+    if (appExport.disabled) return;
+    var app = investigationApps[Number(appSelect.value)];
+    download('IntuneAccess-application-rules.json', JSON.stringify(app, null, 2), 'application/json');
+    appStatus.textContent = 'Exported collected rule metadata. No tenant changes applied. Script bodies and installer commands are not included.';
+  });
+  try {
+    var saved = data.TenantId ? JSON.parse(localStorage.getItem(storageKey) || '{}') : {};
+    if (saved && typeof saved === 'object' && !Array.isArray(saved)) {
+      Object.keys(saved).forEach(function (key) {
+        var item = saved[key];
+        if (item && typeof item.Reason === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.ReviewDate || '')) decisions[key] = item;
+      });
+    }
+  } catch (_) { say('Browser storage is unavailable or unreadable. Decisions can be exported but may not persist.'); }
+  function persist() {
+    if (!data.TenantId) { say('No tenant ID is available. Persistent decisions are disabled to prevent mixing tenants.'); return; }
+    try { localStorage.setItem(storageKey, JSON.stringify(decisions)); say('Decision saved locally for this tenant.'); }
+    catch (_) { say('Decision is held in this page only. Export local decisions before closing.'); }
+  }
+  var host = document.getElementById('action-findings');
+  var verificationHost = document.getElementById('action-verification');
+  if (!data.Verification.length) element('p', 'No finding comparison is available. Run Start-IntuneAccess with -BaselineSnapshotPath and a comparable earlier snapshot.', verificationHost);
+  data.Verification.forEach(function (item) {
+    var card = element('article', undefined, verificationHost); card.className = 'review-card object-row'; card.style.display = 'block';
+    card.setAttribute('data-search', [item.Title, item.DeviceName, item.VerificationState].join(' '));
+    element('h2', item.Title, card);
+    paragraph(card, 'Verification', item.VerificationState);
+    paragraph(card, 'Explanation', item.Explanation);
+    paragraph(card, 'Before collection', item.BeforeCollectedAt);
+    paragraph(card, 'After collection', item.AfterCollectedAt);
+    paragraph(card, 'Original evidence time', item.BeforeEvidenceTimestamp);
+    var details = element('details', undefined, card); element('summary', 'Before and after evidence including timestamps', details);
+    var raw = element('pre', JSON.stringify({Before: item.BeforeEvidence, After: item.AfterEvidence}, null, 2), details); raw.style.whiteSpace = 'pre-wrap'; raw.style.overflowWrap = 'anywhere';
+  });
+  var libraryHost = document.getElementById('action-library');
+  var endpointResults = document.getElementById('endpoint-review-results');
+  var endpointStatus = document.getElementById('endpoint-review-status');
+  document.getElementById('endpoint-review-clear').addEventListener('click', function () {
+    endpointResults.replaceChildren(); endpointStatus.textContent = 'Imported evidence cleared from this page.';
+  });
+  document.getElementById('endpoint-review-import').addEventListener('change', async function (event) {
+    try {
+      var file = event.target.files[0]; if (!file) return;
+      if (file.size > 10485760) throw new Error('Evidence exceeds 10 MiB.');
+      var incoming = JSON.parse(await file.text());
+      if (incoming.SchemaVersion !== '1.0' || !['IntuneAccess.EndpointReview','IntuneAccess.EndpointComparison'].includes(incoming.Kind)) throw new Error('Choose a supported endpoint review or comparison file.');
+      var rows = incoming.Kind === 'IntuneAccess.EndpointReview' ? incoming.Findings : incoming.Rows;
+      if (!Array.isArray(rows) || rows.length > 1000 || rows.some(function (row) { return !row || typeof row !== 'object' || typeof row.State !== 'string'; })) throw new Error('Invalid evidence rows.');
+      var fragment = document.createDocumentFragment();
+      element('p', 'External evidence: ' + (incoming.ComputerName || incoming.ReferenceComputer || 'Unknown device') + ' | ' + (incoming.CollectedAt || incoming.ReferenceTime || 'Time unavailable'), fragment);
+      if (incoming.Kind === 'IntuneAccess.EndpointComparison') {
+        element('p', 'Compared with: ' + (incoming.DifferenceComputer || 'Unknown device') + ' | ' + (incoming.DifferenceTime || 'Time unavailable') + '. Context matches: ' + String(incoming.ContextMatches), fragment);
+        if (Array.isArray(incoming.Warnings)) incoming.Warnings.slice(0, 20).forEach(function (warning) { element('p', 'Review warning: ' + String(warning), fragment); });
+      }
+      if (incoming.DetectionConditions) element('p', 'Combined detection conditions: ' + String(incoming.DetectionConditions) + '. This is not proof of application health.', fragment);
+      rows.forEach(function (row) {
+        var card = element('article', undefined, fragment); card.className = 'review-card';
+        element('h3', (row.Id || row.Key || 'Observation') + ': ' + row.State, card);
+        if (row.Explanation) element('p', row.Explanation, card);
+        if (row.NextCheck) element('p', 'Next check: ' + String(row.NextCheck), card);
+        var details = element('details', undefined, card); element('summary', 'Evidence and proposal for review', details);
+        element('pre', JSON.stringify(row, null, 2), details);
+      });
+      endpointResults.replaceChildren(fragment);
+      endpointStatus.textContent = 'Imported ' + rows.length + ' external observations. Check identity, context and age. No changes applied; no cause or resolution inferred.';
+    } catch (error) { endpointStatus.textContent = error.message || 'Unable to import evidence.'; }
+    finally { event.target.value = ''; }
+  });
+  data.Library.forEach(function (item) {
+    var card = element('article', undefined, libraryHost); card.className = 'review-card object-row'; card.style.display = 'block';
+    card.setAttribute('data-search', item.Name + ' ' + item.Id);
+    element('h2', item.Name, card);
+    element('p', item.MakesChanges ? 'Contains a change making remediation script for external review.' : 'Detection only. No remediation script or cleanup action.', card);
+    element('p', 'Package version: ' + item.Version + '. Review: source and mocked tests; validate in your pilot environment.', card);
+    var notes = element('pre', item.ReviewNotes, card); notes.style.whiteSpace = 'pre-wrap'; notes.style.overflowWrap = 'anywhere';
+    var acknowledge = element('label', undefined, card);
+    var tick = element('input', undefined, acknowledge); tick.type = 'checkbox';
+    acknowledge.appendChild(document.createTextNode(' I understand that exported remediation scripts must be reviewed and tested before external execution.'));
+    var button = element('button', 'Export scripts for review', card); button.type = 'button'; button.disabled = true;
+    tick.addEventListener('change', function () { button.disabled = !tick.checked; });
+    button.addEventListener('click', function () {
+      if (!tick.checked) return;
+      var bytes = Uint8Array.from(atob(item.PackageBase64), function (value) { return value.charCodeAt(0); });
+      download('IntuneAccess-' + item.Id + '-' + item.Version + '.zip', bytes, 'application/zip');
+    });
+    var hash = element('p', 'SHA256: ' + item.PackageSha256, card); hash.style.overflowWrap = 'anywhere';
+  });
+  if (!data.Findings.length) element('p', 'No actionable finding was produced. Review collection coverage before concluding the estate is healthy.', host);
+  data.Findings.forEach(function (finding) {
+    var card = element('article', undefined, host); card.className = 'review-card object-row'; card.style.display = 'block';
+    card.setAttribute('data-search', [finding.Title, finding.DeviceName, finding.SourceType, finding.FindingId].join(' '));
+    var label = element('label', undefined, card);
+    var checkbox = element('input', undefined, label); checkbox.type = 'checkbox';
+    label.appendChild(document.createTextNode(' Include in change plan'));
+    checkbox.addEventListener('change', function () { if (checkbox.checked) selected.add(finding.FindingId); else selected.delete(finding.FindingId); });
+    element('h2', finding.Title, card);
+    element('p', finding.Severity + ' | ' + (finding.DeviceName || 'See affected objects') + ' | ' + finding.SourceType, card);
+    element('p', finding.Explanation, card);
+    element('p', 'Evidence time: ' + (finding.EvidenceTimestamp || 'Not returned') + '. Collected: ' + finding.CollectedAt, card);
+    var detail = element('details', undefined, card); element('summary', 'Resolution guide and supporting evidence', detail);
+    paragraph(detail, 'Affected objects', finding.AffectedObjects.map(function (item) { return item.Type + ': ' + item.Name + ' (' + item.Id + ')'; }));
+    var guide = finding.ResolutionGuide;
+    paragraph(detail, 'Potential impact', guide.PotentialImpact);
+    paragraph(detail, 'Recommended checks', guide.RecommendedChecks);
+    paragraph(detail, 'Suggested fix for external review', guide.SuggestedFix);
+    paragraph(detail, 'Prerequisites', guide.Prerequisites);
+    paragraph(detail, 'Pilot recommendation', guide.PilotRecommendation);
+    paragraph(detail, 'Risks', guide.Risks);
+    paragraph(detail, 'Verification', guide.Verification);
+    paragraph(detail, 'Recovery', guide.Recovery);
+    var reference = element('a', 'Microsoft reference', detail); reference.href = guide.Reference; reference.target = '_blank'; reference.rel = 'noopener noreferrer';
+    var evidence = element('pre', JSON.stringify(finding.Evidence, null, 2), detail); evidence.style.whiteSpace = 'pre-wrap'; evidence.style.overflowWrap = 'anywhere';
+    var form = element('form', undefined, card);
+    var reasonLabel = element('label', 'Reason this is expected ', form);
+    var reason = element('input', undefined, reasonLabel); reason.type = 'text'; reason.required = true; reason.maxLength = 1000;
+    var dateLabel = element('label', ' Review date ', form);
+    var review = element('input', undefined, dateLabel); review.type = 'date'; review.required = true;
+    var save = element('button', 'Mark expected locally', form); save.type = 'submit';
+    var reopen = element('button', 'Return to review', form); reopen.type = 'button';
+    var disposition = element('p', undefined, card);
+    function showDisposition() {
+      var value = decisions[finding.FindingId];
+      if (value) {
+        reason.value = value.Reason; review.value = value.ReviewDate;
+        var expired = new Date(value.ReviewDate + 'T23:59:59').getTime() < Date.now();
+        disposition.textContent = (expired ? 'Expected decision needs review' : 'Expected locally') + ': ' + value.Reason + '. Review: ' + value.ReviewDate;
+      } else { disposition.textContent = 'Needs review'; reason.value = ''; review.value = ''; }
+    }
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (!reason.value.trim() || !review.value || !Number.isFinite(new Date(review.value).getTime())) { say('Provide a reason and valid review date.'); return; }
+      if (new Date(review.value + 'T23:59:59').getTime() < Date.now()) { say('Choose today or a future review date.'); return; }
+      decisions[finding.FindingId] = {Reason: reason.value.trim(), ReviewDate: review.value, UpdatedAt: new Date().toISOString()};
+      persist(); showDisposition();
+    });
+    reopen.addEventListener('click', function () { delete decisions[finding.FindingId]; persist(); showDisposition(); });
+    showDisposition();
+    dispositionRefresh.push(showDisposition);
+  });
+  document.getElementById('action-import-decisions').addEventListener('change', async function (event) {
+    var input = event.target;
+    try {
+      var file = input.files[0];
+      if (!file) return;
+      if (file.size > 2097152) throw new Error('Decision file exceeds the 2 MiB limit.');
+      var imported = JSON.parse(await file.text());
+      if (!data.TenantId || imported.SchemaVersion !== '1.0' || imported.TenantId !== data.TenantId) throw new Error('Decision file must use schema 1.0 and match this exact tenant.');
+      if (!imported.Decisions || typeof imported.Decisions !== 'object' || Array.isArray(imported.Decisions)) throw new Error('Invalid decisions collection.');
+      var knownIds = new Set(data.Findings.map(function (item) { return item.FindingId; }));
+      var additions = Object.create(null);
+      Object.keys(imported.Decisions).forEach(function (id) {
+        var item = imported.Decisions[id];
+        if (!item || typeof item.Reason !== 'string' || !item.Reason.trim() || item.Reason.length > 1000 || typeof item.ReviewDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(item.ReviewDate) || !Number.isFinite(Date.parse(item.ReviewDate)) || new Date(item.ReviewDate).toISOString().slice(0,10) !== item.ReviewDate) throw new Error('Invalid decision reason or review date. Nothing imported.');
+        if (knownIds.has(id) && !Object.prototype.hasOwnProperty.call(decisions,id)) additions[id] = {Reason: item.Reason.trim(), ReviewDate: item.ReviewDate, UpdatedAt: new Date().toISOString()};
+      });
+      Object.keys(additions).forEach(function (id) { decisions[id] = additions[id]; });
+      persist(); dispositionRefresh.forEach(function (refresh) { refresh(); });
+      say('Imported ' + Object.keys(additions).length + ' matching decisions. Existing local decisions were preserved. Export a backup if browser storage is unavailable.');
+    } catch (error) { say(error.message || 'Unable to import decisions.'); }
+    finally { input.value = ''; }
+  });
+  document.getElementById('action-export-decisions').addEventListener('click', function () {
+    download('IntuneAccess-local-decisions.json', JSON.stringify({SchemaVersion: '1.0', TenantId: data.TenantId, Decisions: decisions}, null, 2), 'application/json');
+    say('Local decisions exported. This file can contain sensitive administrative notes.');
+  });
+  document.getElementById('action-export-plan').addEventListener('click', function () {
+    var findings = data.Findings.filter(function (item) { return selected.has(item.FindingId); });
+    if (!findings.length) { say('Select at least one finding for the change plan.'); return; }
+    var lines = ['# IntuneAccess change plan for review', '', 'No changes have been applied. Review and approve each proposal before external execution.', '', 'Tenant ID: ' + data.TenantId, 'Evidence collected: ' + data.GeneratedAt, '', 'This document contains sensitive tenant evidence.'];
+    findings.forEach(function (item) {
+      lines.push('', '## ' + item.Title, '', 'Finding: ' + item.FindingId, 'Evidence timestamp: ' + (item.EvidenceTimestamp || 'Not returned'), '', item.Explanation);
+      lines.push('', 'Affected objects: ' + item.AffectedObjects.map(function (object) { return object.Type + ' ' + object.Id + ' (' + object.Name + ')'; }).join('; '));
+      lines.push('Potential scope is limited to observed relationships; this is not a complete impact simulation.');
+      var guide = item.ResolutionGuide;
+      ['PotentialImpact', 'RecommendedChecks', 'SuggestedFix', 'Prerequisites', 'PilotRecommendation', 'Risks', 'Verification', 'Recovery', 'Reference'].forEach(function (key) {
+        lines.push('', '### ' + key, '', Array.isArray(guide[key]) ? guide[key].map(function (text, index) { return (index + 1) + '. ' + text; }).join('\n') : guide[key]);
+      });
+      if (decisions[item.FindingId]) lines.push('', 'Local decision: ' + JSON.stringify(decisions[item.FindingId]));
+      lines.push('', '### Supporting evidence', '', '~~~~json', JSON.stringify(item.Evidence, null, 2), '~~~~');
+    });
+    download('IntuneAccess-change-plan.md', lines.join('\n'), 'text/markdown;charset=utf-8');
+    say('Change plan exported for review. No changes were applied.');
+  });
+  var remediationHost = document.getElementById('action-remediations');
+  if (!data.Remediations.length) element('p', 'No remediation package evidence is present. Check collection coverage and permissions.', remediationHost);
+  data.Remediations.forEach(function (item) {
+    var card = element('article', undefined, remediationHost); card.className = 'review-card object-row'; card.style.display = 'block';
+    card.setAttribute('data-search', [item.WorkloadName, item.DeviceName, item.FindingState, item.HistoryState].join(' '));
+    element('h2', item.WorkloadName, card);
+    paragraph(card, 'Device', item.DeviceName || 'No matched device result');
+    paragraph(card, 'Assessment', item.FindingState);
+    paragraph(card, 'Explanation', item.Explanation);
+    paragraph(card, 'Detection / remediation', (item.DetectionState || 'Not returned') + ' / ' + (item.RemediationState || 'Not returned'));
+    paragraph(card, 'History', item.HistoryState);
+    paragraph(card, 'Execution timestamp', item.EvidenceTimestamp);
+    var details = element('details', undefined, card); element('summary', 'Supporting observations', details);
+    var raw = element('pre', JSON.stringify({Current: item.Evidence, Previous: item.PreviousObservation}, null, 2), details); raw.style.whiteSpace = 'pre-wrap'; raw.style.overflowWrap = 'anywhere';
+  });
+})();
+</script>

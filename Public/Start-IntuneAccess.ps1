@@ -94,6 +94,10 @@ function Start-IntuneAccess {
             if (-not [string]::IsNullOrWhiteSpace($BaselineSnapshotPath)) {
                 $snapshotComparison = Compare-IntuneAccessSnapshot -ReferencePath $BaselineSnapshotPath -DifferencePath $snapshot.FullName -AuditEvent @(Get-IntuneAccessProperty $tenantRbac 'AuditEvents' @())
                 $tenantRbac | Add-Member -NotePropertyName SnapshotComparison -NotePropertyValue $snapshotComparison -Force
+                if ($null -ne (Get-IntuneAccessProperty $snapshotComparison 'ActionCentre')) {
+                    $tenantRbac | Add-Member -NotePropertyName ActionCentre -NotePropertyValue $snapshotComparison.ActionCentre -Force
+                }
+                $tenantRbac | Add-Member -NotePropertyName FindingVerification -NotePropertyValue @(Get-IntuneAccessProperty $snapshotComparison 'FindingVerification' @()) -Force
                 $tenantRbac | Add-Member -NotePropertyName EstateHistoricalTrend -NotePropertyValue ([PSCustomObject] @{
                     State = 'Compared'
                     Changes = @($snapshotComparison.Changes)

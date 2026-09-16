@@ -2,11 +2,11 @@
 
 ## Comparison target
 
-Source visual truth path: `C:\Users\Codex!\.codex\generated_images\01a00ef7-774a-7822-b4f3-6668efaf0a17\exec-797af496-393c-4492-82fb-50ed8bca5a02.png`
+Source reference: the approved Signal Atlas mock-up, retained privately outside the repository.
 
-Implementation screenshot path: `C:\Users\Codex!\Documents\Codex\2026-08-17\fyi-attached-and\outputs\IntuneAccess\screenshots\IntuneAccess-signal-atlas-full.png`
+Implementation screenshot: `screenshots/IntuneAccess-signal-atlas-full.png`.
 
-Combined comparison path: `C:\Users\Codex!\Documents\Codex\2026-08-17\fyi-attached-and\outputs\IntuneAccess\screenshots\IntuneAccess-signal-atlas-comparison.png`
+Combined comparison: `screenshots/IntuneAccess-signal-atlas-comparison.png`.
 
 State: default read-only report with all permission families visible and evidence details closed.
 

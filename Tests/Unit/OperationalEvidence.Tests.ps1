@@ -55,15 +55,21 @@ Describe 'Device and User 360 operational evidence' {
             $result.Warnings[0] | Should -Match 'could not be collected'
         }
 
-        It 'formats signed Intune error codes as unsigned hexadecimal values' {
+        It 'formats signed Intune error codes as unsigned hexadecimal values' -TestCases @(
+            @{Code=-2016345060;Hex='0x87D1041C'},
+            @{Code=-1;Hex='0xFFFFFFFF'},
+            @{Code=-2147483648;Hex='0x80000000'},
+            @{Code=2147483647;Hex='0x7FFFFFFF'}
+        ) {
+            param($Code,$Hex)
             $workload = [PSCustomObject] @{ Id = 'app-1'; Name = 'Support app'; WorkloadType = 'Applications' }
             $device = [PSCustomObject] @{ Id = 'device-1'; DeviceName = 'PC-001'; UserPrincipalName = 'alex@example.test' }
-            $rawOutcome = [PSCustomObject] @{ id = 'status-1'; deviceId = 'device-1'; installState = 'failed'; errorCode = -2016345060 }
+            $rawOutcome = [PSCustomObject] @{ id = 'status-1'; deviceId = 'device-1'; installState = 'failed'; errorCode = $Code }
 
             $result = ConvertTo-IntuneAccessDeploymentOutcome -InputObject $rawOutcome -Workload $workload -ApiVersion 'beta' -ManagedDevice @($device)
 
-            $result.ErrorCode | Should -Be -2016345060
-            $result.ErrorCodeHex | Should -Be '0x87D1041C'
+            $result.ErrorCode | Should -Be $Code
+            $result.ErrorCodeHex | Should -Be $Hex
         }
 
         It 'builds a selected device 360 view from shared evidence' {

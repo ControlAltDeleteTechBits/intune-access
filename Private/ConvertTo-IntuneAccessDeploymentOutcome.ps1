@@ -32,13 +32,14 @@ function ConvertTo-IntuneAccessDeploymentOutcome {
     $errorCode = Get-IntuneAccessProperty $InputObject 'errorCode'
     $errorCodeHex = ''
     if ($null -ne $errorCode -and [long] $errorCode -ne 0) {
-        $errorCodeHex = '0x{0:X8}' -f ([uint32] ([long] $errorCode -band 0xffffffffL))
+        # Decimal avoids older PowerShell parsing the hexadecimal mask as signed -1.
+        $errorCodeHex = '0x{0:X8}' -f ([uint32] ([long] $errorCode -band 4294967295L))
     }
 
     $matchedDevice = $null
     $matchState = 'NotEvaluated'
     if (-not [string]::IsNullOrWhiteSpace($deviceId)) {
-        $matchedDevice = @($ManagedDevice | Where-Object Id -EQ $deviceId | Select-Object -First 1)[0]
+            $matchedDevice = $ManagedDevice | Where-Object Id -EQ $deviceId | Select-Object -First 1
         if ($null -ne $matchedDevice) { $matchState = 'MatchedById' }
     }
     if ($null -eq $matchedDevice -and -not [string]::IsNullOrWhiteSpace($deviceName)) {
@@ -59,7 +60,7 @@ function ConvertTo-IntuneAccessDeploymentOutcome {
     }
 
     $lastReported = $null
-    foreach ($propertyName in @('lastReportedDateTime', 'lastSyncDateTime', 'lastStateUpdateDateTime')) {
+    foreach ($propertyName in @('lastStateUpdateDateTime', 'lastReportedDateTime', 'lastSyncDateTime')) {
         $candidate = Get-IntuneAccessProperty $InputObject $propertyName
         if ($null -ne $candidate -and -not [string]::IsNullOrWhiteSpace([string] $candidate)) { $lastReported = $candidate; break }
     }
@@ -70,6 +71,7 @@ function ConvertTo-IntuneAccessDeploymentOutcome {
         WorkloadId        = [string] $Workload.Id
         WorkloadName      = [string] $Workload.Name
         WorkloadType      = [string] $Workload.WorkloadType
+        SourceCollection  = [string] (Get-IntuneAccessProperty $Workload 'SourceCollection' '')
         DeviceId          = $deviceId
         DeviceName        = $deviceName
         UserPrincipalName = $userPrincipalName
@@ -79,6 +81,16 @@ function ConvertTo-IntuneAccessDeploymentOutcome {
         ErrorCode         = $errorCode
         ErrorCodeHex      = $errorCodeHex
         LastReportedDateTime = $lastReported
+        LastStateUpdateDateTime = Get-IntuneAccessProperty $InputObject 'lastStateUpdateDateTime'
+        ExpectedStateUpdateDateTime = Get-IntuneAccessProperty $InputObject 'expectedStateUpdateDateTime'
+        LastSyncDateTime   = Get-IntuneAccessProperty $InputObject 'lastSyncDateTime'
+        DetectionState    = [string] (Get-IntuneAccessProperty $InputObject 'detectionState' '')
+        RemediationState  = [string] (Get-IntuneAccessProperty $InputObject 'remediationState' '')
+        PreRemediationDetectionScriptOutput = [string] (Get-IntuneAccessProperty $InputObject 'preRemediationDetectionScriptOutput' '')
+        PreRemediationDetectionScriptError = [string] (Get-IntuneAccessProperty $InputObject 'preRemediationDetectionScriptError' '')
+        RemediationScriptError = [string] (Get-IntuneAccessProperty $InputObject 'remediationScriptError' '')
+        PostRemediationDetectionScriptOutput = [string] (Get-IntuneAccessProperty $InputObject 'postRemediationDetectionScriptOutput' '')
+        PostRemediationDetectionScriptError = [string] (Get-IntuneAccessProperty $InputObject 'postRemediationDetectionScriptError' '')
         DeviceMatchState  = $matchState
         SourceApiVersion  = $ApiVersion
         EvidenceState     = 'Reported'
