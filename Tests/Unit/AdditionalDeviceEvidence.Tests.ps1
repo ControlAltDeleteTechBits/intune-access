@@ -1,4 +1,12 @@
 BeforeAll {
+    # Pester needs a command definition to mock on non-Windows runners.
+    if (-not (Get-Command Get-WinEvent -ErrorAction SilentlyContinue)) {
+        function Get-WinEvent {
+            [CmdletBinding()]
+            param([hashtable]$FilterHashtable, [int]$MaxEvents)
+            throw "Unmocked Windows event query: $($FilterHashtable.Count), $MaxEvents"
+        }
+    }
     . (Join-Path $PSScriptRoot '../../Assets/RemediationLibrary/investigation-common/Get-AdditionalDeviceEvidence.ps1')
 }
 Describe 'Bounded optional endpoint metadata' {

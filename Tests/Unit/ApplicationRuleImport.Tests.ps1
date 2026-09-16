@@ -29,7 +29,7 @@ Describe 'Graph application rule import' {
         @{SchemaVersion='1.0';Kind='IntuneAccess.EndpointEvidence';Investigation='ApplicationDetection';Context=@{IsSystem=$true;UserSid='S-1-5-18'};Configuration=$configuration;Facts=@(@{Key='rule/detection-1/File';State='Observed';Value=@{Version=$Observed}})} | ConvertTo-Json -Depth 20 | Set-Content $evidence
         (& $reviewer -EvidencePath $evidence | ConvertFrom-Json).DetectionConditions | Should -Be $State
     }
-    It 'collects real executable version metadata without executing the target file' {
+    It 'collects real executable version metadata without executing the target file' -Skip:(-not $IsWindows) {
         $target=Join-Path $PSHOME 'pwsh.exe'
         $expected=(Get-Item -LiteralPath $target).VersionInfo.FileVersion
         $path=Save-AppFixture -Rules @(@{'@odata.type'='#microsoft.graph.win32LobAppFileSystemRule';ruleType='detection';path=$PSHOME;fileOrFolderName='pwsh.exe';operationType='version';operator='equal';comparisonValue=$expected;check32BitOn64System=$false})
@@ -46,7 +46,7 @@ Describe 'Graph application rule import' {
         $collected.DeviceConfigurationChanged | Should -BeFalse
         (& $reviewer -EvidencePath $evidence | ConvertFrom-Json).DetectionConditions | Should -Be 'Matches'
     }
-    It 'imports literal file and folder existence and reviews local observations' {
+    It 'imports literal file and folder existence and reviews local observations' -Skip:(-not $IsWindows) {
         $folder=Join-Path $TestDrive 'present'
         New-Item -ItemType Directory -Path $folder -Force | Out-Null
         New-Item -ItemType File -Path (Join-Path $TestDrive 'marker.txt') -Force | Out-Null
