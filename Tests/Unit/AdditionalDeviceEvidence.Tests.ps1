@@ -2,6 +2,7 @@ BeforeAll {
     # Pester needs a command definition to mock on non-Windows runners.
     if (-not (Get-Command Get-WinEvent -ErrorAction SilentlyContinue)) {
         function Get-WinEvent {
+            [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidOverwritingBuiltInCmdlets', '', Justification = 'Test-only mock target, defined only where the Windows cmdlet is absent.')]
             [CmdletBinding()]
             param([hashtable]$FilterHashtable, [int]$MaxEvents)
             throw "Unmocked Windows event query: $($FilterHashtable.Count), $MaxEvents"
