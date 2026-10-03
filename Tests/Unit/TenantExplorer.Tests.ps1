@@ -110,5 +110,29 @@ Describe 'Tenant-wide Intune RBAC explorer' {
             $html | Should -Match 'overflow-wrap:anywhere'
             $html | Should -Match 'Content-Security-Policy'
         }
+
+        It 'opens on a triage section whose links all target existing report views' {
+            $tenantRbac = [PSCustomObject] @{
+                PSTypeName = 'IntuneAccess.TenantRbac'
+                Tenant = [PSCustomObject] @{ Id = 'tenant-1'; DisplayName = 'Example tenant' }
+                Administrators = @(); AdminGroups = @(); RoleAssignments = @(); RoleDefinitions = @(); ScopeGroups = @(); ScopeTags = @(); Permissions = @(); Memberships = @()
+                Warnings = @(); InitialUserPrincipalName = ''; GraphPermissionsUsed = @()
+                GeneratedAt = [DateTimeOffset]::Parse('2026-10-03T10:00:00+01:00'); ToolVersion = '4.1.0'
+            }
+
+            $html = ConvertTo-IntuneAccessExplorerHtml -TenantRbac $tenantRbac
+
+            $html | Should -Match 'class="triage"'
+            $html | Should -Match "Why didn&#39;t it apply\?|Why didn't it apply\?"
+            $html | Should -Match 'What changed\?'
+            $html | Should -Match 'Who can do this\?'
+            $html | Should -Match 'No baseline snapshot was supplied'
+            $html | Should -Match '<strong>0</strong> reported errors'
+            $targets = @([regex]::Matches($html, 'data-go-view="([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+            $targets.Count | Should -BeGreaterThan 8
+            foreach ($target in $targets) {
+                $html | Should -Match ('data-view-panel="{0}"' -f [regex]::Escape($target))
+            }
+        }
     }
 }
