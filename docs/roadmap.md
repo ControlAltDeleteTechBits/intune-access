@@ -1,6 +1,6 @@
 # IntuneAccess product roadmap
 
-Last updated: 24 August 2026.
+Last updated: 3 October 2026.
 
 This roadmap records the agreed product direction after the first stable Gallery release. Planned versions may change when Microsoft Graph contracts, tenant validation or release testing show that a conclusion cannot be supported safely.
 
@@ -16,7 +16,7 @@ The module remains read only. It will distinguish confirmed evidence, calculated
 
 ## Version 1.1.0
 
-Status: implemented locally.
+Status: released.
 
 Complete and release the tenant wide RBAC explorer, including:
 
@@ -28,7 +28,7 @@ Complete and release the tenant wide RBAC explorer, including:
 
 ## Version 1.2.0
 
-Status: implemented locally.
+Status: released.
 
 Add the assignment and impact explorer for:
 
@@ -43,7 +43,7 @@ The explorer now correlates included and excluded groups, broad targets and assi
 
 ## Version 1.3.0
 
-Status: implemented locally.
+Status: released.
 
 Device and User 360 views now contain:
 
@@ -57,7 +57,7 @@ The implemented operational layer covers managed-device inventory plus supported
 
 ## Version 1.4.0
 
-Status: implemented locally.
+Status: released.
 
 Add local snapshots, change comparison and impact summaries:
 
@@ -69,7 +69,7 @@ Add local snapshots, change comparison and impact summaries:
 
 ## Version 2.0.0
 
-Status: implemented locally; live tenant validation remains.
+Status: released in 2.0.0; live tenant validation remains.
 
 Add policy setting overlap and conflict analysis across Settings Catalog, endpoint security, security baselines and supported legacy profiles. The analysis will identify overlapping target populations and different configured values while retaining the source policy and setting evidence.
 
@@ -152,7 +152,7 @@ The release is complete when administrators can distinguish missing targeting, d
 
 ## Version 3.0.0
 
-Status: implemented locally; release gates and representative live validation remain.
+Status: published on 24 August 2026. Representative live validation of every device collector remains.
 
 Add device estate intelligence with prioritised findings, historical trends and cross-device investigation.
 
@@ -165,6 +165,45 @@ Add device estate intelligence with prioritised findings, historical trends and 
 7. Add cross-device impact investigation for a selected policy, application, update or setting.
 
 The release is complete when the report can prioritise an estate-level investigation and trace every finding back to its devices and source evidence.
+
+## Version 4.0.0
+
+Status: published on 16 September 2026.
+
+Added the Findings Centre with resolution guides and local expected decisions, selected change-plan exports, the export-only script library, remediation effectiveness, conservative snapshot verification and four endpoint investigation packs. Separate-device incident validation was waived; see `v4-release-audit-current.md`.
+
+## Version 4.1.0
+
+Status: in development.
+
+Trust and first-use improvements, with no new Graph permissions:
+
+1. Correct documentation that still described V4 as unpublished, and update the security support policy.
+2. Publish a synthetic demonstration report so administrators can evaluate the explorer without signing in.
+3. Open the report on a triage page built around three questions: why did something not apply, what changed, and who can make changes.
+4. State the delivery limitation of the Intune Management Extension service package clearly.
+
+## Version 4.2.0
+
+Status: planned.
+
+Scoped permissions readiness. Microsoft introduced opt-in Scoped permissions in March 2026, states that the setting cannot be reversed once enabled, and plans to make it the default. This release will:
+
+1. Import the Permissions Assessment Report export from the Intune admin centre.
+2. Reconcile it with the IntuneAccess legacy and Scoped models for each administrator, group, scope tag and resource.
+3. Show agreements, disagreements and evidence that is missing from either side, without selecting the tenant mode automatically.
+
+## Version 5.0.0
+
+Status: planned.
+
+Change confidence across three questions administrators are asked every day:
+
+1. Why didn't it apply? An ordered, evidence-backed chain for one device or user and one workload: assignment path, exclusion, filter, applicability, reported state, error code, evidence age and next check. The chain stops at the first broken or unevaluated link.
+2. What changed? One timeline that merges Intune audit events, snapshot differences and changes in reported outcomes. Timing is shown as correlation, never as proven cause.
+3. What will this change affect, and who can make it? Dependency preview for a group, assignment filter or scope tag across policies, applications, scripts and role assignments, plus least-privilege review that compares role permissions with actions observed in the Intune audit log.
+
+Each capability must keep the read-only boundary, preserve `NotEvaluated` where evidence is incomplete, and document every Graph endpoint and permission before release. Any use of report export endpoints that require a POST request will be reviewed and documented as an explicit, read-only exception before adoption.
 
 ## Deferred candidates
 

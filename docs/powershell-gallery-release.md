@@ -1,14 +1,20 @@
 # PowerShell Gallery release procedure
 
-This procedure prepares and publishes the exact IntuneAccess package that passed local validation. The initial publication remains manual.
+This procedure prepares and publishes the exact IntuneAccess package that passed local validation. Publication is manual and is performed by the maintainer.
+
+Set the version once and use it throughout:
+
+```powershell
+$version = (Import-PowerShellDataFile .\IntuneAccess.psd1).ModuleVersion
+```
 
 ## Release boundary
 
-1. Publish only from the protected public repository and final release commit.
+1. Publish only from the protected public repository and the final release commit.
 2. Publish the already-tested `.nupkg`; do not rebuild during submission.
-3. Use a short-lived PowerShell Gallery API key restricted to new `IntuneAccess` versions where the Gallery account permits it.
-4. Never paste the key into chat, source, an issue, a pull request, a workflow file or command history.
-5. Reset the key after the first publication.
+3. Create a short-lived PowerShell Gallery API key, scoped to push new versions of `IntuneAccess` only, immediately before publication.
+4. Never paste the key into chat, an AI assistant, source, an issue, a pull request, a workflow file or command history. Enter it only through the hidden prompt below.
+5. Delete the key straight after publication. If a key is ever exposed, revoke it immediately and create a new one.
 
 ## Build and test
 
@@ -24,7 +30,7 @@ $package = .\tools\New-IntuneAccessGalleryPackage.ps1 -Force
     -PackagePath $package.Package
 ```
 
-Confirm that the package result reports version `3.0.0`, 22 exported commands, no validation error and a successful local repository installation.
+Confirm that the package result reports the expected `$version`, 22 exported commands, no validation error and a successful local repository installation. Update the command count here if the public surface changes.
 
 ## Publication order
 
@@ -38,7 +44,7 @@ Confirm that the package result reports version `3.0.0`, 22 exported commands, n
 8. Confirm the manifest project, licence, icon and release-note links resolve publicly.
 9. Record the final package name, version, size and SHA-256 hash.
 10. Obtain explicit approval for the public upload.
-11. Enter the Gallery key through a hidden local prompt only after approval.
+11. Create the scoped API key and enter it through the hidden local prompt.
 12. Run the publication command once.
 
 Do not use `Publish-PSResource -WhatIf` as a publication safeguard. During the 1.0.0 release with Microsoft.PowerShell.PSResourceGet 1.2.0, the command uploaded the package despite `WhatIf`. Complete package validation without calling `Publish-PSResource`, then obtain approval before invoking the publication command.
@@ -46,7 +52,7 @@ Do not use `Publish-PSResource -WhatIf` as a publication safeguard. During the 1
 ## Controlled publication command
 
 ```powershell
-$packagePath = '.\release\gallery\IntuneAccess.3.0.0.nupkg'
+$packagePath = ".\release\gallery\IntuneAccess.$version.nupkg"
 
 Get-Item -LiteralPath $packagePath |
     Select-Object Name, Length
@@ -85,11 +91,11 @@ Use an isolated PowerShell 7 environment that does not already contain IntuneAcc
 
 ```powershell
 Find-PSResource IntuneAccess `
-    -Version '3.0.0' `
+    -Version $version `
     -Repository PSGallery
 
 Install-PSResource IntuneAccess `
-    -Version '3.0.0' `
+    -Version $version `
     -Repository PSGallery `
     -Scope CurrentUser `
     -TrustRepository
@@ -103,7 +109,8 @@ Confirm:
 1. The Gallery page names Mark Oldham as author and Control Alt Delete Tech Bits as company.
 2. The project, licence, icon and release-note links work.
 3. Microsoft.Graph.Authentication appears as a dependency.
-4. Ten commands are exported, including `Start-IntuneAccess`.
+4. All 22 public commands are exported, including `Start-IntuneAccess`.
 5. A Core analysis works in the authorised development tenant.
 6. The downloaded package hash is recorded and compared with the locally tested package.
 7. The project log records the publication time, URL and validation evidence.
+8. The API key has been deleted.

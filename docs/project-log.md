@@ -2,13 +2,13 @@
 
 This document records product decisions, design choices, validation evidence, release progress and unresolved work. Update it when a decision changes or a release check produces new evidence.
 
-Last updated: 24 August 2026.
+Last updated: 3 October 2026.
 
 ## Current status
 
-IntuneAccess 2.0.1 is published. Version 3.0.0 is implemented locally and completes the agreed device roadmap from inventory and hygiene through estate intelligence. The project remains read only and requests no Microsoft Graph write permission.
+IntuneAccess 4.0.0 was published to GitHub and the PowerShell Gallery on 16 September 2026. Version 4.1.0 is in development and focuses on documentation accuracy, a synthetic demonstration report and a triage landing page. Versions 4.2.0 (Scoped permissions readiness) and 5.0.0 (change confidence) are planned in `docs/roadmap.md`. The project remains read only and requests no Microsoft Graph write permission.
 
-Positive RBAC validation passes against a test user with built-in and custom assignments. A representative 3.0.0 live device-evidence run completed on 24 August 2026 with four managed devices, 137 detected applications, 88 assignment explanations and ten prioritised estate findings. The first pass found a valid workload response without `SourceApiVersion`; the collector now retains `NotReturned` and has regression coverage. Autopilot sources were reachable but returned no identity or event fixture. The final source gate has 99 passing tests, 79.58 per cent command coverage and no Script Analyzer findings. Exact package and local repository gates are rerun after every source or documentation change.
+Earlier status, retained for history: on 24 August 2026 a representative 3.0.0 live device-evidence run completed with four managed devices, 137 detected applications, 88 assignment explanations and ten prioritised estate findings.
 
 ## Product decisions
 

@@ -14,7 +14,7 @@ All notable project changes are recorded here.
 8. Compatible hashing and timestamp parsing, corrected signed error formatting, plain-text library notes and repeated-pagination protection.
 9. Deferred application migration excluded from installable Gallery packages; development source retained.
 
-Default read-scope collection and owner-reported HTML acceptance completed on 16 September 2026. Separate-device incident validation was waived by the owner; optional Autopilot was not part of this permissions test. See docs/v4-release-audit-current.md for evidence and remaining limits. Publication is a separate step.
+Default read-scope collection and owner-reported HTML acceptance completed on 16 September 2026. Separate-device incident validation was waived by the owner; optional Autopilot was not part of this permissions test. See docs/v4-release-audit-current.md for evidence and remaining limits. Published on 16 September 2026.
 
 ## 3.0.0
 

@@ -1,6 +1,6 @@
 # V4 release readiness audit
 
-16 September 2026. Default-permission collection and owner HTML acceptance are complete. Publication is a separate authorised step. Final artefact gate receipts and hashes are retained in the release handover outside the package to avoid self-referential hashes. This audit preserves the original five action-centre capabilities and four approved investigation packs; application migration remains deferred.
+16 September 2026. Default-permission collection and owner HTML acceptance are complete. Version 4.0.0 was published to GitHub and the PowerShell Gallery the same day. Final artefact gate receipts and hashes are retained by the maintainer outside the package to avoid self-referential hashes. This audit preserves the original five action-centre capabilities and four approved investigation packs; application migration remains deferred.
 
 ## Release-owner decision and subsequent evidence
 
@@ -30,7 +30,7 @@ The table below records the preceding technical checkpoint; its controlled-incid
 | HTML runtime, no network, screenshots | Static JavaScript compile; user manual acceptance; recorded URL security restriction | Owner confirmed report appearance and key interactions. Network isolation is not proven by that confirmation. Do not bypass the recorded browser restriction via another surface or URL |
 | Release/package/install gates | Latest source gate: 213 tests, 80.44% coverage, no analyser findings. Earlier exact nupkg installed locally | These are checkpoints, not final acceptance. Regenerate and validate final packages after all acceptance work |
 | PowerShell compatibility | 213 tests passed on isolated PowerShell 7.0.13 with Graph Authentication 2.39.0 and Pester 5.7.1; also passed on current runtime | Older-runtime tests exposed and verified fixes for README metadata serialisation and signed error-code formatting. Snapshot/helper/ZIP tests pass. This is offline fixture coverage, not live Graph authentication coverage or proof for every intervening runtime version |
-| Final documentation and user approval | RELEASE_NOTES.md; this audit; owner acceptance | Completed validation and remaining limits recorded. Publication is a separate approval; nothing published by this validation workflow |
+| Final documentation and user approval | RELEASE_NOTES.md; this audit; owner acceptance | Completed validation and remaining limits recorded. Publication was approved separately and completed on 16 September 2026 |
 
 ## Test environment needs
 
@@ -38,4 +38,4 @@ Positive application, remediation and affected/reference incident validation rem
 
 ## Release handover and future validation
 
-Controlled incident checks in the historical table remain future validation work under the owner's waiver. Real update definition/value collection and principal manual report/export acceptance are now complete as described above. Snapshot timestamp preservation has regression coverage, including the compatibility parser. Rebuild and pass Test-Release.ps1, Test-IntuneAccessGalleryPackage.ps1 and Test-IntuneAccessLocalRepository.ps1, then retain the exact source ZIP and nupkg hashes with the gate receipts. Publish only the exact verified package after separate approval. Do not treat fixture coverage as proof of endpoint remediation success.
+Controlled incident checks in the historical table remain future validation work under the owner's waiver. Real update definition/value collection and principal manual report/export acceptance are now complete as described above. Snapshot timestamp preservation has regression coverage, including the compatibility parser. For every later release, rebuild and pass Test-Release.ps1, Test-IntuneAccessGalleryPackage.ps1 and Test-IntuneAccessLocalRepository.ps1, then retain the exact source ZIP and nupkg hashes with the gate receipts. Publish only the exact verified package after separate approval. Do not treat fixture coverage as proof of endpoint remediation success.
