@@ -1,7 +1,8 @@
 Set-StrictMode -Version Latest
 
 $script:IntuneAccessModuleRoot = $PSScriptRoot
-$script:IntuneAccessVersion = '4.0.0'
+# The manifest is the single source of the module version.
+$script:IntuneAccessVersion = [string] (Import-PowerShellDataFile -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath 'IntuneAccess.psd1')).ModuleVersion
 
 foreach ($folder in @('Private', 'Public')) {
     $functions = Get-ChildItem -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath $folder) -Filter '*.ps1' -File |

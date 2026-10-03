@@ -55,7 +55,7 @@ Describe 'Guided IntuneAccess workflow' {
             $result.ReportPath | Should -Be $path
             $result.Opened | Should -BeTrue
             $result.ReadOnly | Should -BeTrue
-            $result.ToolVersion | Should -Be '4.0.0'
+            $result.ToolVersion | Should -Be ([string] (Import-PowerShellDataFile -LiteralPath (Join-Path $script:IntuneAccessModuleRoot 'IntuneAccess.psd1')).ModuleVersion)
         }
 
         It 'saves and compares snapshots before rendering the explorer' {
