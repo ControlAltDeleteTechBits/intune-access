@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Versions 1.0 and 2.0 are supported stable release lines. Security fixes are applied to the latest published release in each supported line where a safe backport is practical.
+Only the latest published release line receives security fixes. At the time of writing that is 4.x. Earlier lines (1.x, 2.x and 3.x) are no longer supported; upgrade with `Update-Module IntuneAccess` or `Install-Module IntuneAccess -Scope CurrentUser -Force`.
 
 ## Reporting a security issue
 

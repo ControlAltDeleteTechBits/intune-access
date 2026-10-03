@@ -1,6 +1,6 @@
 # IntuneAccess 4.0.0
 
-Release preparation dated 16 September 2026. Publication is a separate authorised step. Exact artefact hashes and final gate receipts are retained in the release handover.
+Published to the PowerShell Gallery and GitHub on 16 September 2026. Exact artefact hashes and final gate receipts are retained by the maintainer outside the package.
 
 This release adds a Findings Centre with resolution guides, affected objects and local expected decisions; selected change plans for external review; six script packages for export only; remediation effectiveness across distinct snapshot observations; and evidence-based verification that does not treat missing devices as fixed.
 

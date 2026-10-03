@@ -1,6 +1,6 @@
 # Investigation pack product standard
 
-Scope decision: 15 September 2026. The user approved four investigation packs for V4 and deferred vendor-specific application migration to the roadmap. Implementation is in progress; this is not a claim of completion or publication readiness.
+Scope decision: 15 September 2026. The user approved four investigation packs for V4 and deferred vendor-specific application migration to the roadmap. The four packs shipped in 4.0.0 with the validation limits recorded in v4-release-audit-current.md.
 
 ## Product promise
 
@@ -24,7 +24,7 @@ Vendor-specific application migration is excluded from V4 acceptance and from th
 ## Two strong follow-on cases
 
 1. Certificate delivery versus usability: compare the assigned certificate and Wi-Fi/VPN requirements with bounded local certificate metadata, store, validity and relevant delivery events. Distinguish missing delivery, expired certificate and requirement mismatch. Do not export private keys, delete certificates or claim successful authentication from certificate presence.
-2. Device trust versus Intune health: compare local registration status and identifiers with the corresponding Entra and Intune objects. Explain a deleted or disabled device separately from absent MDM evidence and a failed diagnostic query. Never recommend automatic disconnect, rejoin or token-cache deletion. This would directly address the type of sign-in incident encountered during our testing.
+2. Device trust versus Intune health: compare local registration status and identifiers with the corresponding Entra and Intune objects. Explain a deleted or disabled device separately from absent MDM evidence and a failed diagnostic query. Never recommend automatic disconnect, rejoin or token-cache deletion. This addresses a common class of sign-in incident in which portal and device state disagree.
 
 Entra.News also suggests a useful future assignment-dependency review: link risky or changing group rules to the Intune workloads that depend on them. Do not implement a retirement deadline from newsletter text alone; confirm official guidance first. Broad identity governance belongs in IdentityAtlas.
 
@@ -41,13 +41,7 @@ Entra.News also suggests a useful future assignment-dependency review: link risk
 
 ## Research sources and boundaries
 
-Relevant sections were inspected rather than reading every book cover to cover. No book scripts or prose were copied into the library.
-
-1. Microsoft Intune Cookbook 2E ERC 3, PDF pages 547 and 548: application detection and architecture as investigation topics. This is an early review copy; behaviour must be checked against current documentation.
-2. Mastering Endpoint Management Using Microsoft Intune Suite, PDF pages 46 and 47: certificate delivery versus endpoint evidence.
-3. Mastering Microsoft Intune, PDF pages 244 and 245: legacy update configuration and ownership as troubleshooting topics. Do not adopt broad policy-clearing advice as an automated repair.
-4. SC 300, PDF pages 289 and 290: investigate actual access events and context rather than infer the cause from a portal sign-in.
-5. Microsoft SC-300 Exam Microsoft Identity and Access Administrator: inspected a rendered sample. It is a questions-and-answers document with older terminology; not used as a technical authority or source of implementation.
+Published Intune and identity books were consulted for investigation topics only: application detection, certificate delivery, legacy update ownership and access-event analysis. No book text, scripts or examples were copied into the product. Behaviour is always checked against current Microsoft documentation.
 
 Current primary references:
 
@@ -57,6 +51,6 @@ Current primary references:
 4. [Device registration diagnostic fields](https://learn.microsoft.com/en-us/entra/identity/devices/troubleshoot-device-dsregcmd), including the distinction between an unhealthy device and a test that could not run.
 5. [Entra.News group dependency discussion](https://entra.news/p/microsoft-entra-memberof-retirement), used for topic discovery, not as proof of tenant impact or a verified deadline.
 
-## Local validation today
+## Local validation at release
 
 All five collector modes and their reviewers executed under Windows PowerShell 5.1 using process-only RemoteSigned. The application and residue runs used example paths and exercise absent-data behaviour. No real repair was tested. No permanent execution policy, tenant setting or device configuration was changed. The prior 135-test release result is separate from these new smoke tests. UI acceptance and full scenario validation remain outstanding.

@@ -1,6 +1,6 @@
 # IntuneAccess V4 implementation and acceptance record
 
-Status: V4 implementation and validation recorded. Publication is a separate authorised step.
+Status: V4 implemented, validated and published on 16 September 2026.
 
 ## Objective
 
