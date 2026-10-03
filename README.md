@@ -10,6 +10,8 @@ The main result is a PowerShell object with an evidence trail. A self contained 
 
 IntuneAccess is an independent community project and is not affiliated with, endorsed by, or supported by Microsoft.
 
+See it first: the [live demonstration report](https://controlaltdeletetechbits.github.io/intune-access/) is generated from a fictional tenant by the same code that runs against your tenant. No sign-in is needed.
+
 ## Quick start
 
 Open PowerShell 7 and run these two commands:
@@ -168,7 +170,9 @@ Test-IntuneResourceAccess `
 
 ## Screenshot
 
-![IntuneAccess Signal Atlas report](screenshots/IntuneAccess-signal-atlas-full.png)
+![IntuneAccess overview generated from the fictional demonstration tenant](screenshots/IntuneAccess-4.1-demo-overview.png)
+
+The screenshot is taken from the synthetic demonstration report. Regenerate it locally with `./tools/New-IntuneAccessDemo.ps1`.
 
 ## Requirements
 

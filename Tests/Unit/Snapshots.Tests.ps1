@@ -124,4 +124,16 @@ Describe 'Local IntuneAccess snapshots' {
         $null = $script:baseModel | Export-IntuneAccessSnapshot -Path $afterPath
         { Compare-IntuneAccessSnapshot -ReferencePath $afterPath -DifferencePath $beforePath } | Should -Throw '*later than*'
     }
+    It 'ignores collection-time fields when comparing records' {
+        InModuleScope IntuneAccess {
+            $before = [pscustomobject] @{ FindingId = 'F-1'; Title = 'Stale check-in'; GeneratedAt = '2026-10-02T10:00:00Z'; EvidenceAgeDays = 3 }
+            $after = [pscustomobject] @{ FindingId = 'F-1'; Title = 'Stale check-in'; GeneratedAt = '2026-10-03T10:00:00Z'; EvidenceAgeDays = 4 }
+            @(Compare-IntuneAccessSnapshotCollection -Before @($before) -After @($after) -EntityType 'EstateFinding').Count | Should -Be 0
+
+            $changed = [pscustomobject] @{ FindingId = 'F-1'; Title = 'Stale check-in resolved'; GeneratedAt = '2026-10-03T10:00:00Z'; EvidenceAgeDays = 4 }
+            $result = @(Compare-IntuneAccessSnapshotCollection -Before @($before) -After @($changed) -EntityType 'EstateFinding')
+            $result.Count | Should -Be 1
+            $result[0].ChangedProperties | Should -Be @('Title')
+        }
+    }
 }

@@ -12,3 +12,6 @@ coverage.xml
 .idea/
 .DS_Store
 Thumbs.db
+
+# Generated demonstration site.
+demo-site/
