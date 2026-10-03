@@ -69,7 +69,9 @@ function Compare-IntuneAccessSnapshotCollection {
         $changedProperties = @()
 
         if ($hasBefore -and $hasAfter) {
-            $propertyNames = @($beforeRecord.PSObject.Properties.Name + $afterRecord.PSObject.Properties.Name | Sort-Object -Unique)
+            # Properties derived from the collection time change on every run and are not tenant changes.
+            $volatileProperties = @('GeneratedAt', 'EvidenceAgeDays')
+            $propertyNames = @($beforeRecord.PSObject.Properties.Name + $afterRecord.PSObject.Properties.Name | Sort-Object -Unique | Where-Object { $_ -notin $volatileProperties })
             $changedProperties = @($propertyNames | Where-Object {
                 $beforeValue = Get-IntuneAccessProperty $beforeRecord $_
                 $afterValue = Get-IntuneAccessProperty $afterRecord $_

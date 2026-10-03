@@ -1,10 +1,10 @@
 # V4 local acceptance testing
 
-Version 4.0.0 validation workflow. Default-permission collection and principal owner HTML acceptance are recorded below. Controlled endpoint incidents remain unverified under the owner's waiver; publishing is a separate authorised step.
+Version 4.0.0 validation workflow, retained for maintainers and contributors testing a local checkout. Default-permission collection and principal owner HTML acceptance are recorded below. Controlled endpoint incidents remain unverified under the owner's waiver.
 
 ## Import a local checkout
 
-Use PowerShell 7. The explicit path selects the local development copy rather than the Gallery installation. After public release, users will not need this development path.
+Use PowerShell 7. The explicit path selects the local development copy rather than the Gallery installation. Users installing from the PowerShell Gallery do not need this development path.
 
 ```powershell
 Remove-Module IntuneAccess -Force -ErrorAction SilentlyContinue
@@ -50,4 +50,4 @@ On 16 September 2026, the release owner waived separate-device incident validati
 
 Default-permission validation completed on 16 September in a fresh process using an isolated temporary application: exactly nine default Graph read scopes, successful read-only collection and HTML/snapshot exports. No failed collection state was recorded; unsupported workload outcome sources remained explicitly NotSupported. Optional Autopilot was not included. The temporary application was subsequently deleted and its enterprise application returned Not found.
 
-No GitHub push or Gallery publication until final artefact gates are recorded and publication is authorised. No tenant test objects, assignments or remediation actions are created by this test workflow. See v4-release-audit-current.md for the accepted validation limits.
+Publish a release only after its final artefact gates are recorded and publication is authorised. No tenant test objects, assignments or remediation actions are created by this test workflow. See v4-release-audit-current.md for the accepted validation limits.

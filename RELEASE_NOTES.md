@@ -1,6 +1,37 @@
-# IntuneAccess 4.0.0
+# IntuneAccess 4.1.0
 
-Release preparation dated 16 September 2026. Publication is a separate authorised step. Exact artefact hashes and final gate receipts are retained in the release handover.
+This release makes the report easier to start with and easier to evaluate. It adds no Microsoft Graph permissions and does not change what is collected.
+
+## Start with a question
+
+The report now opens on a triage section built around the questions administrators are asked most often:
+
+1. Why didn't it apply? Links to the Assignment Explainer, Deployment Outcomes, Device 360 and Application Evidence, with counts of reported errors and excluded, untargeted or unevaluated device paths.
+2. What changed? Links to Snapshot Changes, the Audit Trail and Verification, and states clearly when no baseline snapshot was supplied.
+3. Who can do this? Links to Administrators, Role Assignments, Permissions and Scope Tags.
+4. What needs attention? Links to the Findings Centre, Policy Conflicts and Device Hygiene.
+
+On narrow screens the report now opens at the top instead of scrolling to the inspector.
+
+## Live demonstration report
+
+A demonstration report is published at https://controlaltdeletetechbits.github.io/intune-access/. It is produced by the real collection and report code from a fictional tenant served by an offline synthetic Graph back end that accepts GET requests only. Run `./tools/New-IntuneAccessDemo.ps1` to build it locally. CI now generates it on every change as an end-to-end smoke test.
+
+## Fixes
+
+1. Snapshot comparison no longer reports records as modified when only collection-time fields (`GeneratedAt` and `EvidenceAgeDays`) differ. In a two-snapshot test these accounted for more than half of the reported changes.
+2. The module version is now read from the manifest, removing duplicated version strings.
+
+## Documentation
+
+1. Documents that still described 4.0.0 as unpublished have been corrected, and the security policy now supports the current 4.x line only.
+2. The Gallery release procedure is version-neutral and requires a scoped, short-lived API key entered through a hidden prompt.
+3. The Intune Management Extension service package states that Intune cannot deliver its remediation script to a device whose agent is stopped, and recommends an independent delivery route.
+4. The roadmap records 4.2.0 (Scoped permissions readiness) and 5.0.0 (change confidence).
+
+## Previous release: 4.0.0
+
+Published to the PowerShell Gallery and GitHub on 16 September 2026. Exact artefact hashes and final gate receipts are retained by the maintainer outside the package.
 
 This release adds a Findings Centre with resolution guides, affected objects and local expected decisions; selected change plans for external review; six script packages for export only; remediation effectiveness across distinct snapshot observations; and evidence-based verification that does not treat missing devices as fixed.
 

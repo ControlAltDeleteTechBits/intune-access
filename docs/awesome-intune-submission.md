@@ -1,6 +1,6 @@
 # Awesome Intune submission draft
 
-Prepared on 17 August 2026. Nothing in this document has been submitted.
+Prepared on 17 August 2026 for version 2.0.0. Nothing in this document has been submitted. Refresh the version, feature summary and test figures for the current release before use.
 
 ## Awesome Pick route
 

@@ -38,9 +38,9 @@ The action retains every granting source. If two assignments return it, it appea
 
 Microsoft documents that Intune permissions from several groups are cumulative and that Intune RBAC has no deny permission that overrides an allowed permission.
 
-Microsoft also introduced an opt in Scoped permissions setting in March 2026. Under the legacy behaviour, permissions in a shared category can merge across assignments with different scope tags. Under the preview behaviour, permissions stay within the assignment's scope context.
+Microsoft also introduced an opt in Scoped permissions setting in March 2026. Under the legacy behaviour, permissions in a shared category can merge across assignments with different scope tags. Under the Scoped permissions behaviour (opt-in public preview), permissions stay within the assignment's scope context. Microsoft states the setting cannot be reversed once enabled and will become the default in a future release.
 
-IntuneAccess 0.2 does not obtain this tenant setting from an established Graph contract. It therefore:
+IntuneAccess does not obtain this tenant setting from an established Graph contract. It therefore:
 
 1. Unions confirmed exact actions for the top level permission list.
 2. Retains assignment, scope group and scope tag context for every source.

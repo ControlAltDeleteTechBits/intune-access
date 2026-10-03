@@ -1,6 +1,6 @@
 # IntuneAccess
 
-Version 4.0.0 adds findings, resolution guides and export-only investigation packages. See [V4 validation and testing limits](docs/v4-release-audit-current.md) before using the investigation outputs. Installation from the Gallery requires the version to have been published.
+Version 4.0.0 adds findings, resolution guides and export-only investigation packages. See [V4 validation and testing limits](docs/v4-release-audit-current.md) before using the investigation outputs. Version 4.0.0 was published to the PowerShell Gallery and GitHub on 16 September 2026.
 
 V4 adds findings resolution guides, local expected decisions with review dates, selected change plan exports, an export-only reviewed PowerShell library, remediation effectiveness reporting and conservative verification between snapshots. IntuneAccess never uploads or executes the exported scripts. Change making scripts affect devices only if an administrator runs them separately.
 
@@ -9,6 +9,8 @@ IntuneAccess is an open source, read only PowerShell module that connects Micros
 The main result is a PowerShell object with an evidence trail. A self contained HTML report is available when a human readable record is needed.
 
 IntuneAccess is an independent community project and is not affiliated with, endorsed by, or supported by Microsoft.
+
+See it first: the [live demonstration report](https://controlaltdeletetechbits.github.io/intune-access/) is generated from a fictional tenant by the same code that runs against your tenant. No sign-in is needed.
 
 ## Quick start
 
@@ -168,7 +170,9 @@ Test-IntuneResourceAccess `
 
 ## Screenshot
 
-![IntuneAccess Signal Atlas report](screenshots/IntuneAccess-signal-atlas-full.png)
+![IntuneAccess overview generated from the fictional demonstration tenant](screenshots/IntuneAccess-4.1-demo-overview.png)
+
+The screenshot is taken from the synthetic demonstration report. Regenerate it locally with `./tools/New-IntuneAccessDemo.ps1`.
 
 ## Requirements
 
@@ -419,20 +423,16 @@ Product decisions, design choices, validation evidence and release progress are 
 
 The agreed versioned product plan is tracked in [docs/roadmap.md](docs/roadmap.md).
 
-## Device intelligence releases
+## Release history
 
-Version 3.0.0 completes the agreed device investigation and estate roadmap:
+| Version | Focus |
+| --- | --- |
+| 1.x | Effective Intune RBAC, assignments, Device and User 360, snapshots |
+| 2.0 | Policy setting overlap, potential conflicts and the Intune audit trail |
+| 3.0 | Device inventory and hygiene, assignment explanation, Autopilot, applications, updates and estate intelligence |
+| 4.0 | Findings Centre, resolution guides, change plans, export-only investigation packs and snapshot verification |
 
-| Version | Capability | Result |
-| --- | --- | --- |
-| 2.1.0 | Device inventory and hygiene | Implemented in 3.0.0. |
-| 2.2.0 | Device assignment explainer | Implemented in 3.0.0. |
-| 2.3.0 | Autopilot and enrolment timeline | Implemented as an optional feature in 3.0.0. |
-| 2.4.0 | Application and software evidence | Implemented in 3.0.0. |
-| 2.5.0 | Update and compliance investigator | Implemented in 3.0.0. |
-| 3.0.0 | Device estate intelligence | Implemented in 3.0.0. |
-
-The module will remain read only. Device-changing remote actions are not part of this roadmap. Detailed evidence boundaries and completion criteria are recorded in [docs/roadmap.md](docs/roadmap.md).
+The module will remain read only. Device-changing remote actions are not part of the roadmap. Planned work, including Scoped permissions readiness in 4.2 and the change-confidence features in 5.0, is recorded in [docs/roadmap.md](docs/roadmap.md).
 
 Research into current Intune gaps and candidate product opportunities is recorded in [docs/product-opportunities.md](docs/product-opportunities.md).
 
@@ -448,7 +448,7 @@ The module has no telemetry, analytics, hosted service, persistent tenant cache 
 
 ## Microsoft documentation
 
-The implementation and documentation were checked against Microsoft Learn on 17 August 2026.
+The implementation was checked against Microsoft Learn on 17 August 2026. The Scoped permissions and RBAC references were rechecked on 3 October 2026.
 
 1. [Assign Microsoft Intune roles](https://learn.microsoft.com/en-us/intune/fundamentals/role-based-access-control/assign-role)
 2. [Use RBAC and scope tags for distributed IT](https://learn.microsoft.com/en-us/intune/fundamentals/role-based-access-control/scope-tags)

@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string] $Version = '4.0.0',
+    [string] $Version = [string] (Import-PowerShellDataFile -LiteralPath (Join-Path (Split-Path $PSScriptRoot -Parent) 'IntuneAccess.psd1')).ModuleVersion,
     [string] $OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) 'release')
 )
 

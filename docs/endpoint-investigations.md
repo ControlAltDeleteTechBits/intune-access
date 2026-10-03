@@ -1,6 +1,6 @@
 # Endpoint investigation expansion
 
-Status: four V4 investigation packs in development, not completed repair solutions. Application migration is deferred. Nothing from this expansion has been published.
+Status: four investigation packs shipped in 4.0.0 as export-only evidence collectors. They are not repair solutions. Application migration is deferred and excluded from the Gallery package.
 
 The library contains four new export-only investigation entries alongside the existing service and disk-space packages, six entries in total. Each investigation includes a Windows PowerShell 5.1-compatible source collector, JSON example, evidence reviewer and comparison script. All collection modes and their reviewers have executed on one local Windows PowerShell 5.1 host. This is a smoke test, not verification of every supported fault scenario or execution context. Earlier five-mode results below include the now-deferred user application prototype.
 
@@ -15,7 +15,7 @@ Deferred prototype: user application inventory can identify possible parallel in
 
 The HTML Script Library can import review/comparison JSON locally. It renders untrusted content as text, limits input size/row count, does not upload or persist the data and does not merge unverified endpoint identities into tenant findings. This is a preview interface; manual browser verification is outstanding.
 
-## Required before calling the expansion complete
+## Remaining work before calling the packs fully validated
 
 1. Integrate selected tenant application export with the report; extend supported comparison semantics beyond named registry string equality and test real tenant rules. The new importer and correction artefact have fixture coverage, not live affected-application proof. Unsupported conditions must remain explicit blockers.
 2. Produce an update policy ownership and correction plan first. Microsoft recommends Group Policy or CSP configuration rather than direct registry edits. Any later setting-specific cleanup export requires verified orphaned ownership, preconditions, backup and rollback. Active or unknown Group Policy or Configuration Manager ownership must block local cleanup.
@@ -23,12 +23,6 @@ The HTML Script Library can import review/comparison JSON locally. It renders un
 4. Add relevant certificate/event adapters and reviewed associations between differences and corrections. Make evidence age, context mismatch and identity limitations prominent.
 5. Validate collectors externally on real Windows endpoints using an approved script execution method. Add direct collector failure-path tests, schema validation and UI acceptance tests.
 
-## Validation checkpoint
+## Validation summary
 
-
-
-
-
-The generated release-gate ZIP predates this documentation and is not approved for publication. Regenerate all release/package artefacts after completing the work and acceptance testing.
-
-Public validation summary: source, package import and isolated installation checks passed. Exported collectors have fixture and local runtime coverage, not proof of Intune agent parity or a successful repair. Private endpoint observations and execution paths are excluded. See v4-release-audit-current.md for current validation limits.
+ source, package import and isolated installation checks passed. Exported collectors have fixture and local runtime coverage, not proof of Intune agent parity or a successful repair. Private endpoint observations and execution paths are excluded. See v4-release-audit-current.md for current validation limits.

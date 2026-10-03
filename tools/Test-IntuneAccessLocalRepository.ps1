@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)] [ValidateNotNullOrEmpty()] [string] $PackagePath,
-    [string] $Version = '4.0.0'
+    [string] $Version = [string] (Import-PowerShellDataFile -LiteralPath (Join-Path (Split-Path $PSScriptRoot -Parent) 'IntuneAccess.psd1')).ModuleVersion
 )
 
 $ErrorActionPreference = 'Stop'

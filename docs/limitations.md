@@ -4,7 +4,7 @@ The module is deliberately conservative.
 
 ## Tenant testing
 
-The repository includes mocked unit tests. Positive RBAC integration checks passed against a development tenant with built-in and custom role assignments. The device intelligence collectors added in 3.0.0 still require a maintainer comparison against representative production-like device, Autopilot, application, update and compliance evidence. Mock data proves calculation behaviour but does not establish every tenant API response or tenant-specific condition.
+The repository includes mocked unit tests. Positive RBAC integration checks passed against a development tenant with built-in and custom role assignments. The device intelligence collectors added in 3.0.0 and the 4.0.0 endpoint investigation packs still require a maintainer comparison against representative production-like device, Autopilot, application, update and compliance evidence. Mock data proves calculation behaviour but does not establish every tenant API response or tenant-specific condition.
 
 ## Microsoft Graph beta
 
@@ -74,4 +74,4 @@ The managed-device explanation supports exact device names and one required acti
 
 ## Global commercial cloud
 
-Version 3.0.0 targets Microsoft Graph in the global commercial cloud. The connection and URI design can be extended for sovereign environments, but those environments have not been validated.
+IntuneAccess targets Microsoft Graph in the global commercial cloud. The connection and URI design can be extended for sovereign environments, but those environments have not been validated.
