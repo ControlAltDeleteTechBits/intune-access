@@ -179,7 +179,7 @@ Status: merged on GitHub on 3 October 2026 and released as part of 5.0.0.
 Trust and first-use improvements, with no new Graph permissions:
 
 1. Correct documentation that still described V4 as unpublished, and update the security support policy.
-2. Publish a synthetic demonstration report so administrators can evaluate the explorer without signing in.
+2. Generate a synthetic demonstration report through the real pipeline for screenshots and as an end-to-end test.
 3. Open the report on a triage page built around three questions: why did something not apply, what changed, and who can make changes.
 4. State the delivery limitation of the Intune Management Extension service package clearly.
 
