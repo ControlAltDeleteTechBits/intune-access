@@ -1,4 +1,36 @@
-# IntuneAccess 4.1.0
+# IntuneAccess 5.0.0
+
+IntuneAccess 5.0 answers the questions Intune administrators are asked every day, with the evidence behind each answer. It adds no Microsoft Graph permissions and stays read only. It also includes all 4.1.0 changes, which were not published to the PowerShell Gallery separately.
+
+## Why didn't it apply?
+
+`Get-IntuneDeliveryChain` and the new report view follow every device and workload pair through device check-in, assignment, group targeting (device or primary user), exclusion, assignment filter, intent and the result Intune reported. The verdict is the first link that fails or where the evidence stops: Failed, Excluded, FilteredOut, NotTargeted, NotAssigned, WaitingForDevice, ResultNotCollected, AvailableOrUninstallIntent, NotEvaluated or Applied. Each chain has a suggested next check. Error codes are explained only where Microsoft publishes a meaning in the Intune app installation error reference; other codes are shown in hexadecimal without an invented meaning.
+
+## What changed?
+
+`Get-IntuneChangeTimeline` and the new view merge Intune audit events, configuration differences between two snapshots and changes in device results (new failures and recoveries). Check-in and inventory refreshes are counted but hidden. A change is marked when a device reports a failure on the same workload within 72 hours (configurable). This is correlation in time, not proof of cause. Snapshot comparisons now include outcome transitions.
+
+## Change preview
+
+`Get-IntuneChangePreview` shows every collected policy, app, script, update and role assignment that depends on an Entra group, assignment filter or scope tag. Flags highlight groups that could not be read (possibly deleted), groups used for both inclusion and exclusion, groups that control both administration and targeting, and scope tags used on objects that no role assignment includes. The full scope tag list is now collected so these tags can be named.
+
+## Privilege usage
+
+`Get-IntunePrivilegeUsage` compares each administrator's Intune write permissions with the changes the Intune audit log shows they made. Families with no audited use are least-privilege review prompts. Read permissions are never judged because Intune does not audit reads, and permission families without a direct audit category mapping stay NotEvaluated.
+
+## Scoped permissions readiness
+
+Microsoft's opt-in Scoped permissions setting stops Intune merging permissions across role assignments with different scope tags, and Microsoft states the change cannot be reversed. `Get-IntuneScopedPermissionReadiness` models the change for every Admin Group in the same shape as Microsoft's Permissions Assessment Report and reconciles it with an exported report (.csv or .xlsx, no extra modules needed): Agreed, DifferentPermissions, ModelOnly, ModelOnlyEmptyGroup or MicrosoftOnly. Use `Start-IntuneAccess -PermissionAssessmentPath` to include the comparison in the report. IntuneAccess never reads or changes the tenant setting; Microsoft documents that reading it requires a write permission, which IntuneAccess does not request.
+
+## Report
+
+The report opens on five questions with counts and links, and adds five views: Why didn't it apply?, What changed?, Change preview, Privilege usage and Scoped permissions.
+
+## Validation
+
+Unit tests cover each verdict, error reference handling, outcome transitions, correlation windows, dependency flags, privilege mapping, Scoped permissions modelling and both CSV and Excel import. The synthetic demonstration report exercises every view through the real collection pipeline. Live tenant validation of the new views is recommended before relying on them for decisions.
+
+## Previous release: 4.1.0 (merged into 5.0.0)
 
 This release makes the report easier to start with and easier to evaluate. It adds no Microsoft Graph permissions and does not change what is collected.
 

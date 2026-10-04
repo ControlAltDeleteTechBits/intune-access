@@ -6,7 +6,7 @@ Last updated: 3 October 2026.
 
 ## Current status
 
-IntuneAccess 4.0.0 was published to GitHub and the PowerShell Gallery on 16 September 2026. Version 4.1.0 is in development and focuses on documentation accuracy, a synthetic demonstration report and a triage landing page. Versions 4.2.0 (Scoped permissions readiness) and 5.0.0 (change confidence) are planned in `docs/roadmap.md`. The project remains read only and requests no Microsoft Graph write permission.
+IntuneAccess 4.0.0 was published on 16 September 2026. Version 4.1.0 was merged on GitHub on 3 October 2026 and is released as part of 5.0.0. Version 5.0.0 adds the delivery chain, change timeline, change preview, privilege usage and Scoped permissions readiness, and remains read only with no new Graph permissions.
 
 Earlier status, retained for history: on 24 August 2026 a representative 3.0.0 live device-evidence run completed with four managed devices, 137 detected applications, 88 assignment explanations and ten prioritised estate findings.
 

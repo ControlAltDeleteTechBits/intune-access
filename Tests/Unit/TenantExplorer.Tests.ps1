@@ -125,7 +125,8 @@ Describe 'Tenant-wide Intune RBAC explorer' {
             $html | Should -Match 'class="triage"'
             $html | Should -Match "Why didn&#39;t it apply\?|Why didn't it apply\?"
             $html | Should -Match 'What changed\?'
-            $html | Should -Match 'Who can do this\?'
+            $html | Should -Match 'Who can do this, and do they need to\?'
+            $html | Should -Match 'What will this change affect\?'
             $html | Should -Match 'No baseline snapshot was supplied'
             $html | Should -Match '<strong>0</strong> reported errors'
             $targets = @([regex]::Matches($html, 'data-go-view="([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)

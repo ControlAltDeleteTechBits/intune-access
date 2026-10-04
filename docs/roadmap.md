@@ -1,6 +1,6 @@
 # IntuneAccess product roadmap
 
-Last updated: 3 October 2026.
+Last updated: 4 October 2026.
 
 This roadmap records the agreed product direction after the first stable Gallery release. Planned versions may change when Microsoft Graph contracts, tenant validation or release testing show that a conclusion cannot be supported safely.
 
@@ -174,7 +174,7 @@ Added the Findings Centre with resolution guides and local expected decisions, s
 
 ## Version 4.1.0
 
-Status: in development.
+Status: merged on GitHub on 3 October 2026 and released as part of 5.0.0.
 
 Trust and first-use improvements, with no new Graph permissions:
 
@@ -185,7 +185,7 @@ Trust and first-use improvements, with no new Graph permissions:
 
 ## Version 4.2.0
 
-Status: planned.
+Status: delivered in 5.0.0.
 
 Scoped permissions readiness. Microsoft introduced opt-in Scoped permissions in March 2026, states that the setting cannot be reversed once enabled, and plans to make it the default. This release will:
 
@@ -195,7 +195,7 @@ Scoped permissions readiness. Microsoft introduced opt-in Scoped permissions in 
 
 ## Version 5.0.0
 
-Status: planned.
+Status: implemented. Commands: Get-IntuneDeliveryChain, Get-IntuneChangeTimeline, Get-IntuneChangePreview, Get-IntunePrivilegeUsage and Get-IntuneScopedPermissionReadiness. Report-export endpoints that require POST were not adopted.
 
 Change confidence across three questions administrators are asked every day:
 
@@ -204,6 +204,13 @@ Change confidence across three questions administrators are asked every day:
 3. What will this change affect, and who can make it? Dependency preview for a group, assignment filter or scope tag across policies, applications, scripts and role assignments, plus least-privilege review that compares role permissions with actions observed in the Intune audit log.
 
 Each capability must keep the read-only boundary, preserve `NotEvaluated` where evidence is incomplete, and document every Graph endpoint and permission before release. Any use of report export endpoints that require a POST request will be reviewed and documented as an explicit, read-only exception before adoption.
+
+## Candidates after 5.0
+
+1. Empty-group detection for assignment targets, using a bounded member count per group.
+2. Per-device results for Settings Catalog and endpoint security, if a documented read contract that does not require POST becomes available.
+3. Larger audit windows and Graph batching for large tenants.
+4. Device registration and certificate delivery investigations from the investigation standard.
 
 ## Deferred candidates
 

@@ -111,6 +111,7 @@ function Compare-IntuneAccessSnapshot {
         IdentityMode     = [string] $difference.IdentityMode
         Tenant           = $difference.Tenant
         Changes          = @($changes | Sort-Object EntityType, Name, ChangeType)
+        OutcomeTransitions = @(Compare-IntuneAccessOutcomeTransition -Before @(Get-IntuneAccessProperty $reference.Data 'DeploymentOutcomes' @()) -After @(Get-IntuneAccessProperty $difference.Data 'DeploymentOutcomes' @()))
         FindingVerification = @(Compare-IntuneAccessFindingEvidence -Before $reference.Data -After $difference.Data -BeforeAt ([DateTimeOffset] $reference.ExportedAt) -AfterAt ([DateTimeOffset] $difference.ExportedAt))
         ActionCentre = Get-IntuneAccessActionCentre -Collection $difference.Data -PreviousOutcome @(Get-IntuneAccessProperty $reference.Data 'DeploymentOutcomes' @()) -AsOf ([DateTimeOffset] $difference.ExportedAt)
         AddedCount       = @($changes | Where-Object ChangeType -EQ 'Added').Count

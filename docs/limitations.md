@@ -75,3 +75,12 @@ The managed-device explanation supports exact device names and one required acti
 ## Global commercial cloud
 
 IntuneAccess targets Microsoft Graph in the global commercial cloud. The connection and URI design can be extended for sovereign environments, but those environments have not been validated.
+
+## 5.0 insight views
+
+1. Delivery chains depend on the collected assignment explanation. Compound or unsupported assignment filters, hidden group membership and workloads without a collected per-device result stop the chain as NotEvaluated or ResultNotCollected. Settings Catalog and endpoint security results are not collected.
+2. The change timeline correlates changes and later failures on the same workload by time only. It cannot prove cause, and audit events for object families IntuneAccess does not collect are shown without a workload link.
+3. The change preview covers collected workloads and role assignments only. Groups referenced by object families that are not collected, such as enrolment profiles, are not shown. Empty groups are not yet detected.
+4. Privilege usage maps five audit categories (DeviceConfiguration, Compliance, Device, Application and Role) to RBAC permission families. Other families are NotEvaluated. Intune does not audit reads, and activity performed through Microsoft Entra roles or other tools is not attributed.
+5. Scoped permissions readiness models Admin Group membership and scope tags from collected role assignments. Microsoft's Permissions Assessment Report is the authoritative preview. IntuneAccess does not read the tenant setting because Microsoft documents only a write permission for that call.
+

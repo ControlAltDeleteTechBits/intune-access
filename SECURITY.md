@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Only the latest published release line receives security fixes. At the time of writing that is 4.x. Earlier lines (1.x, 2.x and 3.x) are no longer supported; upgrade with `Update-Module IntuneAccess` or `Install-Module IntuneAccess -Scope CurrentUser -Force`.
+Only the latest published release line receives security fixes. At the time of writing that is 5.x. Earlier lines (1.x to 4.x) are no longer supported; upgrade with `Update-Module IntuneAccess` or `Install-Module IntuneAccess -Scope CurrentUser -Force`.
 
 ## Reporting a security issue
 

@@ -205,3 +205,10 @@ Microsoft documents `Member.Read.Hidden` for reading hidden group membership. In
 19. [List configuration policy settings](https://learn.microsoft.com/en-us/graph/api/intune-deviceconfigv2-devicemanagementconfigurationsetting-list?view=graph-rest-beta)
 20. [Endpoint security intent resource](https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceintent-devicemanagementintent?view=graph-rest-beta)
 21. [List Intune audit events](https://learn.microsoft.com/en-us/graph/api/intune-auditing-auditevent-list?view=graph-rest-1.0)
+
+## 5.0 commands
+
+The 5.0 commands request no new permissions. They reuse the feature scopes listed above: delivery chains use Assignment Explorer, Operational Evidence and Device Intelligence; the timeline and privilege usage use Audit Evidence; the change preview uses Assignment Explorer; Scoped permissions readiness uses Core.
+
+Microsoft documents `GET /beta/deviceManagement/retrieveTenantPerPermissionsScopeTagSetting` for reading whether Scoped permissions is enabled, but lists only `DeviceManagementServiceConfig.ReadWrite.All` for it. IntuneAccess does not request write permissions, so it does not read the setting. Supply the tenant mode explicitly to `Get-IntuneScopedPermissionImpact`, or use the Permissions Assessment Report.
+
