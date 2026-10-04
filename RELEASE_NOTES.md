@@ -45,9 +45,9 @@ The report now opens on a triage section built around the questions administrato
 
 On narrow screens the report now opens at the top instead of scrolling to the inspector.
 
-## Live demonstration report
+## Synthetic demonstration report
 
-A demonstration report is published at https://controlaltdeletetechbits.github.io/intune-access/. It is produced by the real collection and report code from a fictional tenant served by an offline synthetic Graph back end that accepts GET requests only. Run `./tools/New-IntuneAccessDemo.ps1` to build it locally. CI now generates it on every change as an end-to-end smoke test.
+`./tools/New-IntuneAccessDemo.ps1` builds a report from a fictional tenant using the real collection and report code, with an offline synthetic Graph back end that accepts GET requests only. CI builds it on every change as an end-to-end test. The README screenshots come from it. It is not published as a website.
 
 ## Fixes
 

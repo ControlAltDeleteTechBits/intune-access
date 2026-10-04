@@ -118,12 +118,6 @@ try {
     $reportPath = Join-Path $OutputDirectory 'index.html'
     $null = $current | Export-IntuneAccessReport -Path $reportPath -Force 3>$null
 
-    # Real reports are marked noindex because they contain tenant data. The public
-    # demonstration is fictional, so it is made discoverable with a descriptive title.
-    $html = [IO.File]::ReadAllText($reportPath)
-    $html = $html.Replace('<meta name="robots" content="noindex,nofollow">', '<meta name="robots" content="index,follow"><meta name="description" content="Live demonstration of IntuneAccess, a free, open source and read-only PowerShell tool that explains Microsoft Intune RBAC, policy and app assignments, device outcomes and changes in one offline report. All data is fictional.">')
-    $html = [regex]::Replace($html, '<title>[^<]*</title>', '<title>IntuneAccess live demo: free read-only Microsoft Intune RBAC, assignment and device evidence explorer</title>', 1)
-    [IO.File]::WriteAllText($reportPath, $html, [Text.UTF8Encoding]::new($false))
 
     [PSCustomObject] @{
         ReportPath          = $reportPath

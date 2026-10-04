@@ -16,8 +16,6 @@ The main result is a PowerShell object with an evidence trail. A self contained 
 
 IntuneAccess is an independent community project and is not affiliated with, endorsed by, or supported by Microsoft.
 
-See it first: the [live demonstration report](https://controlaltdeletetechbits.github.io/intune-access/) is generated from a fictional tenant by the same code that runs against your tenant. No sign-in is needed.
-
 ## Quick start
 
 Open PowerShell 7 and run these two commands:
@@ -216,7 +214,7 @@ Start-IntuneAccess -PermissionAssessmentPath .\PermissionsAssessment.xlsx
 
 ![What changed? An app detection rule change followed by failures on two devices](screenshots/IntuneAccess-what-changed.png)
 
-The screenshots are taken from the synthetic demonstration report. Regenerate it locally with `./tools/New-IntuneAccessDemo.ps1`.
+The screenshots are taken from a synthetic demonstration report built from a fictional tenant. Regenerate it locally with `./tools/New-IntuneAccessDemo.ps1`.
 
 ## Requirements
 
@@ -475,7 +473,7 @@ The agreed versioned product plan is tracked in [docs/roadmap.md](docs/roadmap.m
 | 2.0 | Policy setting overlap, potential conflicts and the Intune audit trail |
 | 3.0 | Device inventory and hygiene, assignment explanation, Autopilot, applications, updates and estate intelligence |
 | 4.0 | Findings Centre, resolution guides, change plans, export-only investigation packs and snapshot verification |
-| 4.1 | Triage landing page, live demonstration report and documentation corrections (merged into 5.0) |
+| 4.1 | Triage landing page, synthetic demonstration report and documentation corrections (merged into 5.0) |
 | 5.0 | Why didn't it apply, what changed, change preview, privilege usage and Scoped permissions readiness |
 
 The module will remain read only. Device-changing remote actions are not part of the roadmap. Planned work is recorded in [docs/roadmap.md](docs/roadmap.md).
