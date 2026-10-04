@@ -63,7 +63,7 @@ function ConvertTo-IntuneAccessSnapshot {
     $redactionKey = if ($RedactIdentity) { Get-IntuneAccessSnapshotHash -Value "IntuneAccess`n$tenantId" } else { '' }
     $data = [ordered] @{}
     foreach ($collectionName in @(
-        'Administrators', 'AdminGroups', 'RoleAssignments', 'RoleDefinitions', 'ScopeGroups', 'ScopeTags',
+        'Administrators', 'AdminGroups', 'RoleAssignments', 'RoleDefinitions', 'ScopeGroups', 'ScopeTags', 'AllScopeTags',
         'Permissions', 'Memberships', 'WorkloadObjects', 'WorkloadAssignments', 'WorkloadGroups',
         'AssignmentFilters', 'ManagedDevices', 'ManagedUsers', 'DeploymentOutcomes', 'PolicySettings', 'PolicyConflictFindings', 'AuditEvents',
         'DeviceInventory', 'DeviceFindings', 'DeviceAssignmentExplanations', 'AutopilotTimelines', 'AutopilotProfiles', 'EspProfiles',

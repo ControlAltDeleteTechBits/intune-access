@@ -30,7 +30,7 @@ $package = .\tools\New-IntuneAccessGalleryPackage.ps1 -Force
     -PackagePath $package.Package
 ```
 
-Confirm that the package result reports the expected `$version`, 22 exported commands, no validation error and a successful local repository installation. Update the command count here if the public surface changes.
+Confirm that the package result reports the expected `$version`, 27 exported commands, no validation error and a successful local repository installation. Update the command count here if the public surface changes.
 
 ## Publication order
 
@@ -109,7 +109,7 @@ Confirm:
 1. The Gallery page names Mark Oldham as author and Control Alt Delete Tech Bits as company.
 2. The project, licence, icon and release-note links work.
 3. Microsoft.Graph.Authentication appears as a dependency.
-4. All 22 public commands are exported, including `Start-IntuneAccess`.
+4. All 27 public commands are exported, including `Start-IntuneAccess`.
 5. A Core analysis works in the authorised development tenant.
 6. The downloaded package hash is recorded and compared with the locally tested package.
 7. The project log records the publication time, URL and validation evidence.

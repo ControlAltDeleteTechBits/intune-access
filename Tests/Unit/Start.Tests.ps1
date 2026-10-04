@@ -29,6 +29,7 @@ Describe 'Guided IntuneAccess workflow' {
                 [PSCustomObject] @{ PSTypeName = 'IntuneAccess.SnapshotComparison'; Changes = @(1, 2) }
             }
             Mock Invoke-Item {}
+            Mock Add-IntuneAccessInsights { $Collection }
         }
 
         It 'connects, collects tenant RBAC data, exports the explorer and opens it' {
@@ -45,6 +46,7 @@ Describe 'Guided IntuneAccess workflow' {
             Should -Invoke Connect-IntuneAccess -Times 1 -Exactly -ParameterFilter { $Feature -contains 'PolicyAnalysis' }
             Should -Invoke Connect-IntuneAccess -Times 1 -Exactly -ParameterFilter { $Feature -contains 'AuditEvidence' }
             Should -Invoke Get-IntuneAccessTenantRbac -Times 1 -Exactly -ParameterFilter { $InitialUserPrincipalName -eq 'helpdesk@example.test' -and $IncludeWorkloadAssignments -and $IncludeOperationalEvidence -and $IncludePolicyAnalysis -and $IncludeAuditEvidence }
+            Should -Invoke Add-IntuneAccessInsights -Times 1 -Exactly
             Should -Invoke Export-IntuneAccessReport -Times 1 -Exactly -ParameterFilter { $Path -eq $path -and $Force }
             Should -Invoke Invoke-Item -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq $path }
             $result.Tenant | Should -Be 'Example tenant'

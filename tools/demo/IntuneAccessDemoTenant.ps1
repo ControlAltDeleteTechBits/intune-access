@@ -67,6 +67,7 @@ function New-IntuneAccessDemoTenant {
         [pscustomobject]@{ id = '1'; displayName = 'UK';      description = 'United Kingdom objects';     isBuiltIn = $false }
         [pscustomobject]@{ id = '2'; displayName = 'US';      description = 'United States objects';      isBuiltIn = $false }
         [pscustomobject]@{ id = '3'; displayName = 'Finance'; description = 'Finance department objects'; isBuiltIn = $false }
+        [pscustomobject]@{ id = '4'; displayName = 'Retail'; description = 'Retail stores (no role assignment uses this tag)'; isBuiltIn = $false }
     )
 
     # Role definitions
@@ -166,7 +167,7 @@ function New-IntuneAccessDemoTenant {
         [pscustomobject]@{ id = Id 'ca000013' 3; displayName = 'Company Portal'; publisher = 'Microsoft Corporation'; '@odata.type' = '#microsoft.graph.winGetApp'; roleScopeTagIds = @('0'); isAssigned = $true }
     )
     $scripts = @(
-        [pscustomobject]@{ id = Id 'ca000014' 1; displayName = 'Set regional time zone'; description = 'Runs once at enrolment'; runAsAccount = 'system'; roleScopeTagIds = @('0') }
+        [pscustomobject]@{ id = Id 'ca000014' 1; displayName = 'Set regional time zone'; description = 'Runs once at enrolment'; runAsAccount = 'system'; roleScopeTagIds = @('4') }
     )
     $healthScripts = @(
         [pscustomobject]@{ id = Id 'ca000015' 1; displayName = 'Detect low system disk space'; description = 'Detection only'; publisher = 'Contoso'; deviceHealthScriptType = 'deviceHealthScript'; roleScopeTagIds = @('0') }
@@ -185,7 +186,7 @@ function New-IntuneAccessDemoTenant {
         $mobileApps[0].id            = @( Assign 8 (Target 'groupAssignmentTarget' $g['All Corporate Laptops'].id) 'required' )
         $mobileApps[1].id            = @( Assign 9 (Target 'groupAssignmentTarget' $g['Finance Users'].id) 'required' )
         $mobileApps[2].id            = @( Assign 10 (Target 'allLicensedUsersAssignmentTarget') 'available' )
-        $scripts[0].id               = @( Assign 11 (Target 'groupAssignmentTarget' $g['All Corporate Laptops'].id) )
+        $scripts[0].id               = @( Assign 11 (Target 'groupAssignmentTarget' $g['All Corporate Laptops'].id); Assign 14 (Target 'groupAssignmentTarget' (Id 'bb000002' 99)) )
         $healthScripts[0].id         = @( Assign 12 (Target 'allDevicesAssignmentTarget') )
         $featureUpdates[0].id        = @( Assign 13 (Target 'groupAssignmentTarget' $g['Windows Pilot Ring'].id) )
     }
@@ -246,7 +247,7 @@ function New-IntuneAccessDemoTenant {
 
     # Recent Intune audit events
     function Audit($n, [double] $daysAgo, $actor, $activity, $type, $resourceId, $resourceName, $resourceType, $prop, $old, $new) {
-        [pscustomobject]@{ id = Id 'ad000017' $n; displayName = $activity; componentName = 'DeviceConfiguration'; activity = $activity; activityDateTime = (Fixed $daysAgo); activityType = $type; activityOperationType = 'Patch'; activityResult = 'Success'; correlationId = [guid]::Empty.Guid; category = 'DeviceConfiguration'
+        [pscustomobject]@{ id = Id 'ad000017' $n; displayName = $activity; componentName = $(if ($resourceType -eq 'MobileApp') { 'Application' } else { 'DeviceConfiguration' }); activity = $activity; activityDateTime = (Fixed $daysAgo); activityType = $type; activityOperationType = 'Patch'; activityResult = 'Success'; correlationId = [guid]::Empty.Guid; category = $(if ($resourceType -eq 'MobileApp') { 'Application' } else { 'DeviceConfiguration' })
             actor = [pscustomobject]@{ type = 'ItPro'; userPrincipalName = $actor.userPrincipalName; userId = $actor.id; applicationDisplayName = 'Microsoft Intune portal extension'; ipAddress = '' }
             resources = @([pscustomobject]@{ resourceId = $resourceId; displayName = $resourceName; type = $resourceType; auditResourceType = $resourceType; modifiedProperties = @([pscustomobject]@{ displayName = $prop; oldValue = $old; newValue = $new }) }) }
     }

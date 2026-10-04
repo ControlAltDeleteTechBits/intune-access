@@ -1,11 +1,11 @@
 @{
     RootModule           = 'IntuneAccess.psm1'
-    ModuleVersion        = '4.1.0'
+    ModuleVersion        = '5.0.0'
     GUID                 = '9fc99074-cfcf-46db-b99b-830e5a81d0df'
     Author               = 'Mark Oldham'
     CompanyName          = 'Control Alt Delete Tech Bits'
     Copyright            = '(c) 2026 Control Alt Delete Tech Bits contributors. MIT licensed.'
-    Description          = 'Read-only Microsoft Intune evidence explorer. Quick start: Install-Module -Name IntuneAccess -Scope CurrentUser; Start-IntuneAccess'
+    Description          = 'Read-only Microsoft Intune evidence explorer: why a policy or app did not apply, what changed, what a group change will affect, who can do what, and Scoped permissions readiness. Quick start: Install-Module -Name IntuneAccess -Scope CurrentUser; Start-IntuneAccess'
     PowerShellVersion    = '7.0'
     CompatiblePSEditions = @('Core')
     RequiredModules      = @(
@@ -33,6 +33,11 @@
         'Get-IntunePolicyConflict'
         'Get-IntuneRoleAssignment'
         'Get-IntuneScopedPermissionImpact'
+        'Get-IntuneChangePreview'
+        'Get-IntuneChangeTimeline'
+        'Get-IntuneDeliveryChain'
+        'Get-IntunePrivilegeUsage'
+        'Get-IntuneScopedPermissionReadiness'
         'Get-IntuneScopeTagAudit'
         'Get-IntuneUser360'
         'Get-IntuneUpdateCompliance'
@@ -45,11 +50,11 @@
     FormatsToProcess     = @('IntuneAccess.Format.ps1xml')
     PrivateData          = @{
         PSData = @{
-            Tags         = @('Intune', 'RBAC', 'MicrosoftGraph', 'Security', 'ReadOnly', 'PSEdition_Core')
+            Tags         = @('Intune', 'RBAC', 'MicrosoftGraph', 'Security', 'ReadOnly', 'Troubleshooting', 'Audit', 'LeastPrivilege', 'ScopeTags', 'EntraID', 'PSEdition_Core')
             ProjectUri   = 'https://github.com/ControlAltDeleteTechBits/intune-access'
             LicenseUri   = 'https://github.com/ControlAltDeleteTechBits/intune-access/blob/main/LICENSE'
             IconUri      = 'https://raw.githubusercontent.com/ControlAltDeleteTechBits/intune-access/main/Assets/IntuneAccess-Gallery-Icon.svg'
-            ReleaseNotes = 'IntuneAccess 4.1.0: report opens on a triage page (why did it not apply, what changed, who can do this, what needs attention); live synthetic demonstration report; snapshot comparison no longer reports collection-time fields as changes; corrected V4 documentation; IME service package delivery limitation stated. No new Graph permissions. See RELEASE_NOTES.md. Quick start: Install-Module -Name IntuneAccess -Scope CurrentUser; Start-IntuneAccess.'
+            ReleaseNotes = 'IntuneAccess 5.0.0: why did a policy or app not apply (evidence chain with next check), what changed (audit, configuration and result timeline with failure correlation), change preview for groups, filters and scope tags, least-privilege review from Intune audit activity, and Scoped permissions readiness reconciled with the Permissions Assessment Report. Report opens on a triage page. Read only; no new Graph permissions. See RELEASE_NOTES.md. Quick start: Install-Module -Name IntuneAccess -Scope CurrentUser; Start-IntuneAccess.'
         }
     }
 }

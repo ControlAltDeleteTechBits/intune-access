@@ -18,6 +18,9 @@ function Start-IntuneAccess {
     .PARAMETER BaselineSnapshotPath
     Optional earlier snapshot to compare with the current collection. When supplied,
     a current snapshot is saved even when SnapshotPath is omitted.
+    .PARAMETER PermissionAssessmentPath
+    Optional .csv or .xlsx export of Microsoft's Permissions Assessment Report, used to reconcile the
+    Scoped permissions readiness view.
     .PARAMETER RedactSnapshotIdentity
     Pseudonymises tenant and identity values in the saved snapshot.
     .PARAMETER NoOpen
@@ -45,6 +48,9 @@ function Start-IntuneAccess {
 
         [ValidateNotNullOrEmpty()]
         [string] $BaselineSnapshotPath,
+
+        [ValidateNotNullOrEmpty()]
+        [string] $PermissionAssessmentPath,
 
         [switch] $NoOpen,
         [switch] $RedactSnapshotIdentity,
@@ -106,6 +112,10 @@ function Start-IntuneAccess {
             }
         }
 
+        Write-Progress -Activity $activity -Status 'Building delivery chains, change timeline and access reviews' -PercentComplete 75
+        $assessment = if ([string]::IsNullOrWhiteSpace($PermissionAssessmentPath)) { $null } else { Import-IntuneAccessPermissionAssessment -Path $PermissionAssessmentPath }
+        $null = Add-IntuneAccessInsights -Collection $tenantRbac -Assessment $assessment
+
         Write-Progress -Activity $activity -Status 'Generating the self-contained Signal Atlas explorer' -PercentComplete 80
         $report = $tenantRbac | Export-IntuneAccessReport -Path $Path -Force:$Force
 
@@ -135,6 +145,9 @@ function Start-IntuneAccess {
             DetectedApplications = @(Get-IntuneAccessProperty $tenantRbac 'DetectedApplications' @()).Count
             UpdateComplianceInvestigations = @(Get-IntuneAccessProperty $tenantRbac 'UpdateComplianceInvestigations' @()).Count
             EstateFindings     = @(Get-IntuneAccessProperty $tenantRbac 'EstateFindings' @()).Count
+            DeliveryProblems   = @(Get-IntuneAccessProperty $tenantRbac 'DeliveryChains' @() | Where-Object Verdict -In @('Failed', 'Excluded', 'FilteredOut', 'WaitingForDevice')).Count
+            CorrelatedChanges  = [int] (Get-IntuneAccessProperty (Get-IntuneAccessProperty $tenantRbac 'ChangeTimeline') 'CorrelatedChanges' 0)
+            ScopedPermissionReductions = @(Get-IntuneAccessProperty (Get-IntuneAccessProperty $tenantRbac 'ScopedReadiness') 'Rows' @()).Count
             ReportPath       = [string] $report.FullName
             Opened           = -not $NoOpen.IsPresent
             ReadOnly         = $true
