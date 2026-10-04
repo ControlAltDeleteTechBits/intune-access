@@ -27,6 +27,8 @@ function Get-IntuneAccessTenantRbac {
     $adminGroups = @($assignments | ForEach-Object AdminGroups | Where-Object { $null -ne $_ } | Group-Object Id | ForEach-Object { $_.Group[0] })
     $scopeGroups = @($assignments | ForEach-Object ScopeGroups | Where-Object { $null -ne $_ } | Group-Object Id | ForEach-Object { $_.Group[0] })
     $scopeTags = @($assignments | ForEach-Object ScopeTags | Where-Object { $null -ne $_ } | Group-Object Id | ForEach-Object { $_.Group[0] })
+    # Every scope tag in the tenant, so tags used on objects but on no role assignment can be named.
+    $allScopeTags = @(try { Get-IntuneAccessScopeTags } catch { Write-Verbose "The full scope tag list could not be read. $($_.Exception.Message)" })
     $connectedRoleIds = @($assignments | ForEach-Object { [string] $_.RoleDefinition.Id } | Where-Object { $_ } | Select-Object -Unique)
     $roleDefinitions = @($allDefinitions | Where-Object Id -In $connectedRoleIds)
     $memberships = @(Get-IntuneAccessAdminGroupUsers -Group $adminGroups)
@@ -238,6 +240,7 @@ function Get-IntuneAccessTenantRbac {
         RoleDefinitions        = @($roleDefinitions | Sort-Object DisplayName)
         ScopeGroups            = @($scopeGroups | Sort-Object DisplayName)
         ScopeTags              = @($scopeTags | Sort-Object DisplayName)
+        AllScopeTags           = @($allScopeTags | Sort-Object DisplayName)
         Permissions            = $permissions
         Memberships            = $memberships
         WorkloadObjects        = $workloadObjects

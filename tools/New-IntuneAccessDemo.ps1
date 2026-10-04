@@ -19,7 +19,10 @@ Folder that receives index.html. Defaults to ./demo-site under the repository ro
 [CmdletBinding()]
 param(
     [ValidateNotNullOrEmpty()]
-    [string] $OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'demo-site')
+    [string] $OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'demo-site'),
+
+    # Also return the collected demonstration model, for tests and local exploration.
+    [switch] $PassThruCollection
 )
 
 $ErrorActionPreference = 'Stop'
@@ -104,6 +107,12 @@ try {
     $current | Add-Member -NotePropertyName EstateHistoricalTrend -NotePropertyValue ([PSCustomObject] @{
         State = 'Compared'; Changes = @($comparison.Changes); Explanation = 'Changes were calculated locally from two synthetic snapshots one simulated day apart.'
     }) -Force
+    # Add the 5.0 insights. The fictional Permissions Assessment Report export shows reconciliation.
+    $assessmentPath = Join-Path $PSScriptRoot 'demo/permission-assessment.csv'
+    $null = & $module {
+        param($Collection, $Path, $AsOf)
+        Add-IntuneAccessInsights -Collection $Collection -Assessment (Import-IntuneAccessPermissionAssessment -Path $Path) -AsOf $AsOf
+    } $current $assessmentPath $now
     $current.Warnings = @('Demonstration report: every tenant, person, group, device, policy and result is fictional. No Microsoft tenant was accessed.') + @($current.Warnings)
 
     $reportPath = Join-Path $OutputDirectory 'index.html'
@@ -127,6 +136,7 @@ try {
         AuditEvents         = @($current.AuditEvents).Count
         SnapshotChanges     = @($comparison.Changes).Count
         Warnings            = @($current.Warnings)
+        Collection          = if ($PassThruCollection) { $current } else { $null }
     }
 }
 finally {

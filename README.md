@@ -1,8 +1,14 @@
 # IntuneAccess
 
-Version 4.0.0 adds findings, resolution guides and export-only investigation packages. See [V4 validation and testing limits](docs/v4-release-audit-current.md) before using the investigation outputs. Version 4.0.0 was published to the PowerShell Gallery and GitHub on 16 September 2026.
+IntuneAccess is a free, open source and read-only PowerShell tool that answers the questions Microsoft Intune administrators are asked every day, with the evidence behind each answer, in one offline report.
 
-V4 adds findings resolution guides, local expected decisions with review dates, selected change plan exports, an export-only reviewed PowerShell library, remediation effectiveness reporting and conservative verification between snapshots. IntuneAccess never uploads or executes the exported scripts. Change making scripts affect devices only if an administrator runs them separately.
+1. Why didn't this policy or app apply to this device? An ordered evidence chain from check-in, assignment, group targeting, exclusion and assignment filter to the result Intune reported. It stops at the first broken link and suggests the next check.
+2. What changed in Intune, and did anything break afterwards? Audit events, configuration changes and device results on one timeline, with changes that were followed by failures on the same workload marked.
+3. What will this change affect? Every policy, app, script, update and role assignment that depends on an Entra group, assignment filter or scope tag, before you change or delete it.
+4. Who can do this, and do they need to? Exact Intune RBAC permissions per administrator, compared with the changes the audit log shows they made.
+5. Who loses what when Scoped permissions is enabled? A per Admin Group prediction of Microsoft's irreversible Scoped permissions change, reconciled with Microsoft's Permissions Assessment Report export.
+
+Version 5.0.0 adds all five. Earlier releases added the Findings Centre, change plans, export-only investigation packs, Device and User 360, policy conflicts and snapshots; see the [release history](#release-history).
 
 IntuneAccess is an open source, read only PowerShell module that connects Microsoft Intune administration, workload targeting and evidence in one local report. It joins objects that are usually inspected one at a time: administrators, Microsoft Entra groups, Intune roles, scopes, configuration and compliance policies, endpoint security, applications, scripts, updates, targets and assignment filters.
 
@@ -168,11 +174,49 @@ Test-IntuneResourceAccess `
     -DeviceName 'LAPTOP-0234'
 ```
 
+## Answer everyday Intune questions from PowerShell
+
+Every 5.0 view is also a command that returns objects. Each can work offline from saved snapshots: `-SnapshotPath`, or two snapshot paths for the timeline.
+
+```powershell
+Connect-IntuneAccess -Feature Core, AssignmentExplorer, OperationalEvidence, DeviceIntelligence, AuditEvidence
+
+# Why didn't it apply? Problems only, for one device.
+Get-IntuneDeliveryChain -DeviceName 'LAPTOP-0234' -ProblemsOnly |
+    Format-Table WorkloadName, Verdict, StoppedAt, NextCheck
+
+# What changed between two snapshots, and what failed afterwards?
+(Get-IntuneChangeTimeline -ReferenceSnapshotPath .\monday.json -DifferenceSnapshotPath .\tuesday.json).Entries |
+    Format-Table Time, Kind, Title, Target, Actor, Correlated
+
+# What depends on this group before I delete it?
+Get-IntuneChangePreview -Name 'All Corporate Laptops'
+Get-IntuneChangePreview -FlaggedOnly
+
+# Which write permissions have not been used in the audit window?
+(Get-IntunePrivilegeUsage).Rows | Where-Object State -EQ 'NoObservedActivity'
+
+# Who loses which permissions when Scoped permissions is enabled?
+Get-IntuneScopedPermissionReadiness -AssessmentReportPath .\PermissionsAssessment.xlsx
+```
+
+Evidence boundaries stay explicit. A failure that follows a change is correlated in time, not proven to be caused by it. Read permissions are never reported as unused because Intune does not audit reads. Error codes are explained only where Microsoft publishes a meaning. IntuneAccess never reads or changes the Scoped permissions tenant setting.
+
+To reconcile the Scoped permissions view with Microsoft, export the report from Tenant administration > Roles > Settings > Generate Report > Export, then run:
+
+```powershell
+Start-IntuneAccess -PermissionAssessmentPath .\PermissionsAssessment.xlsx
+```
+
 ## Screenshot
 
-![IntuneAccess overview generated from the fictional demonstration tenant](screenshots/IntuneAccess-4.1-demo-overview.png)
+![IntuneAccess overview generated from the fictional demonstration tenant](screenshots/IntuneAccess-demo-overview.png)
 
-The screenshot is taken from the synthetic demonstration report. Regenerate it locally with `./tools/New-IntuneAccessDemo.ps1`.
+![Why didn't it apply? An evidence chain for a failed app installation](screenshots/IntuneAccess-why-didnt-it-apply.png)
+
+![What changed? An app detection rule change followed by failures on two devices](screenshots/IntuneAccess-what-changed.png)
+
+The screenshots are taken from the synthetic demonstration report. Regenerate it locally with `./tools/New-IntuneAccessDemo.ps1`.
 
 ## Requirements
 
@@ -431,8 +475,10 @@ The agreed versioned product plan is tracked in [docs/roadmap.md](docs/roadmap.m
 | 2.0 | Policy setting overlap, potential conflicts and the Intune audit trail |
 | 3.0 | Device inventory and hygiene, assignment explanation, Autopilot, applications, updates and estate intelligence |
 | 4.0 | Findings Centre, resolution guides, change plans, export-only investigation packs and snapshot verification |
+| 4.1 | Triage landing page, live demonstration report and documentation corrections (merged into 5.0) |
+| 5.0 | Why didn't it apply, what changed, change preview, privilege usage and Scoped permissions readiness |
 
-The module will remain read only. Device-changing remote actions are not part of the roadmap. Planned work, including Scoped permissions readiness in 4.2 and the change-confidence features in 5.0, is recorded in [docs/roadmap.md](docs/roadmap.md).
+The module will remain read only. Device-changing remote actions are not part of the roadmap. Planned work is recorded in [docs/roadmap.md](docs/roadmap.md).
 
 Research into current Intune gaps and candidate product opportunities is recorded in [docs/product-opportunities.md](docs/product-opportunities.md).
 

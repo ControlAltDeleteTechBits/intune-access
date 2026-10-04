@@ -1,0 +1,3 @@
+Group,Roles,Scope Tag,Resource,Old Permissions,New Permissions
+Intune App Packagers,"Application Manager, Read Only Operator",Finance,MobileApps,"Read, Create, Update, Assign",Read
+Intune Helpdesk US,Help Desk Operator,US,ManagedDevices,"Read, Remote Lock, Sync Device, Reboot Now, Wipe","Read, Remote Lock, Sync Device, Reboot Now"
